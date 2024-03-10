@@ -1,4 +1,4 @@
-package dac2dac.doc.tect;
+package dac2dac.doctect;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

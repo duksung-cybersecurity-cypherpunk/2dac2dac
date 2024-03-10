@@ -1,4 +1,4 @@
-package dac2dac.doc.tect;
+package dac2dac.doctect;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
