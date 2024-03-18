@@ -8,6 +8,7 @@ import dac2dac.doctect.common.error.exception.InterruptedException;
 import dac2dac.doctect.common.error.exception.NoSuchElementException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
+import dac2dac.doctect.common.response.ApiResult;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -27,90 +28,90 @@ public class RestExceptionHandler {
     // Custom Bad Request Error
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadRequestException.class)
-    protected ErrorResponse<String> handleBadRequestException(BadRequestException exception,
+    protected ApiResult<String> handleBadRequestException(BadRequestException exception,
         HttpServletRequest request) {
         logInfo(request, exception.getMessage());
-        return ErrorResponse.error(exception.getCode());
+        return ApiResult.error(exception.getCode());
     }
 
     // Custom Unauthorized Error
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(UnauthorizedException.class)
-    protected ErrorResponse<String> handleUnauthorizedException(UnauthorizedException exception,
+    protected ApiResult<String> handleUnauthorizedException(UnauthorizedException exception,
         HttpServletRequest request) {
         logInfo(request, exception.getMessage());
-        return ErrorResponse.error(exception.getCode());
+        return ApiResult.error(exception.getCode());
     }
 
     // Custom Internal Server Error
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(InternalServerErrorException.class)
-    protected ErrorResponse<String> handleInternalServerErrorException(
+    protected ApiResult<String> handleInternalServerErrorException(
         InternalServerErrorException exception,
         HttpServletRequest request) {
         logInfo(request, exception.getMessage());
-        return ErrorResponse.error(exception.getCode());
+        return ApiResult.error(exception.getCode());
     }
 
     // @RequestBody valid 에러
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ErrorResponse<String> handleMethodArgNotValidException(
+    protected ApiResult<String> handleMethodArgNotValidException(
         MethodArgumentNotValidException exception,
         HttpServletRequest request) {
         String message = exception.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         logInfo(request, message);
-        return ErrorResponse.error(HttpStatus.BAD_REQUEST, message);
+        return ApiResult.error(HttpStatus.BAD_REQUEST, message);
     }
 
     // @ModelAttribute valid 에러
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BindException.class)
-    protected ErrorResponse<String> handleMethodArgNotValidException(BindException exception,
+    protected ApiResult<String> handleMethodArgNotValidException(BindException exception,
         HttpServletRequest request) {
         String message = exception.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         logInfo(request, message);
-        return ErrorResponse.error(HttpStatus.BAD_REQUEST, message);
+        return ApiResult.error(HttpStatus.BAD_REQUEST, message);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
-    public ErrorResponse<String> handleNotFoundException(NotFoundException exception,
+    public ApiResult<String> handleNotFoundException(NotFoundException exception,
         HttpServletRequest request) {
         logInfo(request, exception.getMessage());
-        return ErrorResponse.error(exception.getCode());
+        return ApiResult.error(exception.getCode());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DuplicateException.class)
-    public ErrorResponse<String> handleDuplicationException(DuplicateException exception,
+    public ApiResult<String> handleDuplicationException(DuplicateException exception,
         HttpServletRequest request) {
         logInfo(request, exception.getMessage());
-        return ErrorResponse.error(exception.getCode());
+        return ApiResult.error(exception.getCode());
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(ForbiddenException.class)
-    public ErrorResponse<String> handlerForbiddenException(ForbiddenException exception,
+    public ApiResult<String> handlerForbiddenException(ForbiddenException exception,
         HttpServletRequest request) {
         logInfo(request, exception.getMessage());
-        return ErrorResponse.error(exception.getCode());
+        return ApiResult.error(exception.getCode());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NoSuchElementException.class)
-    public ErrorResponse<String> handlerNoSuchElementException(ForbiddenException exception,
+    public ApiResult<String> handlerNoSuchElementException(ForbiddenException exception,
         HttpServletRequest request) {
         logInfo(request, exception.getMessage());
-        return ErrorResponse.error(exception.getCode());
+        return ApiResult.error(exception.getCode());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(InterruptedException.class)
-    public ErrorResponse<String> handlerNoSuchElementException(InterruptedException exception,
+    public ApiResult<String> handlerNoSuchElementException(InterruptedException exception,
         HttpServletRequest request) {
         logInfo(request, exception.getMessage());
-        return ErrorResponse.error(exception.getCode());
+        return ApiResult.error(exception.getCode());
     }
 
     private void logInfo(HttpServletRequest request, String message) {

@@ -1,6 +1,6 @@
 package dac2dac.doctect.common.error.exception;
 
-import dac2dac.doctect.common.error.ErrorCode;
+import dac2dac.doctect.common.constant.ErrorCode;
 import lombok.Getter;
 
 @Getter

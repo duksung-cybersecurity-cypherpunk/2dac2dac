@@ -1,4 +1,4 @@
-package dac2dac.doctect.common.error;
+package dac2dac.doctect.common.constant;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
