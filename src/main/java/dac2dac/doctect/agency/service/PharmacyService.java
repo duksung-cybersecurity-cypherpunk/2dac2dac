@@ -1,49 +1,43 @@
 package dac2dac.doctect.agency.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dac2dac.doctect.agency.entity.Pharmacy;
 import dac2dac.doctect.agency.repository.PharmacyRepository;
+import dac2dac.doctect.agency.vo.PharmacyItem;
 import dac2dac.doctect.agency.vo.PharmacyItems;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PharmacyService {
 
-    private final RestClient restClient;
+    private final WebClient webClient;
     private final PharmacyRepository pharmacyRepository;
 
-    @Value("${open-api.pharmacy.api-key}") String PHARMACY_API_KEY;
+    @Value("${open-api.pharmacy.key}") String PHARMACY_API_KEY;
 
     @Transactional
-    public Object getAllPharmacyInfo() {
-        String pharmacyInfo = restClient.get()
+    public PharmacyItems getAllPharmacyInfo() {
+        PharmacyItems pharmacyInfo = webClient.get()
             .uri(uriBuilder -> uriBuilder
                 .queryParam("serviceKey", PHARMACY_API_KEY)
                 .queryParam("_type", "json")
                 .build())
             .retrieve()
-            .body(String.class);
+            .bodyToMono(PharmacyItems.class)
+            .block();
 
-        PharmacyItems items = null;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            items = mapper.readValue(pharmacyInfo, PharmacyItems.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        items.getPharmacyItems().stream().forEach(item -> {
+        List<PharmacyItem> items = pharmacyInfo.getPharmacyItems();
+        items.stream().forEach(item -> {
             Pharmacy pharmacy = item.toEntity();
-            System.out.println("pharmacy = " + pharmacy);
             pharmacyRepository.save(pharmacy);
         });
 
-        return items;
+        return pharmacyInfo;
     }
 }
