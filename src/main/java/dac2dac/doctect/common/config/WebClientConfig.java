@@ -15,8 +15,6 @@ import reactor.netty.http.client.HttpClient;
 
 @Configuration
 public class WebClientConfig {
-    @Value("${open-api.pharmacy.key}")
-    private String API_KEY;
 
     @Value("${open-api.pharmacy.base-url}")
     private String BASE_URL;
@@ -24,17 +22,15 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient(){
         HttpClient httpClient = HttpClient.create()
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-            .responseTimeout(Duration.ofMillis(5000))
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+            .responseTimeout(Duration.ofMillis(10000))
             .doOnConnected(conn ->
-                conn.addHandlerLast(new ReadTimeoutHandler(5000))
-                    .addHandlerLast(new WriteTimeoutHandler(5000)));
+                conn.addHandlerLast(new ReadTimeoutHandler(50000))
+                    .addHandlerLast(new WriteTimeoutHandler(10000)));
 
         return WebClient.builder()
             .baseUrl(BASE_URL)
             .clientConnector(new ReactorClientHttpConnector(httpClient))
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .defaultHeader("Authorization","Bearer " + API_KEY)
             .build();
     }
 }
