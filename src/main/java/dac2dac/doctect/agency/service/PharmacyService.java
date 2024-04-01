@@ -22,7 +22,7 @@ public class PharmacyService {
     @Value("${open-api.pharmacy.key}") String PHARMACY_API_KEY;
 
     @Transactional
-    public PharmacyItems getAllPharmacyInfo() {
+    public PharmacyItems saveAllPharmacyInfo() {
         PharmacyItems pharmacyInfo = webClient.get()
             .uri(uriBuilder -> uriBuilder
                 .queryParam("serviceKey", PHARMACY_API_KEY)
