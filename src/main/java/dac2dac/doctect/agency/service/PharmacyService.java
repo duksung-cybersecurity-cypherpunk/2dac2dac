@@ -4,31 +4,32 @@ import dac2dac.doctect.agency.entity.Pharmacy;
 import dac2dac.doctect.agency.repository.PharmacyRepository;
 import dac2dac.doctect.agency.vo.PharmacyItem;
 import dac2dac.doctect.agency.vo.PharmacyItems;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PharmacyService {
 
     private final WebClient webClient;
     private final PharmacyRepository pharmacyRepository;
 
-    @Value("${open-api.pharmacy.key}") String PHARMACY_API_KEY;
+    @Value("${open-api.pharmacy.key}")
+    private String PHARMACY_API_KEY;
 
-    @Transactional
+    @Value("${open-api.pharmacy.endpoint}")
+    private String PHARMACY_ENDPOINT;
+
     public void saveAllPharmacyInfo() throws ParseException {
         String pharmacyInfo = webClient.get()
             .uri(uriBuilder -> uriBuilder
+                .path(PHARMACY_ENDPOINT)
                 .queryParam("serviceKey", PHARMACY_API_KEY)
                 .queryParam("_type", "json")
                 .build())
@@ -50,30 +51,36 @@ public class PharmacyService {
 
         for (int i=1; i<=totalPage; i++) {
             int pageNo = i;
-            PharmacyItems pharmacies = webClient.get()
+
+            PharmacyItems pharmacyItems = webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                    .queryParam("ServiceKey", PHARMACY_API_KEY)
-                    .queryParam("pageNo", pageNo)
+                    .path(PHARMACY_ENDPOINT)
+                    .queryParam("serviceKey", PHARMACY_API_KEY)
                     .queryParam("_type", "json")
+                    .queryParam("pageNo", pageNo)
                     .build())
-                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(PharmacyItems.class)
+                .retry(3)
                 .block();
 
-            savePharmacyInfo(pharmacies);
+            try {
+                pharmacyItems.getPharmacyItems().forEach(item -> {
+                    if (isValidPharmacyItem(item)) {
+                        Pharmacy pharmacy = item.toEntity();
+                        pharmacyRepository.save(pharmacy);
+                    }
+                });
+            } catch (DataIntegrityViolationException e) {}
+
+            System.out.println("i = " + i);
+            System.out.println("pharmacyItems = " + pharmacyItems);
         }
     }
 
-    private void savePharmacyInfo(PharmacyItems pharmacies) {
-        List<PharmacyItem> items = pharmacies.getPharmacyItems();
-        items.stream()
-            .forEach(item -> {
-                // 필수 필드(이름, 주소, 전화번호, 위도, 경도)가 존재하는지 확인 후 DB에 저장
-                if (item.getName() != null && item.getAddress() != null && item.getTel() != null && item.getLongitude() != null && item.getLatitude() != null) {
-                    Pharmacy pharmacy = item.toEntity();
-                    pharmacyRepository.save(pharmacy);
-                }
-        });
+    private boolean isValidPharmacyItem(PharmacyItem item) {
+        return item.getName() != null && item.getAddress() != null &&
+            item.getTel() != null && item.getLongitude() != null &&
+            item.getLatitude() != null;
     }
 }

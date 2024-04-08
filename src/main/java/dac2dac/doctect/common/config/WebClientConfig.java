@@ -16,11 +16,11 @@ import reactor.netty.http.client.HttpClient;
 @Configuration
 public class WebClientConfig {
 
-    @Value("${open-api.pharmacy.base-url}")
+    @Value("${open-api.base-url}")
     private String BASE_URL;
 
     @Bean
-    public WebClient webClient(){
+    public WebClient pharmacyWebClient(){
         HttpClient httpClient = HttpClient.create()
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
             .responseTimeout(Duration.ofMillis(10000))
@@ -31,6 +31,7 @@ public class WebClientConfig {
         return WebClient.builder()
             .baseUrl(BASE_URL)
             .clientConnector(new ReactorClientHttpConnector(httpClient))
+//            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build();
     }
 }
