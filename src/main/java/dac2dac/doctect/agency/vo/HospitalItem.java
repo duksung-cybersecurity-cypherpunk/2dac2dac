@@ -2,13 +2,13 @@ package dac2dac.doctect.agency.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dac2dac.doctect.agency.entity.Pharmacy;
+import dac2dac.doctect.agency.entity.Hospital;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PharmacyItem {
+public class HospitalItem {
 
     @NotEmpty(message = "dutyName은 필수 값입니다.")
     @JsonProperty("dutyName")
@@ -18,12 +18,13 @@ public class PharmacyItem {
     @JsonProperty("dutyAddr")
     private String address;
 
-    @JsonProperty("dutyFax")
-    private String fax;
-
     @NotEmpty(message = "dutyTel1은 필수 값입니다.")
     @JsonProperty("dutyTel1")
     private String tel;
+
+    @NotEmpty(message = "dutyEryn은 필수 값입니다.")
+    @JsonProperty("dutyEryn")
+    private Boolean isErOperate;
 
     @NotEmpty(message = "wgs84Lat은 필수 값입니다.")
     @JsonProperty("wgs84Lat")
@@ -81,12 +82,12 @@ public class PharmacyItem {
     @JsonProperty("dutyTime8c")
     private Integer diagTimeHolidayClose;
 
-    public Pharmacy toEntity() {
-        return Pharmacy.builder()
+    public Hospital toEntity() {
+        return Hospital.builder()
             .name(name)
             .address(address)
             .tel(tel)
-            .fax(fax)
+            .isErOperate(isErOperate)
             .longitude(longitude)
             .latitude(latitude)
             .diagTimeMonOpen(diagTimeMonOpen)
@@ -107,5 +108,4 @@ public class PharmacyItem {
             .diagTimeHolidayClose(diagTimeHolidayClose)
             .build();
     }
-
 }
