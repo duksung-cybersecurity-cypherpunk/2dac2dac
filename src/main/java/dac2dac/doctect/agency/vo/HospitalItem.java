@@ -87,18 +87,12 @@ public class HospitalItem {
     private Integer diagTimeHolidayClose;
 
     public Hospital toEntity() {
-        System.out.println("dutyEryn = " + dutyEryn);
-        boolean isErOperate = false;
-        if (dutyEryn == 1) {
-            isErOperate = true;
-        }
-
         return Hospital.builder()
             .name(name)
             .address(address)
             .tel(tel)
             .diagDiv(diagDiv)
-            .isErOperate(isErOperate)
+            .isErOperate(checkErOperate(dutyEryn))
             .longitude(longitude)
             .latitude(latitude)
             .diagTimeMonOpen(diagTimeMonOpen)
@@ -118,5 +112,13 @@ public class HospitalItem {
             .diagTimeHolidayOpen(diagTimeHolidayOpen)
             .diagTimeHolidayClose(diagTimeHolidayClose)
             .build();
+    }
+
+    private boolean checkErOperate(Integer dutyEryn) {
+        boolean isErOperate = false;
+        if (dutyEryn == 1) {
+            isErOperate = true;
+        }
+        return isErOperate;
     }
 }
