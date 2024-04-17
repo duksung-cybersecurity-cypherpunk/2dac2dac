@@ -10,6 +10,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -39,8 +40,6 @@ public class PharmacyService {
             .bodyToMono(String.class)
             .block();
 
-        System.out.println("pharmacyInfo = " + pharmacyInfo);
-
         // JSON 문자열을 JSONObject로 변환하여 totalCount 값 Parsing
         JSONParser parser = new JSONParser();
         JSONObject jsonObject = (JSONObject) parser.parse(pharmacyInfo);
@@ -49,9 +48,9 @@ public class PharmacyService {
 
         int totalCount = ((Long) body.get("totalCount")).intValue();
         int numOfRows = ((Long) body.get("numOfRows")).intValue();
-        int totalPage = totalCount / numOfRows + 1;
+        int totalPage = (int) Math.ceil(totalCount / numOfRows);
 
-        for (int i=1; i<=totalPage; i++) {
+        for (int i = 1; i <= totalPage; i++) {
             int pageNo = i;
 
             PharmacyItems pharmacyItems = webClient.get()
@@ -61,6 +60,7 @@ public class PharmacyService {
                     .queryParam("_type", "json")
                     .queryParam("pageNo", pageNo)
                     .build())
+                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(PharmacyItems.class)
                 .retry(3)
@@ -73,7 +73,8 @@ public class PharmacyService {
                         pharmacyRepository.save(pharmacy);
                     }
                 });
-            } catch (DataIntegrityViolationException e) {}
+            } catch (DataIntegrityViolationException e) {
+            }
 
             System.out.println("i = " + i);
             System.out.println("pharmacyItems = " + pharmacyItems);
