@@ -13,7 +13,7 @@ public class OpenApiDataLoader implements ApplicationRunner {
 
     private final PharmacyService pharmacyService;
     private final HospitalService hospitalService;
-
+    
     @Override
     public void run(ApplicationArguments args) throws Exception {
         pharmacyService.saveAllPharmacyInfo();

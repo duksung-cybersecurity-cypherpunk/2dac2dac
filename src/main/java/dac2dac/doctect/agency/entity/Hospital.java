@@ -21,6 +21,7 @@ public class Hospital {
     private String name;
     private String address;
     private String tel;
+    private String diagDiv;
     private boolean isErOperate;
 
     private Double longitude;
@@ -51,13 +52,14 @@ public class Hospital {
     private Integer diagTimeHolidayClose;
 
     @Builder
-    public Hospital(String name, String address, String tel, Boolean isErOperate, Double longitude, Double latitude, Integer diagTimeMonOpen, Integer diagTimeMonClose, Integer diagTimeTuesOpen,
-        Integer diagTimeTuesClose, Integer diagTimeWedsOpen, Integer diagTimeWedsClose, Integer diagTimeThursOpen, Integer diagTimeThursClose, Integer diagTimeFriOpen, Integer diagTimeFriClose,
-        Integer diagTimeSatOpen, Integer diagTimeSatClose, Integer diagTimeSunOpen, Integer diagTimeSunClose, Integer diagTimeHolidayOpen, Integer diagTimeHolidayClose) {
+    public Hospital(String name, String address, String tel, String diagDiv, Boolean isErOperate, Double longitude, Double latitude, Integer diagTimeMonOpen, Integer diagTimeMonClose,
+        Integer diagTimeTuesOpen, Integer diagTimeTuesClose, Integer diagTimeWedsOpen, Integer diagTimeWedsClose, Integer diagTimeThursOpen, Integer diagTimeThursClose, Integer diagTimeFriOpen,
+        Integer diagTimeFriClose, Integer diagTimeSatOpen, Integer diagTimeSatClose, Integer diagTimeSunOpen, Integer diagTimeSunClose, Integer diagTimeHolidayOpen, Integer diagTimeHolidayClose) {
         this.name = name;
         this.address = address;
         this.tel = tel;
-        this.isErOperate = isErOperate();
+        this.diagDiv = diagDiv;
+        this.isErOperate = isErOperate;
         this.longitude = longitude;
         this.latitude = latitude;
         this.diagTimeMonOpen = diagTimeMonOpen;

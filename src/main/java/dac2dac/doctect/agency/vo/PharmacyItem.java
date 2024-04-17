@@ -3,33 +3,33 @@ package dac2dac.doctect.agency.vo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dac2dac.doctect.agency.entity.Pharmacy;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PharmacyItem {
 
-    @NotEmpty(message = "dutyName은 필수 값입니다.")
+    @NotBlank(message = "dutyName은 필수 값입니다.")
     @JsonProperty("dutyName")
     private String name;
 
-    @NotEmpty(message = "dutyAddr은 필수 값입니다.")
+    @NotBlank(message = "dutyAddr은 필수 값입니다.")
     @JsonProperty("dutyAddr")
     private String address;
 
     @JsonProperty("dutyFax")
     private String fax;
 
-    @NotEmpty(message = "dutyTel1은 필수 값입니다.")
+    @NotBlank(message = "dutyTel1은 필수 값입니다.")
     @JsonProperty("dutyTel1")
     private String tel;
 
-    @NotEmpty(message = "wgs84Lat은 필수 값입니다.")
+    @NotBlank(message = "wgs84Lat은 필수 값입니다.")
     @JsonProperty("wgs84Lat")
     private Double latitude;
 
-    @NotEmpty(message = "wgs84Lon은 필수 값입니다.")
+    @NotBlank(message = "wgs84Lon은 필수 값입니다.")
     @JsonProperty("wgs84Lon")
     private Double longitude;
 

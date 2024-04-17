@@ -3,34 +3,38 @@ package dac2dac.doctect.agency.vo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dac2dac.doctect.agency.entity.Hospital;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HospitalItem {
 
-    @NotEmpty(message = "dutyName은 필수 값입니다.")
+    @NotBlank(message = "dutyName은 필수 값입니다.")
     @JsonProperty("dutyName")
     private String name;
 
-    @NotEmpty(message = "dutyAddr은 필수 값입니다.")
+    @NotBlank(message = "dutyAddr은 필수 값입니다.")
     @JsonProperty("dutyAddr")
     private String address;
 
-    @NotEmpty(message = "dutyTel1은 필수 값입니다.")
+    @NotBlank(message = "dutyTel1은 필수 값입니다.")
     @JsonProperty("dutyTel1")
     private String tel;
 
-    @NotEmpty(message = "dutyEryn은 필수 값입니다.")
-    @JsonProperty("dutyEryn")
-    private Boolean isErOperate;
+    @NotBlank(message = "dutyDivNam은 필수 값입니다.")
+    @JsonProperty("dutyDivNam")
+    private String diagDiv;
 
-    @NotEmpty(message = "wgs84Lat은 필수 값입니다.")
+    @NotBlank(message = "dutyEryn은 필수 값입니다.")
+    @JsonProperty("dutyEryn")
+    private Integer dutyEryn;
+
+    @NotBlank(message = "wgs84Lat은 필수 값입니다.")
     @JsonProperty("wgs84Lat")
     private Double latitude;
 
-    @NotEmpty(message = "wgs84Lon은 필수 값입니다.")
+    @NotBlank(message = "wgs84Lon은 필수 값입니다.")
     @JsonProperty("wgs84Lon")
     private Double longitude;
 
@@ -83,10 +87,17 @@ public class HospitalItem {
     private Integer diagTimeHolidayClose;
 
     public Hospital toEntity() {
+        System.out.println("dutyEryn = " + dutyEryn);
+        boolean isErOperate = false;
+        if (dutyEryn == 1) {
+            isErOperate = true;
+        }
+
         return Hospital.builder()
             .name(name)
             .address(address)
             .tel(tel)
+            .diagDiv(diagDiv)
             .isErOperate(isErOperate)
             .longitude(longitude)
             .latitude(latitude)
