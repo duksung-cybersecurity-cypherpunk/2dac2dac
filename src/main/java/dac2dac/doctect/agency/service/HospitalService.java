@@ -10,6 +10,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -26,6 +27,7 @@ public class HospitalService {
     @Value("${open-api.hospital.endpoint}")
     private String HOSPITAL_ENDPOINT;
 
+    @Async
     public void saveAllHospitalInfo() throws ParseException {
         String hospitalInfo = webClient.get()
             .uri(uriBuilder -> uriBuilder
