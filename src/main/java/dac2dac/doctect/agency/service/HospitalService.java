@@ -2,9 +2,9 @@ package dac2dac.doctect.agency.service;
 
 import dac2dac.doctect.agency.entity.Hospital;
 import dac2dac.doctect.agency.repository.HospitalRepository;
-import dac2dac.doctect.agency.vo.HospitalItem;
 import dac2dac.doctect.agency.vo.HospitalItems;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class HospitalService {
 
     private final WebClient webClient;
@@ -68,22 +69,13 @@ public class HospitalService {
 
             try {
                 hospitalItems.getHospitalItems().forEach(item -> {
-                    if (isValidHospitalItem(item)) {
-                        Hospital hospital = item.toEntity();
-                        hospitalRepository.save(hospital);
-                    }
+                    Hospital hospital = item.toEntity();
+                    hospitalRepository.save(hospital);
                 });
             } catch (DataIntegrityViolationException e) {
             }
 
-            System.out.println("i = " + i);
-            System.out.println("hospitalItems = " + hospitalItems);
+            log.info("pageNo: {} :: hospitalItems: {}", i, hospitalItems);
         }
-    }
-
-    private boolean isValidHospitalItem(HospitalItem item) {
-        return item.getName() != null && item.getAddress() != null &&
-            item.getTel() != null && item.getLongitude() != null &&
-            item.getLatitude() != null;
     }
 }

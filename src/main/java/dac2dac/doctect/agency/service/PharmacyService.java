@@ -2,9 +2,9 @@ package dac2dac.doctect.agency.service;
 
 import dac2dac.doctect.agency.entity.Pharmacy;
 import dac2dac.doctect.agency.repository.PharmacyRepository;
-import dac2dac.doctect.agency.vo.PharmacyItem;
 import dac2dac.doctect.agency.vo.PharmacyItems;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PharmacyService {
 
     private final WebClient webClient;
@@ -68,22 +69,13 @@ public class PharmacyService {
 
             try {
                 pharmacyItems.getPharmacyItems().forEach(item -> {
-                    if (isValidPharmacyItem(item)) {
-                        Pharmacy pharmacy = item.toEntity();
-                        pharmacyRepository.save(pharmacy);
-                    }
+                    Pharmacy pharmacy = item.toEntity();
+                    pharmacyRepository.save(pharmacy);
                 });
             } catch (DataIntegrityViolationException e) {
             }
 
-            System.out.println("i = " + i);
-            System.out.println("pharmacyItems = " + pharmacyItems);
+            log.info("pageNo: {} :: hospitalItems: {}", i, pharmacyItems);
         }
-    }
-
-    private boolean isValidPharmacyItem(PharmacyItem item) {
-        return item.getName() != null && item.getAddress() != null &&
-            item.getTel() != null && item.getLongitude() != null &&
-            item.getLatitude() != null;
     }
 }
