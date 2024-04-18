@@ -38,6 +38,10 @@ public class HospitalItem {
     @JsonProperty("wgs84Lon")
     private Double longitude;
 
+    @NotBlank(message = "hpid는 필수 값입니다.")
+    @JsonProperty("hpid")
+    private String hpid;
+
     @JsonProperty("dutyTime1s")
     private Integer diagTimeMonOpen;
 
@@ -88,30 +92,31 @@ public class HospitalItem {
 
     public Hospital toEntity() {
         return Hospital.builder()
-            .name(name)
-            .address(address)
-            .tel(tel)
-            .diagDiv(diagDiv)
-            .isErOperate(checkErOperate(dutyEryn))
-            .longitude(longitude)
-            .latitude(latitude)
-            .diagTimeMonOpen(diagTimeMonOpen)
-            .diagTimeMonClose(diagTimeMonClose)
-            .diagTimeTuesOpen(diagTimeTuesOpen)
-            .diagTimeTuesClose(diagTimeTuesClose)
-            .diagTimeWedsOpen(diagTimeWedsOpen)
-            .diagTimeWedsClose(diagTimeWedsClose)
-            .diagTimeThursOpen(diagTimeThursOpen)
-            .diagTimeThursClose(diagTimeThursClose)
-            .diagTimeFriOpen(diagTimeFriOpen)
-            .diagTimeFriClose(diagTimeFriClose)
-            .diagTimeSatOpen(diagTimeSatOpen)
-            .diagTimeSatClose(diagTimeSatClose)
-            .diagTimeSunOpen(diagTimeSunOpen)
-            .diagTimeSunClose(diagTimeSunClose)
-            .diagTimeHolidayOpen(diagTimeHolidayOpen)
-            .diagTimeHolidayClose(diagTimeHolidayClose)
-            .build();
+                .name(name)
+                .address(address)
+                .tel(tel)
+                .diagDiv(diagDiv)
+                .isErOperate(checkErOperate(dutyEryn))
+                .longitude(longitude)
+                .latitude(latitude)
+                .hpid(hpid)
+                .diagTimeMonOpen(diagTimeMonOpen)
+                .diagTimeMonClose(diagTimeMonClose)
+                .diagTimeTuesOpen(diagTimeTuesOpen)
+                .diagTimeTuesClose(diagTimeTuesClose)
+                .diagTimeWedsOpen(diagTimeWedsOpen)
+                .diagTimeWedsClose(diagTimeWedsClose)
+                .diagTimeThursOpen(diagTimeThursOpen)
+                .diagTimeThursClose(diagTimeThursClose)
+                .diagTimeFriOpen(diagTimeFriOpen)
+                .diagTimeFriClose(diagTimeFriClose)
+                .diagTimeSatOpen(diagTimeSatOpen)
+                .diagTimeSatClose(diagTimeSatClose)
+                .diagTimeSunOpen(diagTimeSunOpen)
+                .diagTimeSunClose(diagTimeSunClose)
+                .diagTimeHolidayOpen(diagTimeHolidayOpen)
+                .diagTimeHolidayClose(diagTimeHolidayClose)
+                .build();
     }
 
     private boolean checkErOperate(Integer dutyEryn) {
