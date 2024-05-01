@@ -1,5 +1,6 @@
 package dac2dac.doctect.agency.entity;
 
+import dac2dac.doctect.agency.entity.constant.AgencyType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,14 +19,8 @@ public class Hospital extends Agency {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String address;
-    private String tel;
     private String diagDiv;
     private boolean isErOperate;
-
-    private Double longitude;
-    private Double latitude;
 
     private String hpid;
 
@@ -57,6 +52,11 @@ public class Hospital extends Agency {
         this.diagTimeSunClose = diagTimeSunClose;
         this.diagTimeHolidayOpen = diagTimeHolidayOpen;
         this.diagTimeHolidayClose = diagTimeHolidayClose;
+    }
+
+    @Override
+    public AgencyType getAgencyType() {
+        return AgencyType.HOSPITAL;
     }
 
 }

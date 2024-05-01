@@ -1,5 +1,6 @@
 package dac2dac.doctect.agency.entity;
 
+import dac2dac.doctect.agency.entity.constant.AgencyType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,13 +19,7 @@ public class Pharmacy extends Agency {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String address;
-    private String tel;
     private String fax;
-
-    private Double longitude;
-    private Double latitude;
 
     @Builder
     public Pharmacy(String name, String address, String tel, String fax, Double longitude, Double latitude, Integer diagTimeMonOpen, Integer diagTimeMonClose, Integer diagTimeTuesOpen,
@@ -52,5 +47,10 @@ public class Pharmacy extends Agency {
         this.diagTimeSunClose = diagTimeSunClose;
         this.diagTimeHolidayOpen = diagTimeHolidayOpen;
         this.diagTimeHolidayClose = diagTimeHolidayClose;
+    }
+
+    @Override
+    public AgencyType getAgencyType() {
+        return AgencyType.PHARMACY;
     }
 }

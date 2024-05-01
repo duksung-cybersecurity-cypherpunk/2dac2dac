@@ -1,5 +1,6 @@
 package dac2dac.doctect.agency.entity;
 
+import dac2dac.doctect.agency.entity.constant.AgencyType;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +13,14 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Agency {
 
-    public Integer diagTimeMonOpen;
+    protected String name;
+    protected String address;
+    protected String tel;
+
+    protected Double longitude;
+    protected Double latitude;
+
+    protected Integer diagTimeMonOpen;
     protected Integer diagTimeMonClose;
 
     protected Integer diagTimeTuesOpen;
@@ -35,5 +43,7 @@ public abstract class Agency {
 
     protected Integer diagTimeHolidayOpen;
     protected Integer diagTimeHolidayClose;
+
+    public abstract AgencyType getAgencyType();
 
 }

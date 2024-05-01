@@ -1,10 +1,8 @@
 package dac2dac.doctect.agency.service;
 
 import dac2dac.doctect.agency.dto.request.UserLocationDto;
-import dac2dac.doctect.agency.dto.response.HospitalPreviewDto;
-import dac2dac.doctect.agency.dto.response.HospitalPreviewListDto;
-import dac2dac.doctect.agency.dto.response.PharmacyPreviewDto;
-import dac2dac.doctect.agency.dto.response.PharmacyPreviewListDto;
+import dac2dac.doctect.agency.dto.response.AgencySearchResultDto;
+import dac2dac.doctect.agency.dto.response.AgencySearchResultListDto;
 import dac2dac.doctect.agency.entity.Agency;
 import dac2dac.doctect.agency.entity.Hospital;
 import dac2dac.doctect.agency.entity.Pharmacy;
@@ -16,8 +14,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,14 +28,24 @@ public class AgencyService {
     private final PharmacyRepository pharmacyRepository;
     private final HospitalRepository hospitalRepository;
 
-    public PharmacyPreviewListDto searchAgency(UserLocationDto userLocationDto) {
-        PharmacyPreviewListDto pharmacyPreviewList = getNearbyPharmacy(userLocationDto);
-        HospitalPreviewListDto hospitalPreviewList = getNearbyHospital(userLocationDto);
+    public AgencySearchResultListDto searchAgency(UserLocationDto userLocationDto) {
+        AgencySearchResultListDto pharmacyPreviewList = getNearbyPharmacy(userLocationDto);
+        AgencySearchResultListDto hospitalPreviewList = getNearbyHospital(userLocationDto);
 
-        return pharmacyPreviewList;
+        List<AgencySearchResultDto> agencySearchResultList = Stream.concat(
+                pharmacyPreviewList.getAgencySearchResultList().stream(),
+                hospitalPreviewList.getAgencySearchResultList().stream()
+            )
+            .sorted(Comparator.comparing(AgencySearchResultDto::getDistance))
+            .collect(Collectors.toList());
+
+        return AgencySearchResultListDto.builder()
+            .totalCnt(agencySearchResultList.size())
+            .agencySearchResultList(agencySearchResultList)
+            .build();
     }
 
-    public HospitalPreviewListDto getNearbyHospital(UserLocationDto userLocationDto) {
+    public AgencySearchResultListDto getNearbyHospital(UserLocationDto userLocationDto) {
         double radius = 2.0;
 
         List<Hospital> nearbyHospitals = hospitalRepository.findNearbyHospitals(userLocationDto.getLatitude(), userLocationDto.getLongitude(), radius);
@@ -43,19 +53,19 @@ public class AgencyService {
             throw new NotFoundException(ErrorCode.NEARBY_HOSPITAL_NOT_FOUND);
         }
 
-        List<HospitalPreviewDto> hospitalPreviewDtoList = nearbyHospitals.stream()
-            .map(h -> createHospitalPreviewDto(h, userLocationDto))
+        List<AgencySearchResultDto> hospitalPreviewDtoList = nearbyHospitals.stream()
+            .map(h -> createAgencySearchResultDto(h, userLocationDto))
             .collect(Collectors.toList());
 
-        HospitalPreviewListDto hospitalPreviewListDto = HospitalPreviewListDto.builder()
+        AgencySearchResultListDto hospitalPreviewListDto = AgencySearchResultListDto.builder()
             .totalCnt(hospitalPreviewDtoList.size())
-            .hospitalPreviewList(hospitalPreviewDtoList)
+            .agencySearchResultList(hospitalPreviewDtoList)
             .build();
 
         return hospitalPreviewListDto;
     }
 
-    public PharmacyPreviewListDto getNearbyPharmacy(UserLocationDto userLocationDto) {
+    public AgencySearchResultListDto getNearbyPharmacy(UserLocationDto userLocationDto) {
         double radius = 2.0; // 검색 반경 설정 (예: 2.0km)
 
         List<Pharmacy> nearbyPharmacies = pharmacyRepository.findNearbyPharmacies(userLocationDto.getLatitude(), userLocationDto.getLongitude(), radius);
@@ -63,41 +73,30 @@ public class AgencyService {
             throw new NotFoundException(ErrorCode.NEARBY_PHARMACY_NOT_FOUND);
         }
 
-        List<PharmacyPreviewDto> pharmacyPreviewDtoList = nearbyPharmacies.stream()
-            .map(p -> createPharmacyPreviewDto(p, userLocationDto))
+        List<AgencySearchResultDto> pharmacyPreviewDtoList = nearbyPharmacies.stream()
+            .map(p -> createAgencySearchResultDto(p, userLocationDto))
             .collect(Collectors.toList());
 
-        PharmacyPreviewListDto pharmacyPreviewListDto = PharmacyPreviewListDto.builder()
+        AgencySearchResultListDto pharmacyPreviewListDto = AgencySearchResultListDto.builder()
             .totalCnt(pharmacyPreviewDtoList.size())
-            .pharmacyPreviewList(pharmacyPreviewDtoList)
+            .agencySearchResultList(pharmacyPreviewDtoList)
             .build();
 
         return pharmacyPreviewListDto;
     }
 
-    private HospitalPreviewDto createHospitalPreviewDto(Hospital h, UserLocationDto userLocation) {
-        return HospitalPreviewDto.builder()
-            .name(h.getName())
-            .todayOpenTime(findTodayOpenTime(h))
-            .todayCloseTime(findTodayCloseTime(h))
-            .isOpen(isAgencyOpen(h))
-            .distance(calculateDistance(h.getLatitude(), h.getLongitude(), userLocation.getLatitude(), userLocation.getLongitude()))
-            .longtitude(h.getLongitude())
-            .latitude(h.getLatitude())
-            .build();
-    }
-
-    private PharmacyPreviewDto createPharmacyPreviewDto(Pharmacy p, UserLocationDto userLocation) {
-        return PharmacyPreviewDto.builder()
-            .name(p.getName())
-            .todayOpenTime(findTodayOpenTime(p))
-            .todayCloseTime(findTodayCloseTime(p))
-            .isOpen(isAgencyOpen(p))
-            .address(p.getAddress())
-            .tel(p.getTel())
-            .distance(calculateDistance(p.getLatitude(), p.getLongitude(), userLocation.getLatitude(), userLocation.getLongitude()))
-            .longtitude(p.getLongitude())
-            .latitude(p.getLatitude())
+    private AgencySearchResultDto createAgencySearchResultDto(Agency a, UserLocationDto userLocation) {
+        return AgencySearchResultDto.builder()
+            .name(a.getName())
+            .todayOpenTime(findTodayOpenTime(a))
+            .todayCloseTime(findTodayCloseTime(a))
+            .isOpen(isAgencyOpen(a))
+            .address(a.getAddress())
+            .tel(a.getTel())
+            .distance(calculateDistance(a.getLatitude(), a.getLongitude(), userLocation.getLatitude(), userLocation.getLongitude()))
+            .longtitude(a.getLongitude())
+            .latitude(a.getLatitude())
+            .agencyType(a.getAgencyType())
             .build();
     }
 
@@ -111,14 +110,14 @@ public class AgencyService {
         return earthRadius * Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));
     }
 
-    private static <T> boolean isAgencyOpen(Agency t) {
-        Integer todayOpenTime = findTodayOpenTime(t);
-        Integer todayCloseTime = findTodayCloseTime(t);
+    private static <T> boolean isAgencyOpen(Agency agency) {
+        Integer todayOpenTime = findTodayOpenTime(agency);
+        Integer todayCloseTime = findTodayCloseTime(agency);
 
         if (todayOpenTime != null && todayCloseTime != null) {
             // LocalTime으로 변환
-            LocalTime startTime = LocalTime.parse(String.format("%04d", findTodayOpenTime(t)), DateTimeFormatter.ofPattern("HHmm"));
-            LocalTime endTime = LocalTime.parse(String.format("%04d", findTodayCloseTime(t)), DateTimeFormatter.ofPattern("HHmm"));
+            LocalTime startTime = LocalTime.parse(String.format("%04d", findTodayOpenTime(agency)), DateTimeFormatter.ofPattern("HHmm"));
+            LocalTime endTime = LocalTime.parse(String.format("%04d", findTodayCloseTime(agency)), DateTimeFormatter.ofPattern("HHmm"));
             LocalTime now = LocalTime.now();
 
             // 현재 시간이 오픈 시간과 클로즈 시간 사이에 있는지 확인
