@@ -8,6 +8,12 @@ import dac2dac.doctect.agency.repository.PharmacyRepository;
 import dac2dac.doctect.agency.vo.PharmacyItems;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,13 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,17 +40,17 @@ public class PharmacyService {
     @Async
     public void savePharmacyInfo(int pageNo) {
         PharmacyItems pharmacyItems = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(PHARMACY_ENDPOINT)
-                        .queryParam("serviceKey", PHARMACY_API_KEY)
-                        .queryParam("_type", "json")
-                        .queryParam("pageNo", pageNo)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(PharmacyItems.class)
-                .retry(3)
-                .block();
+            .uri(uriBuilder -> uriBuilder
+                .path(PHARMACY_ENDPOINT)
+                .queryParam("serviceKey", PHARMACY_API_KEY)
+                .queryParam("_type", "json")
+                .queryParam("pageNo", pageNo)
+                .build())
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToMono(PharmacyItems.class)
+            .retry(3)
+            .block();
 
         try {
             pharmacyItems.getPharmacyItems().forEach(item -> {
@@ -73,26 +72,27 @@ public class PharmacyService {
         }
 
         List<PharmacyPreviewDto> pharmacyPreviewDtoList = nearbyPharmacies.stream()
-                .map(p -> createPharmacyPreviewDto(p, userLocationDto))
-                .collect(Collectors.toList());
+            .map(p -> createPharmacyPreviewDto(p, userLocationDto))
+            .collect(Collectors.toList());
 
         PharmacyPreviewListDto pharmacyPreviewListDto = PharmacyPreviewListDto.builder()
-                .totalCnt(pharmacyPreviewDtoList.size())
-                .pharmacyPreviewList(pharmacyPreviewDtoList)
-                .build();
+            .totalCnt(pharmacyPreviewDtoList.size())
+            .pharmacyPreviewList(pharmacyPreviewDtoList)
+            .build();
 
         return pharmacyPreviewListDto;
     }
 
     private PharmacyPreviewDto createPharmacyPreviewDto(Pharmacy p, UserLocationDto userLocation) {
         return PharmacyPreviewDto.builder()
-                .name(p.getName())
-                .todayOpenTime(findTodayOpenTime(p))
-                .todayCloseTime(findTodayCloseTime(p))
-                .isOpen(isPharmacyOpen(p))
-                .distance(calculateDistance(p.getLatitude(), p.getLongitude(), userLocation.getLatitude(), userLocation.getLongitude()))
-                .address(p.getAddress())
-                .build();
+            .name(p.getName())
+            .todayOpenTime(findTodayOpenTime(p))
+            .todayCloseTime(findTodayCloseTime(p))
+            .isOpen(isPharmacyOpen(p))
+            .distance(calculateDistance(p.getLatitude(), p.getLongitude(), userLocation.getLatitude(), userLocation.getLongitude()))
+            .address(p.getAddress())
+            .tel(p.getTel())
+            .build();
     }
 
     private boolean isPharmacyOpen(Pharmacy p) {
