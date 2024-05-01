@@ -94,7 +94,7 @@ public class AgencyService {
             .name(a.getName())
             .todayOpenTime(findTodayOpenTime(a))
             .todayCloseTime(findTodayCloseTime(a))
-            .isOpen(isAgencyOpen(a))
+            .isOpen(isAgencyOpenNow(a))
             .address(a.getAddress())
             .tel(a.getTel())
             .distance(calculateDistance(a.getLatitude(), a.getLongitude(), latitude, longitude))
@@ -114,14 +114,14 @@ public class AgencyService {
         return earthRadius * Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));
     }
 
-    private static <T> boolean isAgencyOpen(Agency agency) {
+    private static <T> boolean isAgencyOpenNow(Agency agency) {
         Integer todayOpenTime = findTodayOpenTime(agency);
         Integer todayCloseTime = findTodayCloseTime(agency);
 
         if (todayOpenTime != null && todayCloseTime != null) {
             // LocalTime으로 변환
-            LocalTime startTime = LocalTime.parse(String.format("%04d", findTodayOpenTime(agency)), DateTimeFormatter.ofPattern("HHmm"));
-            LocalTime endTime = LocalTime.parse(String.format("%04d", findTodayCloseTime(agency)), DateTimeFormatter.ofPattern("HHmm"));
+            LocalTime startTime = LocalTime.parse(String.format("%04d", todayOpenTime), DateTimeFormatter.ofPattern("HHmm"));
+            LocalTime endTime = LocalTime.parse(String.format("%04d", todayCloseTime), DateTimeFormatter.ofPattern("HHmm"));
             LocalTime now = LocalTime.now();
 
             // 현재 시간이 오픈 시간과 클로즈 시간 사이에 있는지 확인
