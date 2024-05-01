@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Pharmacy {
+public class Pharmacy extends Agency {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,30 +25,6 @@ public class Pharmacy {
 
     private Double longitude;
     private Double latitude;
-
-    private Integer diagTimeMonOpen;
-    private Integer diagTimeMonClose;
-
-    private Integer diagTimeTuesOpen;
-    private Integer diagTimeTuesClose;
-
-    private Integer diagTimeWedsOpen;
-    private Integer diagTimeWedsClose;
-
-    private Integer diagTimeThursOpen;
-    private Integer diagTimeThursClose;
-
-    private Integer diagTimeFriOpen;
-    private Integer diagTimeFriClose;
-
-    private Integer diagTimeSatOpen;
-    private Integer diagTimeSatClose;
-
-    private Integer diagTimeSunOpen;
-    private Integer diagTimeSunClose;
-
-    private Integer diagTimeHolidayOpen;
-    private Integer diagTimeHolidayClose;
 
     @Builder
     public Pharmacy(String name, String address, String tel, String fax, Double longitude, Double latitude, Integer diagTimeMonOpen, Integer diagTimeMonClose, Integer diagTimeTuesOpen,

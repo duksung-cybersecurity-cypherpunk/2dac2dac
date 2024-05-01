@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Hospital {
+public class Hospital extends Agency {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,34 +29,10 @@ public class Hospital {
 
     private String hpid;
 
-    private Integer diagTimeMonOpen;
-    private Integer diagTimeMonClose;
-
-    private Integer diagTimeTuesOpen;
-    private Integer diagTimeTuesClose;
-
-    private Integer diagTimeWedsOpen;
-    private Integer diagTimeWedsClose;
-
-    private Integer diagTimeThursOpen;
-    private Integer diagTimeThursClose;
-
-    private Integer diagTimeFriOpen;
-    private Integer diagTimeFriClose;
-
-    private Integer diagTimeSatOpen;
-    private Integer diagTimeSatClose;
-
-    private Integer diagTimeSunOpen;
-    private Integer diagTimeSunClose;
-
-    private Integer diagTimeHolidayOpen;
-    private Integer diagTimeHolidayClose;
-
     @Builder
     public Hospital(String name, String address, String tel, String diagDiv, Boolean isErOperate, Double longitude, Double latitude, String hpid, Integer diagTimeMonOpen, Integer diagTimeMonClose,
-                    Integer diagTimeTuesOpen, Integer diagTimeTuesClose, Integer diagTimeWedsOpen, Integer diagTimeWedsClose, Integer diagTimeThursOpen, Integer diagTimeThursClose, Integer diagTimeFriOpen,
-                    Integer diagTimeFriClose, Integer diagTimeSatOpen, Integer diagTimeSatClose, Integer diagTimeSunOpen, Integer diagTimeSunClose, Integer diagTimeHolidayOpen, Integer diagTimeHolidayClose) {
+        Integer diagTimeTuesOpen, Integer diagTimeTuesClose, Integer diagTimeWedsOpen, Integer diagTimeWedsClose, Integer diagTimeThursOpen, Integer diagTimeThursClose, Integer diagTimeFriOpen,
+        Integer diagTimeFriClose, Integer diagTimeSatOpen, Integer diagTimeSatClose, Integer diagTimeSunOpen, Integer diagTimeSunClose, Integer diagTimeHolidayOpen, Integer diagTimeHolidayClose) {
         this.name = name;
         this.address = address;
         this.tel = tel;
