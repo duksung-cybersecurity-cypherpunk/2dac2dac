@@ -1,15 +1,12 @@
 package dac2dac.doctect.agency.controller;
 
-import dac2dac.doctect.agency.dto.request.UserLocationDto;
+import dac2dac.doctect.agency.dto.request.SearchCriteria;
 import dac2dac.doctect.agency.service.AgencyService;
-import dac2dac.doctect.agency.service.HospitalService;
-import dac2dac.doctect.agency.service.PharmacyService;
 import dac2dac.doctect.common.constant.SuccessCode;
 import dac2dac.doctect.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.io.ParseException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,15 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/agency")
 public class AgencyController {
 
-    private final PharmacyService pharmacyService;
-    private final HospitalService hospitalService;
     private final AgencyService agencyService;
 
-    @Operation(summary = "test hello", description = "hello api example")
+    @Operation(summary = "병원 & 약국 검색 API", description = "유저의 위치 정보(위도, 경도)를 기반으로 2km 이내 약국 & 병원 정보를 조회한다.")
     @GetMapping("/search")
-    public ApiResult searchAgency(@RequestBody UserLocationDto userLocationDto) throws ParseException {
-        return ApiResult.success(SuccessCode.GET_SUCCESS, agencyService.searchAgency(userLocationDto));
+    public ApiResult searchAgency(@RequestBody SearchCriteria searchCriteria) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, agencyService.searchAgency(searchCriteria));
     }
-
 
 }

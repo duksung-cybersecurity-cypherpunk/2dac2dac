@@ -18,5 +18,27 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
             + "ORDER BY distance", nativeQuery = true)
     List<Hospital> findNearbyHospitals(@Param("latitude") double latitude, @Param("longitude") double longitude, @Param("radius") double radius);
 
+    @Query(value =
+        "SELECT *, (6371 * acos(cos(radians(:latitude)) * cos(radians(latitude)) * cos(radians(longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(latitude)))) AS distance "
+            + "FROM Hospital "
+            + "WHERE is_er_operate = true "
+            + "HAVING distance < :radius "
+            + "ORDER BY distance", nativeQuery = true)
+    List<Hospital> findNearbyERs(@Param("latitude") double latitude, @Param("longitude") double longitude, @Param("radius") double radius);
 
+    @Query(value =
+        "SELECT *, (6371 * acos(cos(radians(:latitude)) * cos(radians(latitude)) * cos(radians(longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(latitude)))) AS distance "
+            + "FROM Hospital "
+            + "WHERE name like %:name% "
+            + "HAVING distance < :radius "
+            + "ORDER BY distance", nativeQuery = true)
+    List<Hospital> findNearbyHospitalsWithKeyword(@Param("latitude") double latitude, @Param("longitude") double longitude, @Param("radius") double radius, @Param("name") String keyword);
+
+    @Query(value =
+        "SELECT *, (6371 * acos(cos(radians(:latitude)) * cos(radians(latitude)) * cos(radians(longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(latitude)))) AS distance "
+            + "FROM Hospital "
+            + "WHERE is_er_operate = true and name like %:name% "
+            + "HAVING distance < :radius "
+            + "ORDER BY distance", nativeQuery = true)
+    List<Hospital> findNearbyERsWithKeyword(@Param("latitude") double latitude, @Param("longitude") double longitude, @Param("radius") double radius, @Param("name") String keyword);
 }

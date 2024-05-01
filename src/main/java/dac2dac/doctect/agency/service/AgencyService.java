@@ -1,23 +1,21 @@
 package dac2dac.doctect.agency.service;
 
-import dac2dac.doctect.agency.dto.request.UserLocationDto;
+import dac2dac.doctect.agency.dto.request.SearchCriteria;
 import dac2dac.doctect.agency.dto.response.AgencySearchResultDto;
 import dac2dac.doctect.agency.dto.response.AgencySearchResultListDto;
 import dac2dac.doctect.agency.entity.Agency;
-import dac2dac.doctect.agency.entity.Hospital;
-import dac2dac.doctect.agency.entity.Pharmacy;
 import dac2dac.doctect.agency.repository.HospitalRepository;
 import dac2dac.doctect.agency.repository.PharmacyRepository;
-import dac2dac.doctect.common.constant.ErrorCode;
-import dac2dac.doctect.common.error.exception.NotFoundException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,64 +26,70 @@ public class AgencyService {
     private final PharmacyRepository pharmacyRepository;
     private final HospitalRepository hospitalRepository;
 
-    public AgencySearchResultListDto searchAgency(UserLocationDto userLocationDto) {
-        AgencySearchResultListDto pharmacyPreviewList = getNearbyPharmacy(userLocationDto);
-        AgencySearchResultListDto hospitalPreviewList = getNearbyHospital(userLocationDto);
+    public AgencySearchResultListDto searchAgency(SearchCriteria criteria) {
+        final double latitude = criteria.getLatitude();
+        final double longitude = criteria.getLongitude();
+        final double radius = 2.0;
 
-        List<AgencySearchResultDto> agencySearchResultList = Stream.concat(
-                pharmacyPreviewList.getAgencySearchResultList().stream(),
-                hospitalPreviewList.getAgencySearchResultList().stream()
-            )
+        Set<AgencySearchResultDto> searchResultSet = new HashSet<>(); // 중복 제거를 위한 Set
+
+        if (criteria.getKeyword() != null && !criteria.getKeyword().isEmpty()) { // 검색명 있는 경우
+            if (criteria.isHospital()) { // 병원 필터 적용
+                hospitalRepository.findNearbyHospitalsWithKeyword(latitude, longitude, radius, criteria.getKeyword())
+                    .stream()
+                    .map(h -> createAgencySearchResultDto(h, latitude, longitude))
+                    .forEach(searchResultSet::add);
+            }
+            if (criteria.isPharmacy()) { // 약국 필터 적용
+                pharmacyRepository.findNearbyPharmaciesWithKeyword(latitude, longitude, radius, criteria.getKeyword())
+                    .stream()
+                    .map(p -> createAgencySearchResultDto(p, latitude, longitude))
+                    .forEach(searchResultSet::add);
+            }
+            if (criteria.isEr()) { // 응급실 필터 적용
+                hospitalRepository.findNearbyERsWithKeyword(latitude, longitude, radius, criteria.getKeyword())
+                    .stream()
+                    .map(p -> createAgencySearchResultDto(p, latitude, longitude))
+                    .forEach(searchResultSet::add);
+            }
+        } else { // 검색어 없는 경우
+            if (criteria.isHospital()) { // 병원 필터 적용
+                hospitalRepository.findNearbyHospitals(latitude, longitude, radius)
+                    .stream()
+                    .map(h -> createAgencySearchResultDto(h, latitude, longitude))
+                    .forEach(searchResultSet::add);
+            }
+            if (criteria.isPharmacy()) { // 약국 필터 적용
+                pharmacyRepository.findNearbyPharmacies(latitude, longitude, radius)
+                    .stream()
+                    .map(p -> createAgencySearchResultDto(p, latitude, longitude))
+                    .forEach(searchResultSet::add);
+            }
+            if (criteria.isEr()) { // 응급실 필터 적용
+                hospitalRepository.findNearbyERs(latitude, longitude, radius)
+                    .stream()
+                    .map(p -> createAgencySearchResultDto(p, latitude, longitude))
+                    .forEach(searchResultSet::add);
+            }
+        }
+
+        // Set에서 중복 제거 후 List로 변환
+        List<AgencySearchResultDto> searchResult = new ArrayList<>(searchResultSet);
+
+        // 영업 시간 필터링
+
+        // 가까운순 정렬
+        List<AgencySearchResultDto> sortedSearchResult = searchResult.stream()
             .sorted(Comparator.comparing(AgencySearchResultDto::getDistance))
             .collect(Collectors.toList());
 
         return AgencySearchResultListDto.builder()
-            .totalCnt(agencySearchResultList.size())
-            .agencySearchResultList(agencySearchResultList)
+            .totalCnt(sortedSearchResult.size())
+            .agencySearchResultList(sortedSearchResult)
             .build();
     }
 
-    public AgencySearchResultListDto getNearbyHospital(UserLocationDto userLocationDto) {
-        double radius = 2.0;
-
-        List<Hospital> nearbyHospitals = hospitalRepository.findNearbyHospitals(userLocationDto.getLatitude(), userLocationDto.getLongitude(), radius);
-        if (nearbyHospitals.isEmpty()) {
-            throw new NotFoundException(ErrorCode.NEARBY_HOSPITAL_NOT_FOUND);
-        }
-
-        List<AgencySearchResultDto> hospitalPreviewDtoList = nearbyHospitals.stream()
-            .map(h -> createAgencySearchResultDto(h, userLocationDto))
-            .collect(Collectors.toList());
-
-        AgencySearchResultListDto hospitalPreviewListDto = AgencySearchResultListDto.builder()
-            .totalCnt(hospitalPreviewDtoList.size())
-            .agencySearchResultList(hospitalPreviewDtoList)
-            .build();
-
-        return hospitalPreviewListDto;
-    }
-
-    public AgencySearchResultListDto getNearbyPharmacy(UserLocationDto userLocationDto) {
-        double radius = 2.0; // 검색 반경 설정 (예: 2.0km)
-
-        List<Pharmacy> nearbyPharmacies = pharmacyRepository.findNearbyPharmacies(userLocationDto.getLatitude(), userLocationDto.getLongitude(), radius);
-        if (nearbyPharmacies.isEmpty()) {
-            throw new NotFoundException(ErrorCode.NEARBY_PHARMACY_NOT_FOUND);
-        }
-
-        List<AgencySearchResultDto> pharmacyPreviewDtoList = nearbyPharmacies.stream()
-            .map(p -> createAgencySearchResultDto(p, userLocationDto))
-            .collect(Collectors.toList());
-
-        AgencySearchResultListDto pharmacyPreviewListDto = AgencySearchResultListDto.builder()
-            .totalCnt(pharmacyPreviewDtoList.size())
-            .agencySearchResultList(pharmacyPreviewDtoList)
-            .build();
-
-        return pharmacyPreviewListDto;
-    }
-
-    private AgencySearchResultDto createAgencySearchResultDto(Agency a, UserLocationDto userLocation) {
+    private AgencySearchResultDto createAgencySearchResultDto(Agency a, double latitude, double longitude) {
         return AgencySearchResultDto.builder()
             .name(a.getName())
             .todayOpenTime(findTodayOpenTime(a))
@@ -93,7 +97,7 @@ public class AgencyService {
             .isOpen(isAgencyOpen(a))
             .address(a.getAddress())
             .tel(a.getTel())
-            .distance(calculateDistance(a.getLatitude(), a.getLongitude(), userLocation.getLatitude(), userLocation.getLongitude()))
+            .distance(calculateDistance(a.getLatitude(), a.getLongitude(), latitude, longitude))
             .longtitude(a.getLongitude())
             .latitude(a.getLatitude())
             .agencyType(a.getAgencyType())
