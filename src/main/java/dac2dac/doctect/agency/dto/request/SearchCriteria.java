@@ -30,9 +30,9 @@ public class SearchCriteria {
     private boolean pharmacy; // 약국
     private boolean er; // 응급실
 
-    private boolean isOpenNow; // 현재 영업중
-    private boolean isOpenAllYear; // 연중 무휴
-    private boolean isOpenAtMidnight; // 야간 영업
+    private boolean openNow; // 현재 영업중
+    private boolean openAllYear; // 연중 무휴
+    private boolean openAtMidnight; // 야간 영업
 
     private boolean mon;
     private boolean tue;
