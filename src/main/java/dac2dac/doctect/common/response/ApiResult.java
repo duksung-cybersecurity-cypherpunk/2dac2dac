@@ -1,12 +1,15 @@
 package dac2dac.doctect.common.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.constant.SuccessCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL) // null 값인 필드는 JSON에서 제외
 public class ApiResult<T> {
+
     private int status;
     private String message;
     private T data;
@@ -24,6 +27,10 @@ public class ApiResult<T> {
 
     public static <T> ApiResult<T> success(SuccessCode code, T data) {
         return new ApiResult<>(code.getStatus().value(), code.getMessage(), data);
+    }
+
+    public static <T> ApiResult<T> success(SuccessCode code) {
+        return new ApiResult<>(code.getStatus().value(), code.getMessage());
     }
 
     public static <T> ApiResult<T> error(ErrorCode code) {
