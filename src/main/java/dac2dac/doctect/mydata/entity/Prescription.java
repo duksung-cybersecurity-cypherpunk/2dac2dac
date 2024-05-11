@@ -1,5 +1,6 @@
-package dac2dac.doctect.user.entity;
+package dac2dac.doctect.mydata.entity;
 
+import dac2dac.doctect.user.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Vaccination {
+public class Prescription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,11 +26,7 @@ public class Vaccination {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String agency_name;
-
-    private String vaccine;
-    private Integer vaccSeries;
-
-    private LocalDateTime diagDate;
+    private String agencyName;
+    private LocalDateTime treatDate;
 
 }
