@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -39,4 +40,14 @@ public class ContactDiag {
     private Integer medication_cnt;
     private Integer visit_days;
 
+    @Builder
+    public ContactDiag(User user, String agencyName, LocalDateTime diagDate, DiagType diagType, Integer prescription_cnt, Integer medication_cnt, Integer visit_days) {
+        this.user = user;
+        this.agencyName = agencyName;
+        this.diagDate = diagDate;
+        this.diagType = diagType;
+        this.prescription_cnt = prescription_cnt;
+        this.medication_cnt = medication_cnt;
+        this.visit_days = visit_days;
+    }
 }

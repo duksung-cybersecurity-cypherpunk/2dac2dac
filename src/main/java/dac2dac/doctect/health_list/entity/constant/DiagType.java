@@ -12,4 +12,13 @@ public enum DiagType {
     PRESCRIPTION_FILLING("처방조제");
 
     private final String DiagTypeName;
+
+    public static DiagType fromString(String text) {
+        for (DiagType b : DiagType.values()) {
+            if (b.DiagTypeName.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("No constant with text " + text + " found");
+    }
 }

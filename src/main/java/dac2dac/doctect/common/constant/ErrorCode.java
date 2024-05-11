@@ -17,6 +17,7 @@ public enum ErrorCode {
      * 401 Unauthorized
      */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "리소스 접근 권한이 없습니다."),
+    MYDATA_AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "마이데이터 연동을 위한 본인 인증에 실패하셨습니다."),
 
     /**
      * 403 Forbidden
@@ -27,6 +28,8 @@ public enum ErrorCode {
      * 404 Not Found
      */
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "엔티티를 찾을 수 없습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."),
+    MYDATA_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "마이데이터 서버에서 유저를 찾을 수 없습니다."),
     NEARBY_PHARMACY_NOT_FOUND(HttpStatus.NOT_FOUND, "반경 2km 이내의 약국을 찾을 수 없습니다."),
     NEARBY_HOSPITAL_NOT_FOUND(HttpStatus.NOT_FOUND, "반경 2km 이내의 병원을 찾을 수 없습니다."),
 
