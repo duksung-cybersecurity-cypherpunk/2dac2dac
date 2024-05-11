@@ -36,7 +36,7 @@ dependencies {
 
     // jpa - spatial
     implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '6.4.1.Final'
-
+    
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
