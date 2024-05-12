@@ -4,8 +4,13 @@ import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.health_list.dto.request.DiagnosisDto;
+import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
 import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
+import dac2dac.doctect.health_list.dto.request.VaccinationDto;
+import dac2dac.doctect.health_list.entity.Prescription;
 import dac2dac.doctect.health_list.repository.ContactDiagRepository;
+import dac2dac.doctect.health_list.repository.PrescriptionRepository;
+import dac2dac.doctect.health_list.repository.VaccinationRepository;
 import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.repository.UserRepository;
@@ -21,21 +26,45 @@ public class HealthListService {
     private final MydataJdbcRepository mydataJdbcRepository;
     private final UserRepository userRepository;
     private final ContactDiagRepository contactDiagRepository;
+    private final PrescriptionRepository prescriptionRepository;
+    private final VaccinationRepository vaccinationRepository;
 
     @Transactional
     public void syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
         // 유저 정보(이름, 주민등록번호)를 통해 마이데이터 DB의 유저 아이디 가져오기 (본인 인증)
         Long mydataUserId = authenticateUser(userAuthenticationDto);
 
-        // 마이데이터 유저의 아이디를 이용하여 마이데이터 조회 후 Doc'tech 서버 DB에 저장한다.
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        //* 진료 내역 마이데이터
-        // 이전 진료 내역 마이데이터 모두 삭제
+        // 마이데이터 유저의 아이디를 이용하여 마이데이터 조회 후 Doc'tech 서버 DB에 저장한다.
+        //* 진료 내역
         contactDiagRepository.deleteByUserId(userId);
-        // 새로 조회되는 진료 내역 마이데이터 조회 후 저장
+
         List<DiagnosisDto> diagnosisData = mydataJdbcRepository.findDiagnosisByUserId(mydataUserId);
-        diagnosisData.forEach(diagnosisDto -> contactDiagRepository.save(diagnosisDto.toEntity(user)));
+        diagnosisData.forEach(diagnosisDto ->
+            contactDiagRepository.save(diagnosisDto.toEntity(user)));
+
+        //* 투악 내역
+        prescriptionRepository.deleteByUserId(userId);
+
+        List<PrescriptionDto> prescriptionData = mydataJdbcRepository.findPrescriptionByUserId(mydataUserId);
+        prescriptionData.forEach(prescriptionDto -> {
+            Prescription prescription = prescriptionDto.toEntity(user);
+            prescriptionDto.getDrugDtoList().forEach(drugDto ->
+                prescription.addPrescriptionDrug(drugDto)
+            );
+            prescriptionRepository.save(prescription);
+        });
+
+        //* 건강검진 내역
+
+        //* 예방접종 내역
+        vaccinationRepository.deleteByUserId(userId);
+
+        List<VaccinationDto> vaccinationData = mydataJdbcRepository.findVaccinationByUserId(mydataUserId);
+        vaccinationData.forEach(vaccinationDto ->
+            vaccinationRepository.save(vaccinationDto.toEntity(user)));
+
     }
 
     private Long authenticateUser(UserAuthenticationDto userAuthenticationDto) {

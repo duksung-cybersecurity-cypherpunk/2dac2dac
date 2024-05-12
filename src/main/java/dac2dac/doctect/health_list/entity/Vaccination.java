@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,4 +33,12 @@ public class Vaccination {
     private Integer vaccSeries;
     private LocalDateTime vaccDate;
 
+    @Builder
+    public Vaccination(User user, String agencyName, String vaccine, Integer vaccSeries, LocalDateTime vaccDate) {
+        this.user = user;
+        this.agencyName = agencyName;
+        this.vaccine = vaccine;
+        this.vaccSeries = vaccSeries;
+        this.vaccDate = vaccDate;
+    }
 }

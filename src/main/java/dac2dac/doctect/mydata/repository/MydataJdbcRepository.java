@@ -1,6 +1,9 @@
 package dac2dac.doctect.mydata.repository;
 
 import dac2dac.doctect.health_list.dto.request.DiagnosisDto;
+import dac2dac.doctect.health_list.dto.request.DrugDto;
+import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
+import dac2dac.doctect.health_list.dto.request.VaccinationDto;
 import dac2dac.doctect.health_list.entity.constant.DiagType;
 import java.util.List;
 import java.util.Optional;
@@ -55,4 +58,49 @@ public class MydataJdbcRepository {
         });
     }
 
+    public List<PrescriptionDto> findPrescriptionByUserId(Long userId) {
+        String sql = "SELECT * FROM prescription p WHERE p.user_id = :userId";
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("userId", userId);
+
+        return namedParameterJdbcTemplate.query(sql, parameters, (rs, rowNum) -> {
+            return PrescriptionDto.builder()
+                .treatDate(rs.getTimestamp("res_treat_date").toLocalDateTime())
+                .agencyName(rs.getString("res_hospital_name"))
+                .drugDtoList(findDrugByPrescriptionId(rs.getLong("id")))
+                .build();
+        });
+    }
+
+    public List<DrugDto> findDrugByPrescriptionId(Long prescriptionId) {
+        String sql = "SELECT * FROM prescription_drug pd WHERE pd.prescription_id = :id";
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("id", prescriptionId);
+
+        return namedParameterJdbcTemplate.query(sql, parameters, (rs, rowNum) -> {
+            return DrugDto.builder()
+                .drugName(rs.getString("res_prescribe_drug_name"))
+                .prescriptionCnt(rs.getInt("res_prescribe_cnt_det"))
+                .medicationDays(rs.getInt("res_prescribe_days"))
+                .build();
+        });
+    }
+
+    public List<VaccinationDto> findVaccinationByUserId(Long userId) {
+        String sql = "SELECT * FROM vaccination v WHERE v.user_id = :userId";
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("userId", userId);
+
+        return namedParameterJdbcTemplate.query(sql, parameters, (rs, rowNum) -> {
+            return VaccinationDto.builder()
+                .agencyName(rs.getString("provider"))
+                .vaccine(rs.getString("vaccine"))
+                .vaccSeries(rs.getInt("vacc_series"))
+                .vaccDate(rs.getTimestamp("given_date").toLocalDateTime())
+                .build();
+        });
+    }
 }

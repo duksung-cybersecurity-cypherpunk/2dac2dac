@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,11 @@ public class PrescriptionDrug {
     private Integer prescriptionCnt;
     private Integer medicationDays;
 
+    @Builder
+    public PrescriptionDrug(Prescription prescription, String drugName, Integer prescriptionCnt, Integer medicationDays) {
+        this.prescription = prescription;
+        this.drugName = drugName;
+        this.prescriptionCnt = prescriptionCnt;
+        this.medicationDays = medicationDays;
+    }
 }
