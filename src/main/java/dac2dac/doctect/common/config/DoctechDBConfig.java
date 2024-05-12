@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     transactionManagerRef = "primaryTransactionManager"
 )
 @RequiredArgsConstructor
-public class Doc_techDBConfig {
+public class DoctechDBConfig {
 
     private final JpaProperties jpaProperties;
     private final HibernateProperties hibernateProperties;

@@ -9,5 +9,14 @@ public enum HepBSurfaceAntibody {
     STANDARD("일반"),
     PRECISION("정밀");
 
-    private final String DiagTypeName;
+    private final String HepBSurfaceAntibodyType;
+
+    public static HepBSurfaceAntibody fromString(String text) {
+        for (HepBSurfaceAntibody b : HepBSurfaceAntibody.values()) {
+            if (b.HepBSurfaceAntibodyType.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

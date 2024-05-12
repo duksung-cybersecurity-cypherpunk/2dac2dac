@@ -10,5 +10,14 @@ public enum UrinaryProtein {
     BORDERLINE("경계"),
     PROTEINURIA_SUSPECTED("단백뇨 의심");
 
-    private final String DiagTypeName;
+    private final String UrinaryProteinType;
+
+    public static UrinaryProtein fromString(String text) {
+        for (UrinaryProtein b : UrinaryProtein.values()) {
+            if (b.UrinaryProteinType.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

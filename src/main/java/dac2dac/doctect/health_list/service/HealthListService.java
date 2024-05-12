@@ -4,11 +4,18 @@ import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.health_list.dto.request.DiagnosisDto;
+import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
 import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
 import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
 import dac2dac.doctect.health_list.dto.request.VaccinationDto;
+import dac2dac.doctect.health_list.entity.BloodTest;
+import dac2dac.doctect.health_list.entity.HealthScreening;
+import dac2dac.doctect.health_list.entity.MeasurementTest;
+import dac2dac.doctect.health_list.entity.OtherTest;
 import dac2dac.doctect.health_list.entity.Prescription;
+import dac2dac.doctect.health_list.entity.PrescriptionDrug;
 import dac2dac.doctect.health_list.repository.ContactDiagRepository;
+import dac2dac.doctect.health_list.repository.HealthScreeningRepository;
 import dac2dac.doctect.health_list.repository.PrescriptionRepository;
 import dac2dac.doctect.health_list.repository.VaccinationRepository;
 import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
@@ -27,6 +34,7 @@ public class HealthListService {
     private final UserRepository userRepository;
     private final ContactDiagRepository contactDiagRepository;
     private final PrescriptionRepository prescriptionRepository;
+    private final HealthScreeningRepository healthScreeningRepository;
     private final VaccinationRepository vaccinationRepository;
 
     @Transactional
@@ -50,13 +58,33 @@ public class HealthListService {
         List<PrescriptionDto> prescriptionData = mydataJdbcRepository.findPrescriptionByUserId(mydataUserId);
         prescriptionData.forEach(prescriptionDto -> {
             Prescription prescription = prescriptionDto.toEntity(user);
-            prescriptionDto.getDrugDtoList().forEach(drugDto ->
-                prescription.addPrescriptionDrug(drugDto)
-            );
+
+            prescriptionDto.getDrugDtoList().forEach(drugDto -> {
+                PrescriptionDrug prescriptionDrug = drugDto.toEntity();
+                prescription.addPrescriptionDrug(prescriptionDrug);
+            });
+
             prescriptionRepository.save(prescription);
         });
 
         //* 건강검진 내역
+        healthScreeningRepository.deleteByUserId(userId);
+
+        List<HealthScreeningDto> healthScreeningData = mydataJdbcRepository.findHealthScreeningByUserId(mydataUserId);
+        healthScreeningData.forEach(healthScreeningDto -> {
+            HealthScreening healthScreening = healthScreeningDto.toEntity(user);
+
+            MeasurementTest measurementTest = healthScreeningDto.getMeasurementTest().toEntity();
+            healthScreening.setMeasurementTest(measurementTest);
+
+            BloodTest bloodTest = healthScreeningDto.getBloodTest().toEntity();
+            healthScreening.setBloodTest(bloodTest);
+
+            OtherTest otherTest = healthScreeningDto.getOtherTest().toEntity();
+            healthScreening.setOtherTest(otherTest);
+
+            healthScreeningRepository.save(healthScreening);
+        });
 
         //* 예방접종 내역
         vaccinationRepository.deleteByUserId(userId);

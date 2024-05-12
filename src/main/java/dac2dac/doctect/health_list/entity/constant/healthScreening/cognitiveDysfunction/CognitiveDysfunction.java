@@ -9,5 +9,14 @@ public enum CognitiveDysfunction {
     NO_SPECIAL_FINDINGS("특이소견 없음"),
     COGNITIVE_IMPAIRMENT_SUSPECTED("인지기능 저하 의심");
 
-    private final String DiagTypeName;
+    private final String CognitiveDysfunctionType;
+
+    public static CognitiveDysfunction fromString(String text) {
+        for (CognitiveDysfunction b : CognitiveDysfunction.values()) {
+            if (b.CognitiveDysfunctionType.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

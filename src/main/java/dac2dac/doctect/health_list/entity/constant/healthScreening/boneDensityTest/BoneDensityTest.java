@@ -10,5 +10,14 @@ public enum BoneDensityTest {
     OSTEOPENIA("골감소증"),
     OSTEOPOROSIS("골다공증");
 
-    private final String DiagTypeName;
+    private final String BoneDensityType;
+
+    public static BoneDensityTest fromString(String text) {
+        for (BoneDensityTest b : BoneDensityTest.values()) {
+            if (b.BoneDensityType.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

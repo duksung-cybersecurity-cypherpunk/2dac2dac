@@ -11,5 +11,14 @@ public enum HepB {
     HEPATITIS_B_SUSPECTED("B형 간염 보유자 의심"),
     JUDGEMENT_PENDING("판정보류");
 
-    private final String DiagTypeName;
+    private final String HepBType;
+
+    public static HepB fromString(String text) {
+        for (HepB b : HepB.values()) {
+            if (b.HepBType.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

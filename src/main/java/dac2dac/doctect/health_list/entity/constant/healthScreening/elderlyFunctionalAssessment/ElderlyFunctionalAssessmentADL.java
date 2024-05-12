@@ -9,5 +9,14 @@ public enum ElderlyFunctionalAssessmentADL {
     NORMAL("정상"),
     ASSISTANCE_REQUIRED("일상생활 도움 필요");
 
-    private final String DiagTypeName;
+    private final String ElderlyFunctionalAssessmentADLType;
+
+    public static ElderlyFunctionalAssessmentADL fromString(String text) {
+        for (ElderlyFunctionalAssessmentADL b : ElderlyFunctionalAssessmentADL.values()) {
+            if (b.ElderlyFunctionalAssessmentADLType.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

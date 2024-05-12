@@ -10,5 +10,14 @@ public enum TBChestDisease {
     LATENT_TB("비활동성 폐결핵"),
     DISEASE_SUSPECTED("질환의심");
 
-    private final String DiagTypeName;
+    private final String TBChestDiseaseType;
+
+    public static TBChestDisease fromString(String text) {
+        for (TBChestDisease b : TBChestDisease.values()) {
+            if (b.TBChestDiseaseType.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

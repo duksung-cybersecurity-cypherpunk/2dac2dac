@@ -10,5 +10,14 @@ public enum ElderlyFunctionalAssessmentVaccination {
     PNEUMOCOCCAL_REQUIRED("폐렴구균 접종 필요"),
     NO_VACCINATION_REQUIRED("접종 필요 없음");
 
-    private final String DiagTypeName;
+    private final String ElderlyFunctionalAssessmentVaccinationType;
+
+    public static ElderlyFunctionalAssessmentVaccination fromString(String text) {
+        for (ElderlyFunctionalAssessmentVaccination b : ElderlyFunctionalAssessmentVaccination.values()) {
+            if (b.ElderlyFunctionalAssessmentVaccinationType.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }
