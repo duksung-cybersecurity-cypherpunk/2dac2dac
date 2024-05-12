@@ -1,5 +1,6 @@
 package dac2dac.doctect.health_list.dto.request;
 
+import dac2dac.doctect.health_list.entity.PrescriptionDrug;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,5 +18,13 @@ public class DrugDto {
         this.drugName = drugName;
         this.prescriptionCnt = prescriptionCnt;
         this.medicationDays = medicationDays;
+    }
+
+    public PrescriptionDrug toEntity() {
+        return PrescriptionDrug.builder()
+            .drugName(drugName)
+            .prescriptionCnt(prescriptionCnt)
+            .medicationDays(medicationDays)
+            .build();
     }
 }

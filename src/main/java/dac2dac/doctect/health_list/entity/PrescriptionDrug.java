@@ -36,4 +36,8 @@ public class PrescriptionDrug {
         this.prescriptionCnt = prescriptionCnt;
         this.medicationDays = medicationDays;
     }
+
+    public void setPrescription(Prescription prescription) {
+        this.prescription = prescription;
+    }
 }

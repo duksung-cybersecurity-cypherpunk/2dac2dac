@@ -1,6 +1,5 @@
 package dac2dac.doctect.health_list.entity;
 
-import dac2dac.doctect.health_list.dto.request.DrugDto;
 import dac2dac.doctect.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -39,15 +38,9 @@ public class Prescription {
     @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PrescriptionDrug> prescriptionDrugList = new ArrayList<>();
 
-    public void addPrescriptionDrug(DrugDto drugDto) {
-        PrescriptionDrug prescriptionDrug = PrescriptionDrug.builder()
-            .prescription(this)
-            .drugName(drugDto.getDrugName())
-            .prescriptionCnt(drugDto.getPrescriptionCnt())
-            .medicationDays(drugDto.getMedicationDays())
-            .build();
-
+    public void addPrescriptionDrug(PrescriptionDrug prescriptionDrug) {
         prescriptionDrugList.add(prescriptionDrug);
+        prescriptionDrug.setPrescription(this);
     }
 
     @Builder
