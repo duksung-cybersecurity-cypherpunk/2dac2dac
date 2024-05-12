@@ -19,7 +19,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -94,4 +97,45 @@ public class OtherTest {
     private Boolean physicalActivity;
     private Boolean exercise;
 
+    @OneToOne
+    @JoinColumn(name = "health_screening_id")
+    private HealthScreening healthScreening;
+
+    // HealthScreening 참조를 설정하는 setter 메서드
+    public void setHealthScreening(HealthScreening healthScreening) {
+        this.healthScreening = healthScreening;
+    }
+
+    @Builder
+    public OtherTest(HealthScreening healthScreening, UrinaryProtein urinaryProtein, dac2dac.doctect.health_list.entity.constant.healthScreening.TBChestDisease TBChestDisease, Boolean isHepB,
+        HepBSurfaceAntibody hepBSurfaceAntibody, HepBSurfaceAntigen hepBSurfaceAntigen, HepB hepB, Boolean isDepression, Depression depression, Boolean isCognitiveDysfunction,
+        CognitiveDysfunction cognitiveDysfunction, Boolean isBoneDensityTest, BoneDensityTest boneDensityTest, Boolean isElderlyPhysicalFunctionTest,
+        ElderlyPhysicalFunctionTest elderlyPhysicalFunctionTest, Boolean isElderlyFunctionalAssessment, ElderlyFunctionalAssessmentFalls elderlyFunctionalAssessmentFalls,
+        ElderlyFunctionalAssessmentADL elderlyFunctionalAssessmentADL, ElderlyFunctionalAssessmentVaccination elderlyFunctionalAssessmentVaccination,
+        ElderlyFunctionalAssessmentUrinaryIncontinence elderlyFunctionalAssessmentUrinaryIncontinence, Boolean smoke, Boolean drink, Boolean physicalActivity, Boolean exercise) {
+        this.healthScreening = healthScreening;
+        this.urinaryProtein = urinaryProtein;
+        this.TBChestDisease = TBChestDisease;
+        this.isHepB = isHepB;
+        this.hepBSurfaceAntibody = hepBSurfaceAntibody;
+        this.hepBSurfaceAntigen = hepBSurfaceAntigen;
+        this.hepB = hepB;
+        this.isDepression = isDepression;
+        this.depression = depression;
+        this.isCognitiveDysfunction = isCognitiveDysfunction;
+        this.cognitiveDysfunction = cognitiveDysfunction;
+        this.isBoneDensityTest = isBoneDensityTest;
+        this.boneDensityTest = boneDensityTest;
+        this.isElderlyPhysicalFunctionTest = isElderlyPhysicalFunctionTest;
+        this.elderlyPhysicalFunctionTest = elderlyPhysicalFunctionTest;
+        this.isElderlyFunctionalAssessment = isElderlyFunctionalAssessment;
+        this.elderlyFunctionalAssessmentFalls = elderlyFunctionalAssessmentFalls;
+        this.elderlyFunctionalAssessmentADL = elderlyFunctionalAssessmentADL;
+        this.elderlyFunctionalAssessmentVaccination = elderlyFunctionalAssessmentVaccination;
+        this.elderlyFunctionalAssessmentUrinaryIncontinence = elderlyFunctionalAssessmentUrinaryIncontinence;
+        this.smoke = smoke;
+        this.drink = drink;
+        this.physicalActivity = physicalActivity;
+        this.exercise = exercise;
+    }
 }

@@ -4,7 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,13 +25,37 @@ public class MeasurementTest {
     private Double waist;
     private Double bmi;
 
-    private Double sight_left;
-    private Double sight_right;
+    private Double sightLeft;
+    private Double sightRight;
 
-    private Integer hearing_left;
-    private Integer hearing_right;
+    private Integer hearingLeft;
+    private Integer hearingRight;
 
-    private Integer blood_pressure_high;
-    private Integer blood_pressure_low;
+    private Integer bloodPressureHigh;
+    private Integer bloodPressureLow;
 
+    @OneToOne
+    @JoinColumn(name = "health_screening_id")
+    private HealthScreening healthScreening;
+
+    // HealthScreening 참조를 설정하는 setter 메서드
+    public void setHealthScreening(HealthScreening healthScreening) {
+        this.healthScreening = healthScreening;
+    }
+
+    @Builder
+    public MeasurementTest(HealthScreening healthScreening, Double height, Double weight, Double waist, Double bmi, Double sightLeft, Double sightRight, Integer hearingLeft, Integer hearingRight,
+        Integer bloodPressureHigh, Integer bloodPressureLow) {
+        this.healthScreening = healthScreening;
+        this.height = height;
+        this.weight = weight;
+        this.waist = waist;
+        this.bmi = bmi;
+        this.sightLeft = sightLeft;
+        this.sightRight = sightRight;
+        this.hearingLeft = hearingLeft;
+        this.hearingRight = hearingRight;
+        this.bloodPressureHigh = bloodPressureHigh;
+        this.bloodPressureLow = bloodPressureLow;
+    }
 }
