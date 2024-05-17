@@ -1,4 +1,4 @@
-package dac2dac.doctect.health_list.dto.response;
+package dac2dac.doctect.health_list.dto.response.diagnosis;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,13 +9,13 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class ContactDiagItemListDto {
+public class ContactDiagItemList {
 
     private int totalCnt;
-    private List<ContactDiagItemDto> contactDiagItemList = new ArrayList<>();
+    private List<ContactDiagItem> contactDiagItemList = new ArrayList<>();
 
     @Builder
-    public ContactDiagItemListDto(int totalCnt, List<ContactDiagItemDto> contactDiagItemList) {
+    public ContactDiagItemList(int totalCnt, List<ContactDiagItem> contactDiagItemList) {
         this.totalCnt = totalCnt;
         this.contactDiagItemList = contactDiagItemList;
     }

@@ -1,4 +1,4 @@
-package dac2dac.doctect.health_list.dto.response;
+package dac2dac.doctect.health_list.dto.response.diagnosis;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class ContactDiagItemDto {
+public class ContactDiagItem {
 
     private LocalDateTime diagDate;
 
@@ -22,7 +22,7 @@ public class ContactDiagItemDto {
     private boolean agencyIsOpenNow;
 
     @Builder
-    public ContactDiagItemDto(LocalDateTime diagDate, String agencyName, String agencyAddress, String agencyThumbnail, Integer agencyTodayOpenTime, Integer agencyTodayCloseTime, boolean agencyIsOpenNow) {
+    public ContactDiagItem(LocalDateTime diagDate, String agencyName, String agencyAddress, String agencyThumbnail, Integer agencyTodayOpenTime, Integer agencyTodayCloseTime, boolean agencyIsOpenNow) {
         this.diagDate = diagDate;
         this.agencyName = agencyName;
         this.agencyAddress = agencyAddress;

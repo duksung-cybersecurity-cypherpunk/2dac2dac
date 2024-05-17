@@ -9,7 +9,8 @@ import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.health_list.dto.request.*;
-import dac2dac.doctect.health_list.dto.response.*;
+import dac2dac.doctect.health_list.dto.response.diagnosis.*;
+import dac2dac.doctect.health_list.dto.response.prescription.*;
 import dac2dac.doctect.health_list.entity.*;
 import dac2dac.doctect.health_list.repository.*;
 import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
@@ -96,23 +97,22 @@ public class HealthListService {
         List<VaccinationDto> vaccinationData = mydataJdbcRepository.findVaccinationByUserId(mydataUserId);
         vaccinationData.forEach(vaccinationDto ->
                 vaccinationRepository.save(vaccinationDto.toEntity(user)));
-
     }
 
     public DiagnosisListDto getDiagnosisList(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        // 비대면 진료 내역
-        List<NoncontactDiagItemDto> noncontactDiagItemList = new ArrayList<>();
+        //* 비대면 진료 내역
+        List<NoncontactDiagItem> noncontactDiagItemList = new ArrayList<>();
 
-        NoncontactDiagItemListDto noncontactDiagItemListDto = NoncontactDiagItemListDto.builder()
+        NoncontactDiagItemList noncontactDiagItemListDto = NoncontactDiagItemList.builder()
                 .totalCnt(noncontactDiagItemList.size())
                 .noncontactDiagItemList(noncontactDiagItemList)
                 .build();
 
-        // 대면 진료 내역
-        List<ContactDiagItemDto> contactDiagItemList = contactDiagRepository.findByUserId(userId)
+        //* 대면 진료 내역
+        List<ContactDiagItem> contactDiagItemList = contactDiagRepository.findByUserId(userId)
                 .stream()
                 .map(c -> {
                     Hospital findHospital = hospitalRepository.findByName(c.getAgencyName())
@@ -120,7 +120,7 @@ public class HealthListService {
                             .findFirst()
                             .orElseThrow(() -> new NotFoundException(ErrorCode.HOSPITAL_NOT_FOUND));
 
-                    return ContactDiagItemDto.builder()
+                    return ContactDiagItem.builder()
                             .diagDate(c.getDiagDate())
                             .agencyName(findHospital.getName())
                             .agencyAddress(findHospital.getAddress())
@@ -131,18 +131,18 @@ public class HealthListService {
                 })
                 .collect(Collectors.toList());
 
-        ContactDiagItemListDto contactDiagItemListDto = ContactDiagItemListDto.builder()
+        ContactDiagItemList contactDiagItemListDto = ContactDiagItemList.builder()
                 .totalCnt(contactDiagItemList.size())
                 .contactDiagItemList(contactDiagItemList)
                 .build();
 
         return DiagnosisListDto.builder()
-                .noncontactDiagItemListDto(noncontactDiagItemListDto)
-                .contactDiagItemListDto(contactDiagItemListDto)
+                .noncontactDiagList(noncontactDiagItemListDto)
+                .contactDiagList(contactDiagItemListDto)
                 .build();
     }
 
-    public ContactDiagDto getDetailContactDiagnosis(Long userId, Long diagId) {
+    public ContactDiagDetailDto getDetailContactDiagnosis(Long userId, Long diagId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
@@ -159,17 +159,27 @@ public class HealthListService {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException(ErrorCode.HOSPITAL_NOT_FOUND));
 
-        return ContactDiagDto.builder()
+        //* 진료 기관
+        ContactDiagItem contactDiagInfo = ContactDiagItem.builder()
+                .diagDate(findContactDiag.getDiagDate())
                 .agencyName(findHospital.getName())
                 .agencyAddress(findHospital.getAddress())
                 .agencyIsOpenNow(isAgencyOpenNow(findHospital))
                 .agencyTodayOpenTime(findTodayOpenTime(findHospital))
                 .agencyTodayCloseTime(findTodayCloseTime(findHospital))
-                .diagDate(findContactDiag.getDiagDate())
-                .diagType(findContactDiag.getDiagType())
+                .build();
+
+        //* 진료 세부 정보
+        DiagDetailInfo diagDetailInfo = DiagDetailInfo.builder()
+                .diagType(findContactDiag.getDiagType().getDiagTypeName())
                 .prescription_cnt(findContactDiag.getPrescription_cnt())
                 .medication_cnt(findContactDiag.getMedication_cnt())
                 .visit_days(findContactDiag.getVisit_days())
+                .build();
+
+        return ContactDiagDetailDto.builder()
+                .contactDiagInfo(contactDiagInfo)
+                .diagDetailInfo(diagDetailInfo)
                 .build();
     }
 
@@ -177,7 +187,7 @@ public class HealthListService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        List<PrescriptionItemDto> prescriptionItemList = prescriptionRepository.findByUserId(userId)
+        List<PrescriptionItem> prescriptionItemList = prescriptionRepository.findByUserId(userId)
                 .stream()
                 .map(p -> {
                     Pharmacy pharmacy = pharmacyRepository.findByName(p.getAgencyName())
@@ -185,7 +195,7 @@ public class HealthListService {
                             .findFirst()
                             .orElseThrow(() -> new NotFoundException(ErrorCode.PHARMACY_NOT_FOUND));
 
-                    return PrescriptionItemDto.builder()
+                    return PrescriptionItem.builder()
                             .treatDate(p.getTreatDate())
                             .agencyName(pharmacy.getName())
                             .agencyAddress(pharmacy.getAddress())
@@ -219,7 +229,7 @@ public class HealthListService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PHARMACY_NOT_FOUND));
 
         //* 처방 기관
-        PrescriptionItemDto prescriptionInfo = PrescriptionItemDto.builder()
+        PrescriptionItem prescriptionInfo = PrescriptionItem.builder()
                 .treatDate(findPrescription.getTreatDate())
                 .agencyName(findPharmacy.getName())
                 .agencyAddress(findPharmacy.getAddress())
@@ -227,18 +237,22 @@ public class HealthListService {
                 .build();
 
         //* 처방전
-        List<PrescriptionDrugDto> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId)
+        List<PrescriptionDrugItem> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId)
                 .stream()
-                .map(pd -> PrescriptionDrugDto.builder()
+                .map(pd -> PrescriptionDrugItem.builder()
                         .drugName(pd.getDrugName())
                         .prescriptionCnt(pd.getPrescriptionCnt())
                         .medicationDays(pd.getMedicationDays())
                         .build())
                 .collect(Collectors.toList());
 
+        PrescriptionDrugItemList prescriptionDrugInfo = PrescriptionDrugItemList.builder()
+                .prescriptionDrugList(prescriptionDrugList)
+                .build();
+
         return PrescriptionDetailDto.builder()
                 .prescriptionInfo(prescriptionInfo)
-                .prescriptionDrugList(prescriptionDrugList)
+                .prescriptionDrugInfo(prescriptionDrugInfo)
                 .build();
     }
 
