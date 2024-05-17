@@ -25,8 +25,14 @@ public class HealthListController {
         return ApiResult.success(SuccessCode.SYNC_SUCCESS);
     }
 
-    @Operation(summary = "진료 내역(대면) 상세 조회 API", description = "유저의 진 내역(대면)을 상세 조회한다.")
-    @GetMapping("{userId}/diagnosis/contact/{diagId}")
+    @Operation(summary = "진료 내역(대면, 비대면) 조회 API", description = "유저의 진료 내역(대면, 비대면)을 조회한다.")
+    @GetMapping("/diagnosis/{userId}")
+    public ApiResult getContactDiagnosis(@PathVariable Long userId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getDiagnosisList(userId));
+    }
+
+    @Operation(summary = "진료 내역(대면) 상세 조회 API", description = "유저의 진료 내역(대면)을 상세 조회한다.")
+    @GetMapping("/diagnosis/contact/{userId}/{diagId}")
     public ApiResult getContactDiagnosis(@PathVariable Long userId, @PathVariable Long diagId) {
         return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getDetailContactDiagnosis(userId, diagId));
     }

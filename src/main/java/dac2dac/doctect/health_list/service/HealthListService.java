@@ -7,7 +7,7 @@ import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.health_list.dto.request.*;
-import dac2dac.doctect.health_list.dto.response.ContactDiagDto;
+import dac2dac.doctect.health_list.dto.response.*;
 import dac2dac.doctect.health_list.entity.*;
 import dac2dac.doctect.health_list.repository.ContactDiagRepository;
 import dac2dac.doctect.health_list.repository.HealthScreeningRepository;
@@ -24,7 +24,9 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -96,30 +98,72 @@ public class HealthListService {
 
     }
 
-    private Long authenticateUser(UserAuthenticationDto userAuthenticationDto) {
-        // 유저 아이디가 존재할 경우 본인 인증에 성공한 것으로 간주한다.
-        return mydataJdbcRepository.findByNameAndPin(userAuthenticationDto.getName(), userAuthenticationDto.getPin())
-                .orElseThrow(() -> new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED));
+    public DiagnosisListDto getDiagnosisList(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        // 비대면 진료 내역
+        List<NoncontactDiagItemDto> noncontactDiagItemList = new ArrayList<>();
+
+        NoncontactDiagItemListDto noncontactDiagItemListDto = NoncontactDiagItemListDto.builder()
+                .totalCnt(noncontactDiagItemList.size())
+                .noncontactDiagItemList(noncontactDiagItemList)
+                .build();
+
+        // 대면 진료 내역
+        List<ContactDiagItemDto> contactDiagItemList = contactDiagRepository.findByUserId(userId)
+                .stream()
+                .map(c -> {
+                    Hospital findHospital = hospitalRepository.findByName(c.getAgencyName())
+                            .stream()
+                            .findFirst()
+                            .orElseThrow(() -> new NotFoundException(ErrorCode.HOSPITAL_NOT_FOUND));
+
+                    return ContactDiagItemDto.builder()
+                            .diagDate(c.getDiagDate())
+                            .agencyName(findHospital.getName())
+                            .agencyAddress(findHospital.getAddress())
+                            .agencyIsOpenNow(isAgencyOpenNow(findHospital))
+                            .agencyTodayOpenTime(findTodayOpenTime(findHospital))
+                            .agencyTodayCloseTime(findTodayCloseTime(findHospital))
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        ContactDiagItemListDto contactDiagItemListDto = ContactDiagItemListDto.builder()
+                .totalCnt(contactDiagItemList.size())
+                .contactDiagItemList(contactDiagItemList)
+                .build();
+
+        return DiagnosisListDto.builder()
+                .noncontactDiagItemListDto(noncontactDiagItemListDto)
+                .contactDiagItemListDto(contactDiagItemListDto)
+                .build();
     }
 
     public ContactDiagDto getDetailContactDiagnosis(Long userId, Long diagId) {
-        User user = userRepository.findById(userId).orElseThrow(()
-                -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-//        ContactDiag findContactDiag = contactDiagRepository.findByUserIdAndDiagId(userId, "원약국");
         ContactDiag findContactDiag = contactDiagRepository.findById(diagId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ENTITY_NOT_FOUND));
-        List<Hospital> findHospital = hospitalRepository.findByName(findContactDiag.getAgencyName());
-        Hospital hospital = findHospital.stream()
+
+        //* 유저와 조회한 진료 내역에 해당하는 유저가 다를 경우
+        if (!user.getId().equals(findContactDiag.getUser().getId())) {
+            new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        Hospital findHospital = hospitalRepository.findByName(findContactDiag.getAgencyName())
+                .stream()
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException(ErrorCode.HOSPITAL_NOT_FOUND));
 
         return ContactDiagDto.builder()
-                .agencyName(hospital.getName())
-                .agencyAddress(hospital.getAddress())
-                .agencyIsOpenNow(isAgencyOpenNow(hospital))
-                .agencyTodayOpenTime(findTodayOpenTime(hospital))
-                .agencyTodayCloseTime(findTodayCloseTime(hospital))
+                .agencyName(findHospital.getName())
+                .agencyAddress(findHospital.getAddress())
+                .agencyIsOpenNow(isAgencyOpenNow(findHospital))
+                .agencyTodayOpenTime(findTodayOpenTime(findHospital))
+                .agencyTodayCloseTime(findTodayCloseTime(findHospital))
                 .diagDate(findContactDiag.getDiagDate())
                 .diagType(findContactDiag.getDiagType())
                 .prescription_cnt(findContactDiag.getPrescription_cnt())
@@ -128,6 +172,11 @@ public class HealthListService {
                 .build();
     }
 
+    private Long authenticateUser(UserAuthenticationDto userAuthenticationDto) {
+        // 유저 아이디가 존재할 경우 본인 인증에 성공한 것으로 간주한다.
+        return mydataJdbcRepository.findByNameAndPin(userAuthenticationDto.getName(), userAuthenticationDto.getPin())
+                .orElseThrow(() -> new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED));
+    }
 
     private boolean isAgencyOpenNow(Agency agency) {
         Integer todayOpenTime = findTodayOpenTime(agency);
