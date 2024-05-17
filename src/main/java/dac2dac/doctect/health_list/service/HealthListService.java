@@ -11,10 +11,7 @@ import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.health_list.dto.request.*;
 import dac2dac.doctect.health_list.dto.response.*;
 import dac2dac.doctect.health_list.entity.*;
-import dac2dac.doctect.health_list.repository.ContactDiagRepository;
-import dac2dac.doctect.health_list.repository.HealthScreeningRepository;
-import dac2dac.doctect.health_list.repository.PrescriptionRepository;
-import dac2dac.doctect.health_list.repository.VaccinationRepository;
+import dac2dac.doctect.health_list.repository.*;
 import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.repository.UserRepository;
@@ -42,6 +39,7 @@ public class HealthListService {
     private final VaccinationRepository vaccinationRepository;
     private final HospitalRepository hospitalRepository;
     private final PharmacyRepository pharmacyRepository;
+    private final PrescriptionDrugRepository prescriptionDrugRepository;
 
     @Transactional
     public void syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
@@ -149,7 +147,7 @@ public class HealthListService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         ContactDiag findContactDiag = contactDiagRepository.findById(diagId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.ENTITY_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CONTACT_DIAGNOSIS_NOT_FOUND));
 
         //* 유저와 조회한 진료 내역에 해당하는 유저가 다를 경우
         if (!user.getId().equals(findContactDiag.getUser().getId())) {
@@ -200,6 +198,47 @@ public class HealthListService {
         return PrescriptionItemListDto.builder()
                 .totalCnt(prescriptionItemList.size())
                 .prescriptionItemList(prescriptionItemList)
+                .build();
+    }
+
+    public PrescriptionDetailDto getDetailPrescription(Long userId, Long prescriptionId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        Prescription findPrescription = prescriptionRepository.findById(prescriptionId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PRESCRIPTION_NOT_FOUND));
+
+        //* 유저와 조회한 진료 내역에 해당하는 유저가 다를 경우
+        if (!user.getId().equals(findPrescription.getUser().getId())) {
+            new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        Pharmacy findPharmacy = pharmacyRepository.findByName(findPrescription.getAgencyName())
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PHARMACY_NOT_FOUND));
+
+        //* 처방 기관
+        PrescriptionItemDto prescriptionInfo = PrescriptionItemDto.builder()
+                .treatDate(findPrescription.getTreatDate())
+                .agencyName(findPharmacy.getName())
+                .agencyAddress(findPharmacy.getAddress())
+                .agencyTel(findPharmacy.getTel())
+                .build();
+
+        //* 처방전
+        List<PrescriptionDrugDto> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId)
+                .stream()
+                .map(pd -> PrescriptionDrugDto.builder()
+                        .drugName(pd.getDrugName())
+                        .prescriptionCnt(pd.getPrescriptionCnt())
+                        .medicationDays(pd.getMedicationDays())
+                        .build())
+                .collect(Collectors.toList());
+
+        return PrescriptionDetailDto.builder()
+                .prescriptionInfo(prescriptionInfo)
+                .prescriptionDrugList(prescriptionDrugList)
                 .build();
     }
 
