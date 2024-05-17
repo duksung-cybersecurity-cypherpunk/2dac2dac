@@ -2,7 +2,9 @@ package dac2dac.doctect.health_list.service;
 
 import dac2dac.doctect.agency.entity.Agency;
 import dac2dac.doctect.agency.entity.Hospital;
+import dac2dac.doctect.agency.entity.Pharmacy;
 import dac2dac.doctect.agency.repository.HospitalRepository;
+import dac2dac.doctect.agency.repository.PharmacyRepository;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
@@ -39,6 +41,7 @@ public class HealthListService {
     private final HealthScreeningRepository healthScreeningRepository;
     private final VaccinationRepository vaccinationRepository;
     private final HospitalRepository hospitalRepository;
+    private final PharmacyRepository pharmacyRepository;
 
     @Transactional
     public void syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
@@ -169,6 +172,34 @@ public class HealthListService {
                 .prescription_cnt(findContactDiag.getPrescription_cnt())
                 .medication_cnt(findContactDiag.getMedication_cnt())
                 .visit_days(findContactDiag.getVisit_days())
+                .build();
+    }
+
+    public PrescriptionItemListDto getPrescriptionList(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        List<PrescriptionItemDto> prescriptionItemList = prescriptionRepository.findByUserId(userId)
+                .stream()
+                .map(p -> {
+                    Pharmacy pharmacy = pharmacyRepository.findByName(p.getAgencyName())
+                            .stream()
+                            .findFirst()
+                            .orElseThrow(() -> new NotFoundException(ErrorCode.PHARMACY_NOT_FOUND));
+
+                    return PrescriptionItemDto.builder()
+                            .treatDate(p.getTreatDate())
+                            .agencyName(pharmacy.getName())
+                            .agencyAddress(pharmacy.getAddress())
+                            .agencyTel(pharmacy.getTel())
+                            .build();
+
+                })
+                .collect(Collectors.toList());
+
+        return PrescriptionItemListDto.builder()
+                .totalCnt(prescriptionItemList.size())
+                .prescriptionItemList(prescriptionItemList)
                 .build();
     }
 
