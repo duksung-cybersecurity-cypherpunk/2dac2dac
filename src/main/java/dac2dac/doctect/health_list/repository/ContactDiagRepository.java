@@ -6,4 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ContactDiagRepository extends JpaRepository<ContactDiag, Long> {
 
     void deleteByUserId(Long userId);
+
+//    @Query("select cd from ContactDiag cd where cd.user.id =:userId and cd.agencyName =:agencyName")
+//    ContactDiag findByUserIdAndDiagId(Long userId, String agencyName);
 }

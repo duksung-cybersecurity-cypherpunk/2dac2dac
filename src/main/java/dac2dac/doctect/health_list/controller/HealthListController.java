@@ -8,11 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "내역", description = "HealthList API")
 @RestController
@@ -27,6 +23,12 @@ public class HealthListController {
     public ApiResult syncMydata(@Valid @RequestBody UserAuthenticationDto userAuthenticationDto, @PathVariable Long userId) {
         healthListService.syncMydata(userAuthenticationDto, userId);
         return ApiResult.success(SuccessCode.SYNC_SUCCESS);
+    }
+
+    @Operation(summary = "진료 내역(대면) 상세 조회 API", description = "유저의 진료 내역(대면)을 상세 조회한다.")
+    @GetMapping("{userId}/diagnosis/{diagId}")
+    public ApiResult getContactDiagnosis(@PathVariable Long userId, @PathVariable Long diagId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getDetailContactDiagnosis(userId, diagId));
     }
 
 }

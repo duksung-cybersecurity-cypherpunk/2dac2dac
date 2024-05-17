@@ -1,19 +1,14 @@
 package dac2dac.doctect.health_list.service;
 
+import dac2dac.doctect.agency.entity.Agency;
+import dac2dac.doctect.agency.entity.Hospital;
+import dac2dac.doctect.agency.repository.HospitalRepository;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
-import dac2dac.doctect.health_list.dto.request.DiagnosisDto;
-import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
-import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
-import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
-import dac2dac.doctect.health_list.dto.request.VaccinationDto;
-import dac2dac.doctect.health_list.entity.BloodTest;
-import dac2dac.doctect.health_list.entity.HealthScreening;
-import dac2dac.doctect.health_list.entity.MeasurementTest;
-import dac2dac.doctect.health_list.entity.OtherTest;
-import dac2dac.doctect.health_list.entity.Prescription;
-import dac2dac.doctect.health_list.entity.PrescriptionDrug;
+import dac2dac.doctect.health_list.dto.request.*;
+import dac2dac.doctect.health_list.dto.response.ContactDiagDto;
+import dac2dac.doctect.health_list.entity.*;
 import dac2dac.doctect.health_list.repository.ContactDiagRepository;
 import dac2dac.doctect.health_list.repository.HealthScreeningRepository;
 import dac2dac.doctect.health_list.repository.PrescriptionRepository;
@@ -21,10 +16,15 @@ import dac2dac.doctect.health_list.repository.VaccinationRepository;
 import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.repository.UserRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +36,7 @@ public class HealthListService {
     private final PrescriptionRepository prescriptionRepository;
     private final HealthScreeningRepository healthScreeningRepository;
     private final VaccinationRepository vaccinationRepository;
+    private final HospitalRepository hospitalRepository;
 
     @Transactional
     public void syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
@@ -50,7 +51,7 @@ public class HealthListService {
 
         List<DiagnosisDto> diagnosisData = mydataJdbcRepository.findDiagnosisByUserId(mydataUserId);
         diagnosisData.forEach(diagnosisDto ->
-            contactDiagRepository.save(diagnosisDto.toEntity(user)));
+                contactDiagRepository.save(diagnosisDto.toEntity(user)));
 
         //* 투악 내역
         prescriptionRepository.deleteByUserId(userId);
@@ -91,13 +92,106 @@ public class HealthListService {
 
         List<VaccinationDto> vaccinationData = mydataJdbcRepository.findVaccinationByUserId(mydataUserId);
         vaccinationData.forEach(vaccinationDto ->
-            vaccinationRepository.save(vaccinationDto.toEntity(user)));
+                vaccinationRepository.save(vaccinationDto.toEntity(user)));
 
     }
 
     private Long authenticateUser(UserAuthenticationDto userAuthenticationDto) {
         // 유저 아이디가 존재할 경우 본인 인증에 성공한 것으로 간주한다.
         return mydataJdbcRepository.findByNameAndPin(userAuthenticationDto.getName(), userAuthenticationDto.getPin())
-            .orElseThrow(() -> new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED));
+                .orElseThrow(() -> new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED));
+    }
+
+    public ContactDiagDto getDetailContactDiagnosis(Long userId, Long diagId) {
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+//        ContactDiag findContactDiag = contactDiagRepository.findByUserIdAndDiagId(userId, "원약국");
+        ContactDiag findContactDiag = contactDiagRepository.findById(diagId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ENTITY_NOT_FOUND));
+        List<Hospital> findHospital = hospitalRepository.findByName(findContactDiag.getAgencyName());
+        Hospital hospital = findHospital.stream()
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(ErrorCode.HOSPITAL_NOT_FOUND));
+
+        return ContactDiagDto.builder()
+                .agencyName(hospital.getName())
+                .agencyAddress(hospital.getAddress())
+                .agencyIsOpenNow(isAgencyOpenNow(hospital))
+                .agencyTodayOpenTime(findTodayOpenTime(hospital))
+                .agencyTodayCloseTime(findTodayCloseTime(hospital))
+                .diagDate(findContactDiag.getDiagDate())
+                .diagType(findContactDiag.getDiagType())
+                .prescription_cnt(findContactDiag.getPrescription_cnt())
+                .medication_cnt(findContactDiag.getMedication_cnt())
+                .visit_days(findContactDiag.getVisit_days())
+                .build();
+    }
+
+
+    private boolean isAgencyOpenNow(Agency agency) {
+        Integer todayOpenTime = findTodayOpenTime(agency);
+        Integer todayCloseTime = findTodayCloseTime(agency);
+
+        if (todayOpenTime != null && todayCloseTime != null) {
+            LocalTime now = LocalTime.now();
+            LocalTime startTime = LocalTime.parse(String.format("%04d", todayOpenTime), DateTimeFormatter.ofPattern("HHmm"));
+            LocalTime endTime;
+            if (todayCloseTime == 2400) {
+                endTime = LocalTime.MAX;
+            } else {
+                endTime = LocalTime.parse(String.format("%04d", todayCloseTime), DateTimeFormatter.ofPattern("HHmm"));
+            }
+            // 현재 시간이 오픈 시간과 클로즈 시간 사이에 있는지 확인
+            return !now.isBefore(startTime) && now.isBefore(endTime);
+        } else {
+            return false;
+        }
+    }
+
+    private static Integer findTodayOpenTime(Agency agency) {
+        LocalDate today = LocalDate.now();
+        DayOfWeek dayOfWeek = today.getDayOfWeek();
+
+        switch (dayOfWeek) {
+            case MONDAY:
+                return agency.getDiagTimeMonOpen();
+            case TUESDAY:
+                return agency.getDiagTimeTuesOpen();
+            case WEDNESDAY:
+                return agency.getDiagTimeWedsOpen();
+            case THURSDAY:
+                return agency.getDiagTimeThursOpen();
+            case FRIDAY:
+                return agency.getDiagTimeFriOpen();
+            case SATURDAY:
+                return agency.getDiagTimeSatOpen();
+            case SUNDAY:
+                return agency.getDiagTimeSunOpen();
+        }
+        return 0;
+    }
+
+    private static Integer findTodayCloseTime(Agency agency) {
+        LocalDate today = LocalDate.now();
+        DayOfWeek dayOfWeek = today.getDayOfWeek();
+
+        switch (dayOfWeek) {
+            case MONDAY:
+                return agency.getDiagTimeMonClose();
+            case TUESDAY:
+                return agency.getDiagTimeTuesClose();
+            case WEDNESDAY:
+                return agency.getDiagTimeWedsClose();
+            case THURSDAY:
+                return agency.getDiagTimeThursClose();
+            case FRIDAY:
+                return agency.getDiagTimeFriClose();
+            case SATURDAY:
+                return agency.getDiagTimeSatClose();
+            case SUNDAY:
+                return agency.getDiagTimeSunClose();
+        }
+        return 0;
     }
 }
