@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "내역", description = "HealthList API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/mydata")
+@RequestMapping("/api/v1/healthList")
 public class HealthListController {
 
     private final HealthListService healthListService;
@@ -25,10 +25,9 @@ public class HealthListController {
         return ApiResult.success(SuccessCode.SYNC_SUCCESS);
     }
 
-    @Operation(summary = "진료 내역(대면) 상세 조회 API", description = "유저의 진료 내역(대면)을 상세 조회한다.")
-    @GetMapping("{userId}/diagnosis/{diagId}")
+    @Operation(summary = "진료 내역(대면) 상세 조회 API", description = "유저의 진 내역(대면)을 상세 조회한다.")
+    @GetMapping("{userId}/diagnosis/contact/{diagId}")
     public ApiResult getContactDiagnosis(@PathVariable Long userId, @PathVariable Long diagId) {
         return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getDetailContactDiagnosis(userId, diagId));
     }
-
 }
