@@ -34,6 +34,7 @@ public enum ErrorCode {
     CONTACT_DIAGNOSIS_NOT_FOUND(HttpStatus.NOT_FOUND, "ID에 해당하는 대면 진료 내역을 찾을 수 없습니다."),
     PRESCRIPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "ID에 해당하는 투약 내역을 찾을 수 없습니다."),
     VACCINATION_NOT_FOUND(HttpStatus.NOT_FOUND, "ID에 해당하는 예방접종 내역을 찾을 수 없습니다."),
+    HEALTHSCREENING_NOT_FOUND(HttpStatus.NOT_FOUND, "ID에 해당하는 건강검진 내역을 찾을 수 없습니다."),
     NEARBY_PHARMACY_NOT_FOUND(HttpStatus.NOT_FOUND, "반경 2km 이내의 약국을 찾을 수 없습니다."),
     NEARBY_HOSPITAL_NOT_FOUND(HttpStatus.NOT_FOUND, "반경 2km 이내의 병원을 찾을 수 없습니다."),
 

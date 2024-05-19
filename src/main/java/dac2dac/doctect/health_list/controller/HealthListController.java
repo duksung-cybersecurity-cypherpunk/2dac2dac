@@ -72,4 +72,10 @@ public class HealthListController {
         return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getHealthScreeningList(userId));
     }
 
+    @Operation(summary = "건강검진 내역 상세 조회 API", description = "유저의 건강검진 내역을 상세 조회한다.")
+    @GetMapping("/healthScreening/{userId}/{hsId}")
+    public ApiResult getHealthScreening(@PathVariable Long userId, @PathVariable Long hsId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getDetailHealthScreening(userId, hsId));
+    }
+
 }

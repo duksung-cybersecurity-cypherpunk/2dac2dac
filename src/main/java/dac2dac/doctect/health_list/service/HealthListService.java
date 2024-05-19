@@ -13,6 +13,7 @@ import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
 import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
 import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
 import dac2dac.doctect.health_list.dto.request.VaccinationDto;
+import dac2dac.doctect.health_list.dto.response.DoctorInfo;
 import dac2dac.doctect.health_list.dto.response.HostpitalInfo;
 import dac2dac.doctect.health_list.dto.response.PharmacyInfo;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagDetailDto;
@@ -22,8 +23,13 @@ import dac2dac.doctect.health_list.dto.response.diagnosis.DiagDetailInfo;
 import dac2dac.doctect.health_list.dto.response.diagnosis.DiagnosisListDto;
 import dac2dac.doctect.health_list.dto.response.diagnosis.NoncontactDiagItem;
 import dac2dac.doctect.health_list.dto.response.diagnosis.NoncontactDiagItemList;
+import dac2dac.doctect.health_list.dto.response.healthScreening.BloodTestInfo;
+import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningDetailDto;
+import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningInfo;
 import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningItem;
 import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningItemListDto;
+import dac2dac.doctect.health_list.dto.response.healthScreening.MeasurementTestInfo;
+import dac2dac.doctect.health_list.dto.response.healthScreening.OtherTestInfo;
 import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDetailDto;
 import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDrugItem;
 import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDrugItemList;
@@ -58,6 +64,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -388,6 +395,121 @@ public class HealthListService {
         return HealthScreeningItemListDto.builder()
             .totalCnt(healthScreeningItemList.size())
             .healthScreeningItemList(healthScreeningItemList)
+            .build();
+    }
+
+    public HealthScreeningDetailDto getDetailHealthScreening(Long userId, Long hsId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        HealthScreening findHealthScreening = healthScreeningRepository.findById(hsId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.HEALTHSCREENING_NOT_FOUND));
+
+        //* 유저와 조회한 건강검진 내역에 해당하는 유저가 다를 경우
+        if (!user.getId().equals(findHealthScreening.getUser().getId())) {
+            new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        //* 의사 정보
+        DoctorInfo doctorInfo = DoctorInfo.builder()
+            .diagDate(findHealthScreening.getCheckupDate())
+            .doctorHospital(findHealthScreening.getAgencyName())
+            .doctorName(findHealthScreening.getDoctorName())
+            .build();
+
+        //* 건강검진 결과 정보
+        HealthScreeningInfo healthScreeningInfo = HealthScreeningInfo.builder()
+            .diagDate(findHealthScreening.getCheckupDate())
+            .doctorHospital(findHealthScreening.getAgencyName())
+            .doctorName(findHealthScreening.getDoctorName())
+            .opinion(findHealthScreening.getOpinion())
+            .build();
+
+        //* 계측 검사 정보
+        MeasurementTestInfo measurementTestInfo = MeasurementTestInfo.builder()
+            .height(findHealthScreening.getMeasurementTest().getHeight())
+            .weight(findHealthScreening.getMeasurementTest().getWeight())
+            .waist(findHealthScreening.getMeasurementTest().getWaist())
+            .bmi(findHealthScreening.getMeasurementTest().getBmi())
+            .sightLeft(findHealthScreening.getMeasurementTest().getSightLeft())
+            .sightRight(findHealthScreening.getMeasurementTest().getSightRight())
+            .hearingLeft(findHealthScreening.getMeasurementTest().getHearingLeft())
+            .hearingRight(findHealthScreening.getMeasurementTest().getHearingRight())
+            .bloodPressureHigh(findHealthScreening.getMeasurementTest().getBloodPressureHigh())
+            .bloodPressureLow(findHealthScreening.getMeasurementTest().getBloodPressureLow())
+            .build();
+
+        //* 혈액 검사 정보
+        BloodTestInfo bloodTestInfo = BloodTestInfo.builder()
+            .hemoglobin(findHealthScreening.getBloodTest().getHemoglobin())
+            .fastingBloodSugar(findHealthScreening.getBloodTest().getFastingBloodSugar())
+            .totalCholesterol(findHealthScreening.getBloodTest().getTotalCholesterol())
+            .HDLCholesterol(findHealthScreening.getBloodTest().getHDLCholesterol())
+            .triglyceride(findHealthScreening.getBloodTest().getTriglyceride())
+            .LDLCholesterol(findHealthScreening.getBloodTest().getLDLCholesterol())
+            .serumCreatinine(findHealthScreening.getBloodTest().getSerumCreatinine())
+            .GFR(findHealthScreening.getBloodTest().getGFR())
+            .AST(findHealthScreening.getBloodTest().getAST())
+            .ALT(findHealthScreening.getBloodTest().getALT())
+            .GPT(findHealthScreening.getBloodTest().getGPT())
+            .build();
+
+        OtherTestInfo otherTestInfo = OtherTestInfo.builder()
+            .urinaryProtein(Optional.ofNullable(findHealthScreening.getOtherTest().getUrinaryProtein())
+                .map(u -> u.getUrinaryProteinType())
+                .orElse(null))
+            .TBChestDisease(Optional.ofNullable(findHealthScreening.getOtherTest().getTBChestDisease())
+                .map(t -> t.getTBChestDiseaseType())
+                .orElse(null))
+            .isHepB(findHealthScreening.getOtherTest().getIsHepB())
+            .hepBSurfaceAntibody(Optional.ofNullable(findHealthScreening.getOtherTest().getHepBSurfaceAntibody())
+                .map(h -> h.getHepBSurfaceAntibodyType())
+                .orElse(null))
+            .hepBSurfaceAntigen(Optional.ofNullable(findHealthScreening.getOtherTest().getHepBSurfaceAntigen())
+                .map(h -> h.getHepBSurfaceAntigenType())
+                .orElse(null))
+            .hepB(findHealthScreening.getOtherTest().getHepB())
+            .isDepression(findHealthScreening.getOtherTest().getIsDepression())
+            .depression(Optional.ofNullable(findHealthScreening.getOtherTest().getDepression())
+                .map(h -> h.getDepressionType())
+                .orElse(null))
+            .isCognitiveDysfunction(findHealthScreening.getOtherTest().getIsCognitiveDysfunction())
+            .cognitiveDysfunction(Optional.ofNullable(findHealthScreening.getOtherTest().getCognitiveDysfunction())
+                .map(h -> h.getCognitiveDysfunctionType())
+                .orElse(null))
+            .isBoneDensityTest(findHealthScreening.getOtherTest().getIsBoneDensityTest())
+            .boneDensityTest(Optional.ofNullable(findHealthScreening.getOtherTest().getBoneDensityTest())
+                .map(h -> h.getBoneDensityType())
+                .orElse(null))
+            .isElderlyPhysicalFunctionTest(findHealthScreening.getOtherTest().getIsElderlyPhysicalFunctionTest())
+            .elderlyPhysicalFunctionTest(Optional.ofNullable(findHealthScreening.getOtherTest().getElderlyPhysicalFunctionTest())
+                .map(h -> h.getElderlyPhysicalFunctionTestType())
+                .orElse(null))
+            .isElderlyFunctionalAssessment(findHealthScreening.getOtherTest().getIsElderlyFunctionalAssessment())
+            .elderlyFunctionalAssessmentFalls(Optional.ofNullable(findHealthScreening.getOtherTest().getElderlyFunctionalAssessmentFalls())
+                .map(h -> h.getElderlyFunctionalAssessmentFallsType())
+                .orElse(null))
+            .elderlyFunctionalAssessmentADL(Optional.ofNullable(findHealthScreening.getOtherTest().getElderlyFunctionalAssessmentADL())
+                .map(h -> h.getElderlyFunctionalAssessmentADLType())
+                .orElse(null))
+            .elderlyFunctionalAssessmentVaccination(Optional.ofNullable(findHealthScreening.getOtherTest().getElderlyFunctionalAssessmentVaccination())
+                .map(h -> h.getElderlyFunctionalAssessmentVaccinationType())
+                .orElse(null))
+            .elderlyFunctionalAssessmentUrinaryIncontinence(Optional.ofNullable(findHealthScreening.getOtherTest().getElderlyFunctionalAssessmentUrinaryIncontinence())
+                .map(h -> h.getElderlyFunctionalAssessmentUrinaryIncontinenceType())
+                .orElse(null))
+            .smoke(findHealthScreening.getOtherTest().getSmoke())
+            .drink(findHealthScreening.getOtherTest().getDrink())
+            .physicalActivity(findHealthScreening.getOtherTest().getPhysicalActivity())
+            .exercise(findHealthScreening.getOtherTest().getExercise())
+            .build();
+
+        return HealthScreeningDetailDto.builder()
+            .doctorInfo(doctorInfo)
+            .healthScreeningInfo(healthScreeningInfo)
+            .measurementTestInfo(measurementTestInfo)
+            .bloodTestInfo(bloodTestInfo)
+            .otherTestInfo(otherTestInfo)
             .build();
     }
 
