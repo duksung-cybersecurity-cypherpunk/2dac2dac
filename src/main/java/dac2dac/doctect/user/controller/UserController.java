@@ -1,8 +1,6 @@
 package dac2dac.doctect.user.controller;
 
-import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.constant.SuccessCode;
-import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

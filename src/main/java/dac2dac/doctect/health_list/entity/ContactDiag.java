@@ -1,6 +1,7 @@
-package dac2dac.doctect.user.entity;
+package dac2dac.doctect.health_list.entity;
 
-import dac2dac.doctect.user.entity.constant.ContactDiagType;
+import dac2dac.doctect.health_list.entity.constant.DiagType;
+import dac2dac.doctect.user.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,10 +34,20 @@ public class ContactDiag {
     private LocalDateTime diagDate;
 
     @Enumerated(EnumType.STRING)
-    private ContactDiagType diagType;
+    private DiagType diagType;
 
-    private Integer prescribeCnt;
-    private Integer visitCnt;
-    private Integer medicationCnt;
+    private Integer prescription_cnt;
+    private Integer medication_cnt;
+    private Integer visit_days;
 
+    @Builder
+    public ContactDiag(User user, String agencyName, LocalDateTime diagDate, DiagType diagType, Integer prescription_cnt, Integer medication_cnt, Integer visit_days) {
+        this.user = user;
+        this.agencyName = agencyName;
+        this.diagDate = diagDate;
+        this.diagType = diagType;
+        this.prescription_cnt = prescription_cnt;
+        this.medication_cnt = medication_cnt;
+        this.visit_days = visit_days;
+    }
 }
