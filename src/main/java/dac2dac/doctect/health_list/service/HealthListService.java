@@ -13,6 +13,8 @@ import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
 import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
 import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
 import dac2dac.doctect.health_list.dto.request.VaccinationDto;
+import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationDetailDto;
+import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationDetailInfo;
 import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationItem;
 import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationItemListDto;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagDetailDto;
@@ -34,6 +36,7 @@ import dac2dac.doctect.health_list.entity.MeasurementTest;
 import dac2dac.doctect.health_list.entity.OtherTest;
 import dac2dac.doctect.health_list.entity.Prescription;
 import dac2dac.doctect.health_list.entity.PrescriptionDrug;
+import dac2dac.doctect.health_list.entity.Vaccination;
 import dac2dac.doctect.health_list.repository.ContactDiagRepository;
 import dac2dac.doctect.health_list.repository.HealthScreeningRepository;
 import dac2dac.doctect.health_list.repository.PrescriptionDrugRepository;
@@ -44,8 +47,10 @@ import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.repository.UserRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -246,7 +251,7 @@ public class HealthListService {
         Prescription findPrescription = prescriptionRepository.findById(prescriptionId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.PRESCRIPTION_NOT_FOUND));
 
-        //* 유저와 조회한 진료 내역에 해당하는 유저가 다를 경우
+        //* 유저와 조회한 처방 내역에 해당하는 유저가 다를 경우
         if (!user.getId().equals(findPrescription.getUser().getId())) {
             new UnauthorizedException(ErrorCode.UNAUTHORIZED);
         }
@@ -313,6 +318,51 @@ public class HealthListService {
         return VaccinationItemListDto.builder()
             .totalCnt(vaccinationItemList.size())
             .vaccinationItemList(vaccinationItemList)
+            .build();
+    }
+
+    public VaccinationDetailDto getDetailVaccination(Long userId, Long vaccId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        Vaccination findVaccination = vaccinationRepository.findById(vaccId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.VACCINATION_NOT_FOUND));
+
+        //* 유저와 조회한 예방접종 내역에 해당하는 유저가 다를 경우
+        if (!user.getId().equals(findVaccination.getUser().getId())) {
+            new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        Hospital findHospital = hospitalRepository.findByName(findVaccination.getAgencyName())
+            .stream()
+            .findFirst()
+            .orElseThrow(() -> new NotFoundException(ErrorCode.HOSPITAL_NOT_FOUND));
+
+        //* 접종 기관
+        VaccinationItem vaccinationInfo = VaccinationItem.builder()
+            .vaccDate(findVaccination.getVaccDate())
+            .agencyName(findHospital.getName())
+            .agencyAddress(findHospital.getAddress())
+            .agencyTodayOpenTime(findTodayOpenTime(findHospital))
+            .agencyTodayCloseTime(findTodayCloseTime(findHospital))
+            .agencyIsOpenNow(isAgencyOpenNow(findHospital))
+            .build();
+
+        // 접종경과일 계산
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        long postVaccinationDays = ChronoUnit.DAYS.between(findVaccination.getVaccDate(), currentDateTime);
+
+        //* 접종 정보
+        VaccinationDetailInfo vaccinationDetailInfo = VaccinationDetailInfo.builder()
+            .vaccDate(findVaccination.getVaccDate())
+            .vaccName(findVaccination.getVaccine())
+            .vaccSeries(findVaccination.getVaccSeries())
+            .postVaccinationDays(postVaccinationDays)
+            .build();
+
+        return VaccinationDetailDto.builder()
+            .vaccinationInfo(vaccinationInfo)
+            .vaccinationDetailInfo(vaccinationDetailInfo)
             .build();
     }
 

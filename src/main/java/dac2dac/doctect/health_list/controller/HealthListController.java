@@ -60,5 +60,10 @@ public class HealthListController {
         return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getVaccinationList(userId));
     }
 
+    @Operation(summary = "예방접종 내역 상세 조회 API", description = "유저의 예방접종 내역을 상세 조회한다.")
+    @GetMapping("/vaccination/{userId}/{vaccId}")
+    public ApiResult getVaccination(@PathVariable Long userId, @PathVariable Long vaccId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getDetailVaccination(userId, vaccId));
+    }
 
 }
