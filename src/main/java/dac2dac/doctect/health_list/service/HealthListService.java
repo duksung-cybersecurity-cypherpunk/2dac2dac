@@ -155,6 +155,7 @@ public class HealthListService {
                     .agencyTodayCloseTime(findTodayCloseTime(findHospital))
                     .build();
             })
+            .sorted(Comparator.comparing(ContactDiagItem::getDiagDate).reversed())
             .collect(Collectors.toList());
 
         ContactDiagItemList contactDiagItemListDto = ContactDiagItemList.builder()
@@ -229,6 +230,7 @@ public class HealthListService {
                     .build();
 
             })
+            .sorted(Comparator.comparing(PrescriptionItem::getTreatDate).reversed())
             .collect(Collectors.toList());
 
         return PrescriptionItemListDto.builder()
