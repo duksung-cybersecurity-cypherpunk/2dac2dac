@@ -135,6 +135,7 @@ public class MydataJdbcRepository {
                 .bloodTest(findBloodTestById(rs.getLong("blood_test_id")))
                 .otherTest(findOtherTestById(rs.getLong("other_test_id")))
                 .agencyName(rs.getString("res_organization_name"))
+                .doctorName(rs.getString("res_doctor_name"))
                 .checkupDate(rs.getTimestamp("res_checkup_date").toLocalDateTime())
                 .opinion(rs.getString("res_opinion"))
                 .build();

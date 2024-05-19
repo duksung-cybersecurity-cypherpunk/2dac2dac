@@ -17,17 +17,19 @@ public class HealthScreeningDto {
     private OtherTestDto otherTest;
 
     private String agencyName;
+    private String doctorName;
     private LocalDateTime checkupDate;
 
     @Lob
     private String opinion;
 
     @Builder
-    public HealthScreeningDto(MeasurementTestDto measurementTest, BloodTestDto bloodTest, OtherTestDto otherTest, String agencyName, LocalDateTime checkupDate, String opinion) {
+    public HealthScreeningDto(MeasurementTestDto measurementTest, BloodTestDto bloodTest, OtherTestDto otherTest, String agencyName, String doctorName, LocalDateTime checkupDate, String opinion) {
         this.measurementTest = measurementTest;
         this.bloodTest = bloodTest;
         this.otherTest = otherTest;
         this.agencyName = agencyName;
+        this.doctorName = doctorName;
         this.checkupDate = checkupDate;
         this.opinion = opinion;
     }
@@ -36,6 +38,7 @@ public class HealthScreeningDto {
         return HealthScreening.builder()
             .user(user)
             .agencyName(agencyName)
+            .doctorName(doctorName)
             .checkupDate(checkupDate)
             .opinion(opinion)
             .build();

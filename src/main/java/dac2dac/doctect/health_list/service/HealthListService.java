@@ -15,10 +15,6 @@ import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
 import dac2dac.doctect.health_list.dto.request.VaccinationDto;
 import dac2dac.doctect.health_list.dto.response.HostpitalInfo;
 import dac2dac.doctect.health_list.dto.response.PharmacyInfo;
-import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationDetailDto;
-import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationDetailInfo;
-import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationItem;
-import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationItemListDto;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagDetailDto;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagItem;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagItemList;
@@ -26,11 +22,17 @@ import dac2dac.doctect.health_list.dto.response.diagnosis.DiagDetailInfo;
 import dac2dac.doctect.health_list.dto.response.diagnosis.DiagnosisListDto;
 import dac2dac.doctect.health_list.dto.response.diagnosis.NoncontactDiagItem;
 import dac2dac.doctect.health_list.dto.response.diagnosis.NoncontactDiagItemList;
+import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningItem;
+import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningItemListDto;
 import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDetailDto;
 import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDrugItem;
 import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDrugItemList;
 import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionItem;
 import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionItemListDto;
+import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationDetailDto;
+import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationDetailInfo;
+import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationItem;
+import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationItemListDto;
 import dac2dac.doctect.health_list.entity.BloodTest;
 import dac2dac.doctect.health_list.entity.ContactDiag;
 import dac2dac.doctect.health_list.entity.HealthScreening;
@@ -365,6 +367,27 @@ public class HealthListService {
         return VaccinationDetailDto.builder()
             .agencyInfo(hospitalInfo)
             .vaccinationDetailInfo(vaccinationDetailInfo)
+            .build();
+    }
+
+    public HealthScreeningItemListDto getHealthScreeningList(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        List<HealthScreeningItem> healthScreeningItemList = healthScreeningRepository.findByUserId(userId)
+            .stream()
+            .map(h -> HealthScreeningItem.builder()
+                .doctorHospital(h.getAgencyName())
+                .doctorName(h.getDoctorName())
+                .diagDate(h.getCheckupDate())
+                .build()
+            )
+            .sorted(Comparator.comparing(HealthScreeningItem::getDiagDate).reversed())
+            .collect(Collectors.toList());
+
+        return HealthScreeningItemListDto.builder()
+            .totalCnt(healthScreeningItemList.size())
+            .healthScreeningItemList(healthScreeningItemList)
             .build();
     }
 

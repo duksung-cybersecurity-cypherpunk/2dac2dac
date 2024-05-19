@@ -1,4 +1,4 @@
-package dac2dac.doctect.health_list.dto.response.Vaccination;
+package dac2dac.doctect.health_list.dto.response.vaccination;
 
 import dac2dac.doctect.health_list.dto.response.HostpitalInfo;
 import lombok.Builder;

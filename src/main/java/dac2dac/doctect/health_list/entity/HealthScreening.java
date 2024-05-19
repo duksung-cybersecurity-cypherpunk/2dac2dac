@@ -31,6 +31,7 @@ public class HealthScreening {
     private User user;
 
     private String agencyName;
+    private String doctorName;
     private LocalDateTime checkupDate;
 
     @Lob
@@ -62,9 +63,10 @@ public class HealthScreening {
     }
 
     @Builder
-    public HealthScreening(User user, String agencyName, LocalDateTime checkupDate, String opinion, MeasurementTest measurementTest, BloodTest bloodTest, OtherTest otherTest) {
+    public HealthScreening(User user, String agencyName, String doctorName, LocalDateTime checkupDate, String opinion, MeasurementTest measurementTest, BloodTest bloodTest, OtherTest otherTest) {
         this.user = user;
         this.agencyName = agencyName;
+        this.doctorName = doctorName;
         this.checkupDate = checkupDate;
         this.opinion = opinion;
         this.measurementTest = measurementTest;
