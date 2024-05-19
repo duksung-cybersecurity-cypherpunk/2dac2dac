@@ -8,7 +8,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "내역", description = "HealthList API")
 @RestController
@@ -48,5 +53,12 @@ public class HealthListController {
     public ApiResult getPrescription(@PathVariable Long userId, @PathVariable Long prescriptionId) {
         return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getDetailPrescription(userId, prescriptionId));
     }
+
+    @Operation(summary = "예방접종 내역 조회 API", description = "유저의 예방접종 내역을 조회한다.")
+    @GetMapping("/vaccination/{userId}")
+    public ApiResult getVaccinationList(@PathVariable Long userId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getVaccinationList(userId));
+    }
+
 
 }
