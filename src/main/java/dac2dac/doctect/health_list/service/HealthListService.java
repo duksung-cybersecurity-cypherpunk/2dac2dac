@@ -299,6 +299,7 @@ public class HealthListService {
                 return VaccinationItem.builder()
                     .vaccDate(v.getVaccDate())
                     .vaccName(v.getVaccine())
+                    .vaccSeries(v.getVaccSeries())
                     .agencyName(findHospital.getName())
                     .agencyAddress(findHospital.getAddress())
                     .agencyTodayOpenTime(findTodayOpenTime(findHospital))

@@ -11,6 +11,7 @@ public class VaccinationItem {
 
     private LocalDateTime vaccDate;
     private String vaccName;
+    private Integer vaccSeries;
 
     private String agencyName;
     private String agencyAddress;
@@ -22,10 +23,11 @@ public class VaccinationItem {
     private boolean agencyIsOpenNow;
 
     @Builder
-    public VaccinationItem(LocalDateTime vaccDate, String vaccName, String agencyName, String agencyAddress, String agencyThumbnail, Integer agencyTodayOpenTime, Integer agencyTodayCloseTime,
-        boolean agencyIsOpenNow) {
+    public VaccinationItem(LocalDateTime vaccDate, String vaccName, Integer vaccSeries, String agencyName, String agencyAddress, String agencyThumbnail, Integer agencyTodayOpenTime,
+        Integer agencyTodayCloseTime, boolean agencyIsOpenNow) {
         this.vaccDate = vaccDate;
         this.vaccName = vaccName;
+        this.vaccSeries = vaccSeries;
         this.agencyName = agencyName;
         this.agencyAddress = agencyAddress;
         this.agencyThumbnail = agencyThumbnail;
