@@ -9,13 +9,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class HealthScreeningItem {
 
+    private Long hsId;
+
     private LocalDateTime diagDate;
 
     private String doctorName;
     private String doctorHospital;
 
     @Builder
-    public HealthScreeningItem(LocalDateTime diagDate, String doctorName, String doctorHospital) {
+    public HealthScreeningItem(Long hsId, LocalDateTime diagDate, String doctorName, String doctorHospital) {
+        this.hsId = hsId;
         this.diagDate = diagDate;
         this.doctorName = doctorName;
         this.doctorHospital = doctorHospital;

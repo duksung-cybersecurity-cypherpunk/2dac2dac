@@ -163,6 +163,7 @@ public class HealthListService {
                     .orElseThrow(() -> new NotFoundException(ErrorCode.HOSPITAL_NOT_FOUND));
 
                 return ContactDiagItem.builder()
+                    .diagId(c.getId())
                     .diagDate(c.getDiagDate())
                     .agencyName(findHospital.getName())
                     .agencyAddress(findHospital.getAddress())
@@ -239,6 +240,7 @@ public class HealthListService {
                     .orElseThrow(() -> new NotFoundException(ErrorCode.PHARMACY_NOT_FOUND));
 
                 return PrescriptionItem.builder()
+                    .prescriptionId(p.getId())
                     .treatDate(p.getTreatDate())
                     .agencyName(pharmacy.getName())
                     .agencyAddress(pharmacy.getAddress())
@@ -313,6 +315,7 @@ public class HealthListService {
                     .orElseThrow(() -> new NotFoundException(ErrorCode.HOSPITAL_NOT_FOUND));
 
                 return VaccinationItem.builder()
+                    .vaccId(v.getId())
                     .vaccDate(v.getVaccDate())
                     .vaccName(v.getVaccine())
                     .vaccSeries(v.getVaccSeries())
@@ -384,6 +387,7 @@ public class HealthListService {
         List<HealthScreeningItem> healthScreeningItemList = healthScreeningRepository.findByUserId(userId)
             .stream()
             .map(h -> HealthScreeningItem.builder()
+                .hsId(h.getId())
                 .doctorHospital(h.getAgencyName())
                 .doctorName(h.getDoctorName())
                 .diagDate(h.getCheckupDate())

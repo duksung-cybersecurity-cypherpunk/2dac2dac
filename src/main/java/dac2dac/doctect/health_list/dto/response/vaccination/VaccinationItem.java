@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VaccinationItem {
 
+    private Long vaccId;
+
     private LocalDateTime vaccDate;
     private String vaccName;
     private Integer vaccSeries;
@@ -23,8 +25,9 @@ public class VaccinationItem {
     private boolean agencyIsOpenNow;
 
     @Builder
-    public VaccinationItem(LocalDateTime vaccDate, String vaccName, Integer vaccSeries, String agencyName, String agencyAddress, String agencyThumbnail, Integer agencyTodayOpenTime,
+    public VaccinationItem(Long vaccId, LocalDateTime vaccDate, String vaccName, Integer vaccSeries, String agencyName, String agencyAddress, String agencyThumbnail, Integer agencyTodayOpenTime,
         Integer agencyTodayCloseTime, boolean agencyIsOpenNow) {
+        this.vaccId = vaccId;
         this.vaccDate = vaccDate;
         this.vaccName = vaccName;
         this.vaccSeries = vaccSeries;
