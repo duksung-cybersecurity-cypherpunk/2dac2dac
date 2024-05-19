@@ -1,5 +1,6 @@
 package dac2dac.doctect.health_list.dto.response.prescription;
 
+import dac2dac.doctect.health_list.dto.response.PharmacyInfo;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,12 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PrescriptionDetailDto {
 
-    PrescriptionItem prescriptionInfo;
+    PharmacyInfo agencyInfo;
     PrescriptionDrugItemList prescriptionDrugInfo;
 
     @Builder
-    public PrescriptionDetailDto(PrescriptionItem prescriptionInfo, PrescriptionDrugItemList prescriptionDrugInfo) {
-        this.prescriptionInfo = prescriptionInfo;
+    public PrescriptionDetailDto(PharmacyInfo agencyInfo, PrescriptionDrugItemList prescriptionDrugInfo) {
+        this.agencyInfo = agencyInfo;
         this.prescriptionDrugInfo = prescriptionDrugInfo;
     }
 }

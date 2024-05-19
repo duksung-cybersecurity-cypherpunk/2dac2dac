@@ -13,6 +13,8 @@ import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
 import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
 import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
 import dac2dac.doctect.health_list.dto.request.VaccinationDto;
+import dac2dac.doctect.health_list.dto.response.HostpitalInfo;
+import dac2dac.doctect.health_list.dto.response.PharmacyInfo;
 import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationDetailDto;
 import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationDetailInfo;
 import dac2dac.doctect.health_list.dto.response.Vaccination.VaccinationItem;
@@ -192,7 +194,7 @@ public class HealthListService {
             .orElseThrow(() -> new NotFoundException(ErrorCode.HOSPITAL_NOT_FOUND));
 
         //* 진료 기관
-        ContactDiagItem contactDiagInfo = ContactDiagItem.builder()
+        HostpitalInfo hospitalInfo = HostpitalInfo.builder()
             .diagDate(findContactDiag.getDiagDate())
             .agencyName(findHospital.getName())
             .agencyAddress(findHospital.getAddress())
@@ -210,7 +212,7 @@ public class HealthListService {
             .build();
 
         return ContactDiagDetailDto.builder()
-            .contactDiagInfo(contactDiagInfo)
+            .agencyInfo(hospitalInfo)
             .diagDetailInfo(diagDetailInfo)
             .build();
     }
@@ -262,7 +264,7 @@ public class HealthListService {
             .orElseThrow(() -> new NotFoundException(ErrorCode.PHARMACY_NOT_FOUND));
 
         //* 처방 기관
-        PrescriptionItem prescriptionInfo = PrescriptionItem.builder()
+        PharmacyInfo pharmacyInfo = PharmacyInfo.builder()
             .treatDate(findPrescription.getTreatDate())
             .agencyName(findPharmacy.getName())
             .agencyAddress(findPharmacy.getAddress())
@@ -284,7 +286,7 @@ public class HealthListService {
             .build();
 
         return PrescriptionDetailDto.builder()
-            .prescriptionInfo(prescriptionInfo)
+            .agencyInfo(pharmacyInfo)
             .prescriptionDrugInfo(prescriptionDrugInfo)
             .build();
     }
@@ -339,8 +341,8 @@ public class HealthListService {
             .orElseThrow(() -> new NotFoundException(ErrorCode.HOSPITAL_NOT_FOUND));
 
         //* 접종 기관
-        VaccinationItem vaccinationInfo = VaccinationItem.builder()
-            .vaccDate(findVaccination.getVaccDate())
+        HostpitalInfo hospitalInfo = HostpitalInfo.builder()
+            .diagDate(findVaccination.getVaccDate())
             .agencyName(findHospital.getName())
             .agencyAddress(findHospital.getAddress())
             .agencyTodayOpenTime(findTodayOpenTime(findHospital))
@@ -361,7 +363,7 @@ public class HealthListService {
             .build();
 
         return VaccinationDetailDto.builder()
-            .vaccinationInfo(vaccinationInfo)
+            .agencyInfo(hospitalInfo)
             .vaccinationDetailInfo(vaccinationDetailInfo)
             .build();
     }
