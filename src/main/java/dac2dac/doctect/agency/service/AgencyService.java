@@ -3,7 +3,9 @@ package dac2dac.doctect.agency.service;
 import dac2dac.doctect.agency.dto.request.SearchCriteria;
 import dac2dac.doctect.agency.dto.response.AgencySearchResultDto;
 import dac2dac.doctect.agency.dto.response.AgencySearchResultListDto;
+import dac2dac.doctect.agency.dto.response.PharmacyDto;
 import dac2dac.doctect.agency.entity.Agency;
+import dac2dac.doctect.agency.entity.Pharmacy;
 import dac2dac.doctect.agency.repository.HospitalRepository;
 import dac2dac.doctect.agency.repository.PharmacyRepository;
 import dac2dac.doctect.common.constant.ErrorCode;
@@ -64,6 +66,26 @@ public class AgencyService {
         return AgencySearchResultListDto.builder()
             .totalCnt(sortedResult.size())
             .agencySearchResultList(sortedResult)
+            .build();
+    }
+
+    public PharmacyDto getDetailPharmacy(Long userId, Long pharmacyId) {
+        Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.PHARMACY_NOT_FOUND));
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        return PharmacyDto.builder()
+            .name(pharmacy.getName())
+            .address(pharmacy.getAddress())
+            .tel(pharmacy.getTel())
+            .distance(calculateDistance(user.getLatitude(), user.getLongitude(), pharmacy.getLatitude(), pharmacy.getLongitude()))
+            .isOpen(isAgencyOpenNow(pharmacy))
+            .todayOpenTime(findTodayOpenTime(pharmacy))
+            .todayCloseTime(findTodayCloseTime(pharmacy))
+            .latitude(pharmacy.getLatitude())
+            .longtitude(pharmacy.getLongitude())
             .build();
     }
 
