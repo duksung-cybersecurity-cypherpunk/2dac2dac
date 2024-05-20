@@ -6,6 +6,11 @@ import dac2dac.doctect.agency.dto.response.AgencySearchResultListDto;
 import dac2dac.doctect.agency.entity.Agency;
 import dac2dac.doctect.agency.repository.HospitalRepository;
 import dac2dac.doctect.agency.repository.PharmacyRepository;
+import dac2dac.doctect.common.constant.ErrorCode;
+import dac2dac.doctect.common.error.exception.NotFoundException;
+import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,13 +29,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AgencyService {
 
+    private final UserRepository userRepository;
     private final PharmacyRepository pharmacyRepository;
     private final HospitalRepository hospitalRepository;
 
-    public AgencySearchResultListDto searchAgency(SearchCriteria criteria) {
+    @Transactional
+    public AgencySearchResultListDto searchAgency(Long userId, SearchCriteria criteria) {
         final double latitude = criteria.getLatitude();
         final double longitude = criteria.getLongitude();
         final double radius = 2.0;
+
+        //* 사용자 위치 정보 DB에 저장
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        user.setLocation(latitude, longitude);
+        userRepository.save(user);
 
         //* 중복 제거를 위한 Set
         Set<Agency> searchResultSet = new HashSet<>();

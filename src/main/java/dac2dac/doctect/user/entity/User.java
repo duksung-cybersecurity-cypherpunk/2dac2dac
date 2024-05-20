@@ -36,4 +36,8 @@ public class User extends BaseEntity {
     private Double longitude;
     private Double latitude;
 
+    public void setLocation(Double longitude, Double latitude) {
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
 }
