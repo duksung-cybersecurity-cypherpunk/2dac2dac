@@ -46,4 +46,6 @@ public abstract class Agency {
 
     public abstract AgencyType getAgencyType();
 
+    public abstract Long getId();
+
 }

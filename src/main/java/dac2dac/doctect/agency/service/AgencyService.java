@@ -3,9 +3,18 @@ package dac2dac.doctect.agency.service;
 import dac2dac.doctect.agency.dto.request.SearchCriteria;
 import dac2dac.doctect.agency.dto.response.AgencySearchResultDto;
 import dac2dac.doctect.agency.dto.response.AgencySearchResultListDto;
+import dac2dac.doctect.agency.dto.response.HospitalDto;
+import dac2dac.doctect.agency.dto.response.PharmacyDto;
 import dac2dac.doctect.agency.entity.Agency;
+import dac2dac.doctect.agency.entity.Hospital;
+import dac2dac.doctect.agency.entity.Pharmacy;
 import dac2dac.doctect.agency.repository.HospitalRepository;
 import dac2dac.doctect.agency.repository.PharmacyRepository;
+import dac2dac.doctect.common.constant.ErrorCode;
+import dac2dac.doctect.common.error.exception.NotFoundException;
+import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,24 +33,33 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AgencyService {
 
+    private final UserRepository userRepository;
     private final PharmacyRepository pharmacyRepository;
     private final HospitalRepository hospitalRepository;
 
-    public AgencySearchResultListDto searchAgency(SearchCriteria criteria) {
+    @Transactional
+    public AgencySearchResultListDto searchAgency(Long userId, SearchCriteria criteria) {
         final double latitude = criteria.getLatitude();
         final double longitude = criteria.getLongitude();
         final double radius = 2.0;
 
-        // 중복 제거를 위한 Set
+        //* 사용자 위치 정보 DB에 저장
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        user.setLocation(latitude, longitude);
+        userRepository.save(user);
+
+        //* 중복 제거를 위한 Set
         Set<Agency> searchResultSet = new HashSet<>();
 
-        // 검색 조건에 따른 데이터 조회
+        //* 검색 조건에 따른 데이터 조회
         loadDataBasedOnCriteria(criteria, latitude, longitude, radius, searchResultSet);
 
-        // 결과 필터링
+        //* 결과 필터링
         List<Agency> filteredResult = filterSearchResult(criteria, new ArrayList<>(searchResultSet));
 
-        // 가까운순 정렬
+        //* 가까운순 정렬
         List<AgencySearchResultDto> sortedResult = filteredResult.stream()
             .map(s -> createAgencySearchResultDto(s, latitude, longitude))
             .sorted(Comparator.comparing(AgencySearchResultDto::getDistance))
@@ -50,6 +68,46 @@ public class AgencyService {
         return AgencySearchResultListDto.builder()
             .totalCnt(sortedResult.size())
             .agencySearchResultList(sortedResult)
+            .build();
+    }
+
+    public PharmacyDto getDetailPharmacy(Long userId, Long pharmacyId) {
+        Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.PHARMACY_NOT_FOUND));
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        return PharmacyDto.builder()
+            .name(pharmacy.getName())
+            .address(pharmacy.getAddress())
+            .tel(pharmacy.getTel())
+            .distance(calculateDistance(user.getLatitude(), user.getLongitude(), pharmacy.getLatitude(), pharmacy.getLongitude()))
+            .isOpen(isAgencyOpenNow(pharmacy))
+            .todayOpenTime(findTodayOpenTime(pharmacy))
+            .todayCloseTime(findTodayCloseTime(pharmacy))
+            .latitude(pharmacy.getLatitude())
+            .longtitude(pharmacy.getLongitude())
+            .build();
+    }
+
+    public HospitalDto getDetailHospital(Long userId, Long hospitalId) {
+        Hospital hospital = hospitalRepository.findById(hospitalId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.PHARMACY_NOT_FOUND));
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        return HospitalDto.builder()
+            .name(hospital.getName())
+            .address(hospital.getAddress())
+            .tel(hospital.getTel())
+            .distance(calculateDistance(user.getLatitude(), user.getLongitude(), hospital.getLatitude(), hospital.getLongitude()))
+            .isOpen(isAgencyOpenNow(hospital))
+            .todayOpenTime(findTodayOpenTime(hospital))
+            .todayCloseTime(findTodayCloseTime(hospital))
+            .latitude(hospital.getLatitude())
+            .longtitude(hospital.getLongitude())
             .build();
     }
 
@@ -233,6 +291,7 @@ public class AgencyService {
 
     private AgencySearchResultDto createAgencySearchResultDto(Agency a, double latitude, double longitude) {
         return AgencySearchResultDto.builder()
+            .id(a.getId())
             .name(a.getName())
             .todayOpenTime(findTodayOpenTime(a))
             .todayCloseTime(findTodayCloseTime(a))

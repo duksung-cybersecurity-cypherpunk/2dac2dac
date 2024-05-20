@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = {"name", "address"}) // 'name', address 필드를 기반으로 equals와 hashCode 메소드 생성
 public class AgencySearchResultDto {
 
+    private Long id;
+
     private String name;
 
     private boolean isOpen;
@@ -27,8 +29,9 @@ public class AgencySearchResultDto {
     private AgencyType agencyType;
 
     @Builder
-    public AgencySearchResultDto(String name, boolean isOpen, Integer todayOpenTime, Integer todayCloseTime, Double distance, String address, String tel, Double latitude, Double longtitude,
+    public AgencySearchResultDto(Long id, String name, boolean isOpen, Integer todayOpenTime, Integer todayCloseTime, Double distance, String address, String tel, Double latitude, Double longtitude,
         AgencyType agencyType) {
+        this.id = id;
         this.name = name;
         this.isOpen = isOpen;
         this.todayOpenTime = todayOpenTime;
@@ -40,5 +43,4 @@ public class AgencySearchResultDto {
         this.longtitude = longtitude;
         this.agencyType = agencyType;
     }
-
 }
