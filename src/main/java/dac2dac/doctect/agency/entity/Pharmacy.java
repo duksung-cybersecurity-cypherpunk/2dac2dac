@@ -53,4 +53,9 @@ public class Pharmacy extends Agency {
     public AgencyType getAgencyType() {
         return AgencyType.PHARMACY;
     }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
 }

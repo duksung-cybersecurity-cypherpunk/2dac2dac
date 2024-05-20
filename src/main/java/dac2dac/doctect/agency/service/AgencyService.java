@@ -32,16 +32,16 @@ public class AgencyService {
         final double longitude = criteria.getLongitude();
         final double radius = 2.0;
 
-        // 중복 제거를 위한 Set
+        //* 중복 제거를 위한 Set
         Set<Agency> searchResultSet = new HashSet<>();
 
-        // 검색 조건에 따른 데이터 조회
+        //* 검색 조건에 따른 데이터 조회
         loadDataBasedOnCriteria(criteria, latitude, longitude, radius, searchResultSet);
 
-        // 결과 필터링
+        //* 결과 필터링
         List<Agency> filteredResult = filterSearchResult(criteria, new ArrayList<>(searchResultSet));
 
-        // 가까운순 정렬
+        //* 가까운순 정렬
         List<AgencySearchResultDto> sortedResult = filteredResult.stream()
             .map(s -> createAgencySearchResultDto(s, latitude, longitude))
             .sorted(Comparator.comparing(AgencySearchResultDto::getDistance))
@@ -233,6 +233,7 @@ public class AgencyService {
 
     private AgencySearchResultDto createAgencySearchResultDto(Agency a, double latitude, double longitude) {
         return AgencySearchResultDto.builder()
+            .id(a.getId())
             .name(a.getName())
             .todayOpenTime(findTodayOpenTime(a))
             .todayCloseTime(findTodayCloseTime(a))

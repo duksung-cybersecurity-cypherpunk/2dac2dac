@@ -59,4 +59,9 @@ public class Hospital extends Agency {
         return AgencyType.HOSPITAL;
     }
 
+    @Override
+    public Long getId() {
+        return id;
+    }
+
 }
