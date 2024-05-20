@@ -35,4 +35,10 @@ public class AgencyController {
         return ApiResult.success(SuccessCode.GET_SUCCESS, agencyService.getDetailPharmacy(userId, pharmacyId));
     }
 
+    @Operation(summary = "병원 상세조회 API", description = "병원의 상세 정보를 조회한다.")
+    @GetMapping("/search/hospitals/{userId}/{hospitalId}")
+    public ApiResult getDetailHospital(@PathVariable Long userId, @PathVariable Long hospitalId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, agencyService.getDetailHospital(userId, hospitalId));
+    }
+
 }
