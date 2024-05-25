@@ -4,6 +4,7 @@ import dac2dac.doctect.doctor.repository.DepartmentRepository;
 import dac2dac.doctect.doctor.repository.DepartmentTagRepository;
 import dac2dac.doctect.noncontact_diag.dto.response.DepartmentInfo;
 import dac2dac.doctect.noncontact_diag.dto.response.DepartmentListDto;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class NoncontactDiagService {
                     .tags(tags)
                     .build();
             })
+            .sorted(Comparator.comparing(DepartmentInfo::getDepartmentName))
             .collect(Collectors.toList());
 
         return DepartmentListDto.builder()
