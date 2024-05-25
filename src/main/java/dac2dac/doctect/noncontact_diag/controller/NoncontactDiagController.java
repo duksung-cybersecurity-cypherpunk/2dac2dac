@@ -22,13 +22,13 @@ public class NoncontactDiagController {
     @Operation(summary = "진료과목 리스트 조회 API", description = "진료 과목 리스트를 조회한다.")
     @GetMapping("/departments")
     public ApiResult getDepartmentList() {
-        return ApiResult.success(SuccessCode.SYNC_SUCCESS, noncontactDiagService.getDepartmentList());
+        return ApiResult.success(SuccessCode.GET_SUCCESS, noncontactDiagService.getDepartmentList());
     }
 
     @Operation(summary = "진료과목 별 의사 리스트 조회 API", description = "진료 과목 별 의사 리스트를 조회한다.")
     @GetMapping("/departments/{departmentId}/doctors")
     public ApiResult getDoctorList(@PathVariable Long departmentId) {
-        return ApiResult.success(SuccessCode.SYNC_SUCCESS, noncontactDiagService.getDoctorList(departmentId));
+        return ApiResult.success(SuccessCode.GET_SUCCESS, noncontactDiagService.getDoctorList(departmentId));
     }
 
 }
