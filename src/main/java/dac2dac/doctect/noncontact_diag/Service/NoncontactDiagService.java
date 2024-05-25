@@ -18,14 +18,18 @@ public class NoncontactDiagService {
 
     public DepartmentListDto getDepartmentList() {
         List<DepartmentInfo> departmentInfoList = departmentRepository.findAll().stream()
-            .map(d -> DepartmentInfo.builder()
-                .departmentId(d.getId())
-                .departmentName(d.getDepartmentName())
-                .tags(departmentTagRepository.findByDepartmentId(d.getId()).stream()
-                    .map(dt -> dt.getTag())
-                    .collect(Collectors.toList()))
-                .build()
-            ).collect(Collectors.toList());
+            .map(department -> {
+                List<String> tags = departmentTagRepository.findByDepartmentId(department.getId()).stream()
+                    .map(departmentTag -> departmentTag.getTag())
+                    .collect(Collectors.toList());
+
+                return DepartmentInfo.builder()
+                    .departmentId(department.getId())
+                    .departmentName(department.getDepartmentName())
+                    .tags(tags)
+                    .build();
+            })
+            .collect(Collectors.toList());
 
         return DepartmentListDto.builder()
             .cnt(departmentInfoList.size())
