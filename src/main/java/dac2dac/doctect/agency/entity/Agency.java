@@ -1,6 +1,8 @@
 package dac2dac.doctect.agency.entity;
 
 import dac2dac.doctect.agency.entity.constant.AgencyType;
+import dac2dac.doctect.common.entity.DiagTime;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,29 +22,8 @@ public abstract class Agency {
     protected Double longitude;
     protected Double latitude;
 
-    protected Integer diagTimeMonOpen;
-    protected Integer diagTimeMonClose;
-
-    protected Integer diagTimeTuesOpen;
-    protected Integer diagTimeTuesClose;
-
-    protected Integer diagTimeWedsOpen;
-    protected Integer diagTimeWedsClose;
-
-    protected Integer diagTimeThursOpen;
-    protected Integer diagTimeThursClose;
-
-    protected Integer diagTimeFriOpen;
-    protected Integer diagTimeFriClose;
-
-    protected Integer diagTimeSatOpen;
-    protected Integer diagTimeSatClose;
-
-    protected Integer diagTimeSunOpen;
-    protected Integer diagTimeSunClose;
-
-    protected Integer diagTimeHolidayOpen;
-    protected Integer diagTimeHolidayClose;
+    @Embedded
+    protected DiagTime diagTime;
 
     public abstract AgencyType getAgencyType();
 

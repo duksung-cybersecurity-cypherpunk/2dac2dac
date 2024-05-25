@@ -1,6 +1,9 @@
 package dac2dac.doctect.health_list.service;
 
-import dac2dac.doctect.agency.entity.Agency;
+import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayCloseTime;
+import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayOpenTime;
+import static dac2dac.doctect.common.utils.DiagTimeUtils.isAgencyOpenNow;
+
 import dac2dac.doctect.agency.entity.Hospital;
 import dac2dac.doctect.agency.entity.Pharmacy;
 import dac2dac.doctect.agency.repository.HospitalRepository;
@@ -55,11 +58,7 @@ import dac2dac.doctect.health_list.repository.VaccinationRepository;
 import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.repository.UserRepository;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -167,9 +166,9 @@ public class HealthListService {
                     .diagDate(c.getDiagDate())
                     .agencyName(findHospital.getName())
                     .agencyAddress(findHospital.getAddress())
-                    .agencyIsOpenNow(isAgencyOpenNow(findHospital))
-                    .agencyTodayOpenTime(findTodayOpenTime(findHospital))
-                    .agencyTodayCloseTime(findTodayCloseTime(findHospital))
+                    .agencyIsOpenNow(isAgencyOpenNow(findHospital.getDiagTime()))
+                    .agencyTodayOpenTime(findTodayOpenTime(findHospital.getDiagTime()))
+                    .agencyTodayCloseTime(findTodayCloseTime(findHospital.getDiagTime()))
                     .build();
             })
             .sorted(Comparator.comparing(ContactDiagItem::getDiagDate).reversed())
@@ -208,9 +207,9 @@ public class HealthListService {
             .diagDate(findContactDiag.getDiagDate())
             .agencyName(findHospital.getName())
             .agencyAddress(findHospital.getAddress())
-            .agencyIsOpenNow(isAgencyOpenNow(findHospital))
-            .agencyTodayOpenTime(findTodayOpenTime(findHospital))
-            .agencyTodayCloseTime(findTodayCloseTime(findHospital))
+            .agencyIsOpenNow(isAgencyOpenNow(findHospital.getDiagTime()))
+            .agencyTodayOpenTime(findTodayOpenTime(findHospital.getDiagTime()))
+            .agencyTodayCloseTime(findTodayCloseTime(findHospital.getDiagTime()))
             .build();
 
         //* 진료 세부 정보
@@ -321,9 +320,9 @@ public class HealthListService {
                     .vaccSeries(v.getVaccSeries())
                     .agencyName(findHospital.getName())
                     .agencyAddress(findHospital.getAddress())
-                    .agencyTodayOpenTime(findTodayOpenTime(findHospital))
-                    .agencyTodayCloseTime(findTodayCloseTime(findHospital))
-                    .agencyIsOpenNow(isAgencyOpenNow(findHospital))
+                    .agencyTodayOpenTime(findTodayOpenTime(findHospital.getDiagTime()))
+                    .agencyTodayCloseTime(findTodayCloseTime(findHospital.getDiagTime()))
+                    .agencyIsOpenNow(isAgencyOpenNow(findHospital.getDiagTime()))
                     .build();
             })
             .sorted(Comparator.comparing(VaccinationItem::getVaccDate).reversed())
@@ -357,9 +356,9 @@ public class HealthListService {
             .diagDate(findVaccination.getVaccDate())
             .agencyName(findHospital.getName())
             .agencyAddress(findHospital.getAddress())
-            .agencyTodayOpenTime(findTodayOpenTime(findHospital))
-            .agencyTodayCloseTime(findTodayCloseTime(findHospital))
-            .agencyIsOpenNow(isAgencyOpenNow(findHospital))
+            .agencyTodayOpenTime(findTodayOpenTime(findHospital.getDiagTime()))
+            .agencyTodayCloseTime(findTodayCloseTime(findHospital.getDiagTime()))
+            .agencyIsOpenNow(isAgencyOpenNow(findHospital.getDiagTime()))
             .build();
 
         // 접종경과일 계산
@@ -521,71 +520,5 @@ public class HealthListService {
         // 유저 아이디가 존재할 경우 본인 인증에 성공한 것으로 간주한다.
         return mydataJdbcRepository.findByNameAndPin(userAuthenticationDto.getName(), userAuthenticationDto.getPin())
             .orElseThrow(() -> new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED));
-    }
-
-    private boolean isAgencyOpenNow(Agency agency) {
-        Integer todayOpenTime = findTodayOpenTime(agency);
-        Integer todayCloseTime = findTodayCloseTime(agency);
-
-        if (todayOpenTime != null && todayCloseTime != null) {
-            LocalTime now = LocalTime.now();
-            LocalTime startTime = LocalTime.parse(String.format("%04d", todayOpenTime), DateTimeFormatter.ofPattern("HHmm"));
-            LocalTime endTime;
-            if (todayCloseTime == 2400) {
-                endTime = LocalTime.MAX;
-            } else {
-                endTime = LocalTime.parse(String.format("%04d", todayCloseTime), DateTimeFormatter.ofPattern("HHmm"));
-            }
-            // 현재 시간이 오픈 시간과 클로즈 시간 사이에 있는지 확인
-            return !now.isBefore(startTime) && now.isBefore(endTime);
-        } else {
-            return false;
-        }
-    }
-
-    private static Integer findTodayOpenTime(Agency agency) {
-        LocalDate today = LocalDate.now();
-        DayOfWeek dayOfWeek = today.getDayOfWeek();
-
-        switch (dayOfWeek) {
-            case MONDAY:
-                return agency.getDiagTimeMonOpen();
-            case TUESDAY:
-                return agency.getDiagTimeTuesOpen();
-            case WEDNESDAY:
-                return agency.getDiagTimeWedsOpen();
-            case THURSDAY:
-                return agency.getDiagTimeThursOpen();
-            case FRIDAY:
-                return agency.getDiagTimeFriOpen();
-            case SATURDAY:
-                return agency.getDiagTimeSatOpen();
-            case SUNDAY:
-                return agency.getDiagTimeSunOpen();
-        }
-        return 0;
-    }
-
-    private static Integer findTodayCloseTime(Agency agency) {
-        LocalDate today = LocalDate.now();
-        DayOfWeek dayOfWeek = today.getDayOfWeek();
-
-        switch (dayOfWeek) {
-            case MONDAY:
-                return agency.getDiagTimeMonClose();
-            case TUESDAY:
-                return agency.getDiagTimeTuesClose();
-            case WEDNESDAY:
-                return agency.getDiagTimeWedsClose();
-            case THURSDAY:
-                return agency.getDiagTimeThursClose();
-            case FRIDAY:
-                return agency.getDiagTimeFriClose();
-            case SATURDAY:
-                return agency.getDiagTimeSatClose();
-            case SUNDAY:
-                return agency.getDiagTimeSunClose();
-        }
-        return 0;
     }
 }

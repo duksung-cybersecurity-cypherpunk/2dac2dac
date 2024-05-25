@@ -32,4 +32,26 @@ public class DiagTime {
 
     private Integer diagTimeHolidayOpen;
     private Integer diagTimeHolidayClose;
+
+    public DiagTime(Integer diagTimeMonOpen, Integer diagTimeMonClose, Integer diagTimeTuesOpen, Integer diagTimeTuesClose, Integer diagTimeWedsOpen, Integer diagTimeWedsClose,
+        Integer diagTimeThursOpen,
+        Integer diagTimeThursClose, Integer diagTimeFriOpen, Integer diagTimeFriClose, Integer diagTimeSatOpen, Integer diagTimeSatClose, Integer diagTimeSunOpen, Integer diagTimeSunClose,
+        Integer diagTimeHolidayOpen, Integer diagTimeHolidayClose) {
+        this.diagTimeMonOpen = diagTimeMonOpen;
+        this.diagTimeMonClose = diagTimeMonClose;
+        this.diagTimeTuesOpen = diagTimeTuesOpen;
+        this.diagTimeTuesClose = diagTimeTuesClose;
+        this.diagTimeWedsOpen = diagTimeWedsOpen;
+        this.diagTimeWedsClose = diagTimeWedsClose;
+        this.diagTimeThursOpen = diagTimeThursOpen;
+        this.diagTimeThursClose = diagTimeThursClose;
+        this.diagTimeFriOpen = diagTimeFriOpen;
+        this.diagTimeFriClose = diagTimeFriClose;
+        this.diagTimeSatOpen = diagTimeSatOpen;
+        this.diagTimeSatClose = diagTimeSatClose;
+        this.diagTimeSunOpen = diagTimeSunOpen;
+        this.diagTimeSunClose = diagTimeSunClose;
+        this.diagTimeHolidayOpen = diagTimeHolidayOpen;
+        this.diagTimeHolidayClose = diagTimeHolidayClose;
+    }
 }

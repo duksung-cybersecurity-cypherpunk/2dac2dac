@@ -1,5 +1,9 @@
 package dac2dac.doctect.agency.service;
 
+import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayCloseTime;
+import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayOpenTime;
+import static dac2dac.doctect.common.utils.DiagTimeUtils.isAgencyOpenNow;
+
 import dac2dac.doctect.agency.dto.request.SearchCriteria;
 import dac2dac.doctect.agency.dto.response.AgencySearchResultDto;
 import dac2dac.doctect.agency.dto.response.AgencySearchResultListDto;
@@ -11,14 +15,12 @@ import dac2dac.doctect.agency.entity.Pharmacy;
 import dac2dac.doctect.agency.repository.HospitalRepository;
 import dac2dac.doctect.agency.repository.PharmacyRepository;
 import dac2dac.doctect.common.constant.ErrorCode;
+import dac2dac.doctect.common.entity.DiagTime;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -83,9 +85,9 @@ public class AgencyService {
             .address(pharmacy.getAddress())
             .tel(pharmacy.getTel())
             .distance(calculateDistance(user.getLatitude(), user.getLongitude(), pharmacy.getLatitude(), pharmacy.getLongitude()))
-            .isOpen(isAgencyOpenNow(pharmacy))
-            .todayOpenTime(findTodayOpenTime(pharmacy))
-            .todayCloseTime(findTodayCloseTime(pharmacy))
+            .isOpen(isAgencyOpenNow(pharmacy.getDiagTime()))
+            .todayOpenTime(findTodayOpenTime(pharmacy.getDiagTime()))
+            .todayCloseTime(findTodayCloseTime(pharmacy.getDiagTime()))
             .latitude(pharmacy.getLatitude())
             .longtitude(pharmacy.getLongitude())
             .build();
@@ -103,9 +105,9 @@ public class AgencyService {
             .address(hospital.getAddress())
             .tel(hospital.getTel())
             .distance(calculateDistance(user.getLatitude(), user.getLongitude(), hospital.getLatitude(), hospital.getLongitude()))
-            .isOpen(isAgencyOpenNow(hospital))
-            .todayOpenTime(findTodayOpenTime(hospital))
-            .todayCloseTime(findTodayCloseTime(hospital))
+            .isOpen(isAgencyOpenNow(hospital.getDiagTime()))
+            .todayOpenTime(findTodayOpenTime(hospital.getDiagTime()))
+            .todayCloseTime(findTodayCloseTime(hospital.getDiagTime()))
             .latitude(hospital.getLatitude())
             .longtitude(hospital.getLongitude())
             .build();
@@ -140,13 +142,13 @@ public class AgencyService {
 
         // 영업 시간별 필터링
         if (criteria.isOpenNow()) {
-            stream = stream.filter(this::isAgencyOpenNow);
+            stream = stream.filter(s -> isAgencyOpenNow(s.getDiagTime()));
         }
         if (criteria.isOpenAllYear()) {
-            stream = stream.filter(this::isAgencyOpenAllYear);
+            stream = stream.filter(s -> isAgencyOpenAllYear(s.getDiagTime()));
         }
         if (criteria.isOpenAtMidnight()) {
-            stream = stream.filter(this::isAgencyOpenMidnight);
+            stream = stream.filter(s -> isAgencyOpenMidnight(s.getDiagTime()));
         }
 
         // 영업 요일별 필터링
@@ -174,13 +176,13 @@ public class AgencyService {
         }
 
         for (DayOfWeek day : daysFilter) {
-            stream = stream.filter(s -> isAgencyOpenOnDay(s, day));
+            stream = stream.filter(s -> isAgencyOpenOnDay(s.getDiagTime(), day));
         }
 
         return stream.collect(Collectors.toList());
     }
 
-    private boolean isAgencyOpenOnDay(Agency agency, DayOfWeek day) {
+    private boolean isAgencyOpenOnDay(DiagTime agency, DayOfWeek day) {
         // 요일별로 오픈 상태를 확인하는 로직
         switch (day) {
             case MONDAY:
@@ -202,27 +204,7 @@ public class AgencyService {
         }
     }
 
-    private boolean isAgencyOpenNow(Agency agency) {
-        Integer todayOpenTime = findTodayOpenTime(agency);
-        Integer todayCloseTime = findTodayCloseTime(agency);
-
-        if (todayOpenTime != null && todayCloseTime != null) {
-            LocalTime now = LocalTime.now();
-            LocalTime startTime = LocalTime.parse(String.format("%04d", todayOpenTime), DateTimeFormatter.ofPattern("HHmm"));
-            LocalTime endTime;
-            if (todayCloseTime == 2400) {
-                endTime = LocalTime.MAX;
-            } else {
-                endTime = LocalTime.parse(String.format("%04d", todayCloseTime), DateTimeFormatter.ofPattern("HHmm"));
-            }
-            // 현재 시간이 오픈 시간과 클로즈 시간 사이에 있는지 확인
-            return !now.isBefore(startTime) && now.isBefore(endTime);
-        } else {
-            return false;
-        }
-    }
-
-    private boolean isAgencyOpenAllYear(Agency agency) {
+    private boolean isAgencyOpenAllYear(DiagTime agency) {
         return (agency.getDiagTimeHolidayOpen() != null && agency.getDiagTimeHolidayClose() != null)
             && (agency.getDiagTimeMonOpen() != null && agency.getDiagTimeMonClose() != null)
             && (agency.getDiagTimeTuesOpen() != null && agency.getDiagTimeTuesClose() != null)
@@ -233,7 +215,7 @@ public class AgencyService {
             && (agency.getDiagTimeSunOpen() != null && agency.getDiagTimeSunClose() != null);
     }
 
-    private boolean isAgencyOpenMidnight(Agency agency) {
+    private boolean isAgencyOpenMidnight(DiagTime agency) {
         Integer todayOpenTime = findTodayOpenTime(agency);
         Integer todayCloseTime = findTodayCloseTime(agency);
 
@@ -243,59 +225,13 @@ public class AgencyService {
         return false;
     }
 
-    private static Integer findTodayOpenTime(Agency agency) {
-        LocalDate today = LocalDate.now();
-        DayOfWeek dayOfWeek = today.getDayOfWeek();
-
-        switch (dayOfWeek) {
-            case MONDAY:
-                return agency.getDiagTimeMonOpen();
-            case TUESDAY:
-                return agency.getDiagTimeTuesOpen();
-            case WEDNESDAY:
-                return agency.getDiagTimeWedsOpen();
-            case THURSDAY:
-                return agency.getDiagTimeThursOpen();
-            case FRIDAY:
-                return agency.getDiagTimeFriOpen();
-            case SATURDAY:
-                return agency.getDiagTimeSatOpen();
-            case SUNDAY:
-                return agency.getDiagTimeSunOpen();
-        }
-        return 0;
-    }
-
-    private static Integer findTodayCloseTime(Agency agency) {
-        LocalDate today = LocalDate.now();
-        DayOfWeek dayOfWeek = today.getDayOfWeek();
-
-        switch (dayOfWeek) {
-            case MONDAY:
-                return agency.getDiagTimeMonClose();
-            case TUESDAY:
-                return agency.getDiagTimeTuesClose();
-            case WEDNESDAY:
-                return agency.getDiagTimeWedsClose();
-            case THURSDAY:
-                return agency.getDiagTimeThursClose();
-            case FRIDAY:
-                return agency.getDiagTimeFriClose();
-            case SATURDAY:
-                return agency.getDiagTimeSatClose();
-            case SUNDAY:
-                return agency.getDiagTimeSunClose();
-        }
-        return 0;
-    }
-
     private AgencySearchResultDto createAgencySearchResultDto(Agency a, double latitude, double longitude) {
         return AgencySearchResultDto.builder()
             .id(a.getId())
             .name(a.getName())
-            .todayOpenTime(findTodayOpenTime(a))
-            .todayCloseTime(findTodayCloseTime(a))
-            .isOpen(isAgencyOpenNow(a))
+            .todayOpenTime(findTodayOpenTime(a.getDiagTime()))
+            .todayCloseTime(findTodayCloseTime(a.getDiagTime()))
+            .isOpen(isAgencyOpenNow(a.getDiagTime()))
             .address(a.getAddress())
             .tel(a.getTel())
             .distance(calculateDistance(a.getLatitude(), a.getLongitude(), latitude, longitude))
