@@ -55,6 +55,7 @@ public class NoncontactDiagService {
                 Integer reviewCnt = reviewRepository.findByDoctorId(doctor.getId()).size();
 
                 return DoctorItem.builder()
+                    .id(doctor.getId())
                     .name(doctor.getName())
                     .hospitalName(doctor.getHospital().getName())
                     .profilePath(doctor.getProfileImagePath())

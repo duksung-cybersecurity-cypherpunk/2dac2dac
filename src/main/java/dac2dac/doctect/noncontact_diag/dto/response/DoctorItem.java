@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DoctorItem {
 
+    private Long id;
+
     private String name;
     private String hospitalName;
 
@@ -21,7 +23,8 @@ public class DoctorItem {
     private Integer todayCloseTime;
 
     @Builder
-    public DoctorItem(String name, String hospitalName, String profilePath, Double averageRating, Integer reviewCnt, Boolean isOpen, Integer todayOpenTime, Integer todayCloseTime) {
+    public DoctorItem(Long id, String name, String hospitalName, String profilePath, Double averageRating, Integer reviewCnt, Boolean isOpen, Integer todayOpenTime, Integer todayCloseTime) {
+        this.id = id;
         this.name = name;
         this.hospitalName = hospitalName;
         this.profilePath = profilePath;
