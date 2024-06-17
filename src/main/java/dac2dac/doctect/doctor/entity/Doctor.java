@@ -1,8 +1,8 @@
 package dac2dac.doctect.doctor.entity;
 
 import dac2dac.doctect.agency.entity.Hospital;
-import dac2dac.doctect.common.entity.BaseEntity;
 import dac2dac.doctect.common.entity.DiagTime;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Doctor extends BaseEntity {
+public class Doctor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,7 +42,7 @@ public class Doctor extends BaseEntity {
     private Boolean isLicenseCertificated;
     private String profileImagePath;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String oneLiner;
 
     @Lob
