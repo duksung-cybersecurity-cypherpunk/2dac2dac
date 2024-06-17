@@ -33,7 +33,7 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
-    private Double rating;
+    private Integer rating;
 
     @Lob
     private String content;

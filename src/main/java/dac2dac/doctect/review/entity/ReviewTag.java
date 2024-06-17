@@ -18,5 +18,6 @@ public class ReviewTag {
     private Long id;
 
     private String reviewTagName;
+    private Boolean isPositive;
 
 }

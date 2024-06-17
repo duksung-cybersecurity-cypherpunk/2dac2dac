@@ -31,4 +31,9 @@ public class NoncontactDiagController {
         return ApiResult.success(SuccessCode.GET_SUCCESS, noncontactDiagService.getDoctorList(departmentId));
     }
 
+    @Operation(summary = "의사 상세 조회 API", description = "의사 정보를 상세 조회한다.")
+    @GetMapping("/doctors/{doctorId}")
+    public ApiResult getDoctorDetailInfo(@PathVariable Long doctorId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, noncontactDiagService.getDoctorDetailInfo(doctorId));
+    }
 }

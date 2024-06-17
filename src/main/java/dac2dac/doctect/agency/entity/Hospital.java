@@ -26,12 +26,14 @@ public class Hospital extends Agency {
     private String hpid;
 
     @Builder
-    public Hospital(String name, String address, String tel, String diagDiv, Boolean isErOperate, Double longitude, Double latitude, String hpid, Integer diagTimeMonOpen, Integer diagTimeMonClose,
+    public Hospital(String name, String address, String tel, String thumnail, String diagDiv, Boolean isErOperate, Double longitude, Double latitude, String hpid, Integer diagTimeMonOpen,
+        Integer diagTimeMonClose,
         Integer diagTimeTuesOpen, Integer diagTimeTuesClose, Integer diagTimeWedsOpen, Integer diagTimeWedsClose, Integer diagTimeThursOpen, Integer diagTimeThursClose, Integer diagTimeFriOpen,
         Integer diagTimeFriClose, Integer diagTimeSatOpen, Integer diagTimeSatClose, Integer diagTimeSunOpen, Integer diagTimeSunClose, Integer diagTimeHolidayOpen, Integer diagTimeHolidayClose) {
         this.name = name;
         this.address = address;
         this.tel = tel;
+        this.thumnail = thumnail;
         this.diagDiv = diagDiv;
         this.isErOperate = isErOperate;
         this.longitude = longitude;

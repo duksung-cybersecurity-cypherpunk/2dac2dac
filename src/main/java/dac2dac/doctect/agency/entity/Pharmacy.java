@@ -23,13 +23,15 @@ public class Pharmacy extends Agency {
     private String fax;
 
     @Builder
-    public Pharmacy(String name, String address, String tel, String fax, Double longitude, Double latitude, Integer diagTimeMonOpen, Integer diagTimeMonClose, Integer diagTimeTuesOpen,
+    public Pharmacy(String name, String address, String tel, String fax, String thumnail, Double longitude, Double latitude, Integer diagTimeMonOpen, Integer diagTimeMonClose,
+        Integer diagTimeTuesOpen,
         Integer diagTimeTuesClose, Integer diagTimeWedsOpen, Integer diagTimeWedsClose, Integer diagTimeThursOpen, Integer diagTimeThursClose, Integer diagTimeFriOpen, Integer diagTimeFriClose,
         Integer diagTimeSatOpen, Integer diagTimeSatClose, Integer diagTimeSunOpen, Integer diagTimeSunClose, Integer diagTimeHolidayOpen, Integer diagTimeHolidayClose) {
         this.name = name;
         this.address = address;
         this.tel = tel;
         this.fax = fax;
+        this.thumnail = thumnail;
         this.longitude = longitude;
         this.latitude = latitude;
         this.diagTime = new DiagTime(diagTimeMonOpen, diagTimeMonClose, diagTimeTuesOpen, diagTimeTuesClose, diagTimeWedsOpen, diagTimeWedsClose,

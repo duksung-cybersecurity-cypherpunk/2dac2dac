@@ -25,6 +25,8 @@ public abstract class Agency {
     @Embedded
     protected DiagTime diagTime;
 
+    protected String thumnail;
+
     public abstract AgencyType getAgencyType();
 
     public abstract Long getId();
