@@ -1,6 +1,7 @@
 package dac2dac.doctect.agency.entity;
 
 import dac2dac.doctect.agency.entity.constant.AgencyType;
+import dac2dac.doctect.common.entity.DiagTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,31 +23,20 @@ public class Pharmacy extends Agency {
     private String fax;
 
     @Builder
-    public Pharmacy(String name, String address, String tel, String fax, Double longitude, Double latitude, Integer diagTimeMonOpen, Integer diagTimeMonClose, Integer diagTimeTuesOpen,
+    public Pharmacy(String name, String address, String tel, String fax, String thumnail, Double longitude, Double latitude, Integer diagTimeMonOpen, Integer diagTimeMonClose,
+        Integer diagTimeTuesOpen,
         Integer diagTimeTuesClose, Integer diagTimeWedsOpen, Integer diagTimeWedsClose, Integer diagTimeThursOpen, Integer diagTimeThursClose, Integer diagTimeFriOpen, Integer diagTimeFriClose,
         Integer diagTimeSatOpen, Integer diagTimeSatClose, Integer diagTimeSunOpen, Integer diagTimeSunClose, Integer diagTimeHolidayOpen, Integer diagTimeHolidayClose) {
         this.name = name;
         this.address = address;
         this.tel = tel;
         this.fax = fax;
+        this.thumnail = thumnail;
         this.longitude = longitude;
         this.latitude = latitude;
-        this.diagTimeMonOpen = diagTimeMonOpen;
-        this.diagTimeMonClose = diagTimeMonClose;
-        this.diagTimeTuesOpen = diagTimeTuesOpen;
-        this.diagTimeTuesClose = diagTimeTuesClose;
-        this.diagTimeWedsOpen = diagTimeWedsOpen;
-        this.diagTimeWedsClose = diagTimeWedsClose;
-        this.diagTimeThursOpen = diagTimeThursOpen;
-        this.diagTimeThursClose = diagTimeThursClose;
-        this.diagTimeFriOpen = diagTimeFriOpen;
-        this.diagTimeFriClose = diagTimeFriClose;
-        this.diagTimeSatOpen = diagTimeSatOpen;
-        this.diagTimeSatClose = diagTimeSatClose;
-        this.diagTimeSunOpen = diagTimeSunOpen;
-        this.diagTimeSunClose = diagTimeSunClose;
-        this.diagTimeHolidayOpen = diagTimeHolidayOpen;
-        this.diagTimeHolidayClose = diagTimeHolidayClose;
+        this.diagTime = new DiagTime(diagTimeMonOpen, diagTimeMonClose, diagTimeTuesOpen, diagTimeTuesClose, diagTimeWedsOpen, diagTimeWedsClose,
+            diagTimeThursOpen, diagTimeThursClose, diagTimeFriOpen, diagTimeFriClose, diagTimeSatOpen, diagTimeSatClose,
+            diagTimeSunOpen, diagTimeSunClose, diagTimeHolidayOpen, diagTimeHolidayClose);
     }
 
     @Override

@@ -1,9 +1,9 @@
 package dac2dac.doctect.doctor.entity;
 
 import dac2dac.doctect.agency.entity.Hospital;
-import dac2dac.doctect.common.entity.BaseEntity;
-import dac2dac.doctect.doctor.entity.constant.Department;
-import dac2dac.doctect.user.entity.constant.SocialType;
+import dac2dac.doctect.common.entity.DiagTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Doctor extends BaseEntity {
+public class Doctor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,20 +29,27 @@ public class Doctor extends BaseEntity {
     @JoinColumn(name = "hospital_id")
     private Hospital hospital;
 
-    private String name;
-    private String email;
-    private SocialType socialType;
-    private String code;
-
-    @Lob
-    private String oneLiner;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
     private Department department;
 
-    @Lob
-    private String experience;
+    private String name;
+    private String email;
+    private String password;
+
+    private Double averageRating;
 
     private Boolean isLicenseCertificated;
     private String profileImagePath;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String oneLiner;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String experience;
+
+    @Embedded
+    private DiagTime diagTime;
 }
