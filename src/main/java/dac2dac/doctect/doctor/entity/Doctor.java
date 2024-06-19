@@ -37,15 +37,17 @@ public class Doctor {
     private String email;
     private String password;
 
-    private Double avarageRating;
+    private Double averageRating;
 
     private Boolean isLicenseCertificated;
     private String profileImagePath;
 
+    @Lob
     @Column(columnDefinition = "TEXT")
     private String oneLiner;
 
     @Lob
+    @Column(columnDefinition = "TEXT")
     private String experience;
 
     @Embedded
