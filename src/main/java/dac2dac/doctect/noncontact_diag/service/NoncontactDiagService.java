@@ -25,6 +25,7 @@ import dac2dac.doctect.noncontact_diag.dto.response.DoctorReviewList;
 import dac2dac.doctect.noncontact_diag.dto.response.Top3ReviewTagInfo;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
+import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
 import dac2dac.doctect.noncontact_diag.repository.SymptomRepository;
 import dac2dac.doctect.review.entity.Review;
@@ -218,7 +219,7 @@ public class NoncontactDiagService {
         Symptom symptom = Symptom.builder()
             .isPrescribedDrug(requestDto.getIsPrescribedDrug())
             .prescribedDrug(requestDto.getPrescribedDrug())
-            .isAllergicSymtom(requestDto.getIsAllergicSymtom())
+            .isAllergicSymptom(requestDto.getIsAllergicSymptom())
             .allergicSymptom(requestDto.getAllergicSymptom())
             .isInbornDisease(requestDto.getIsInbornDisease())
             .inbornDisease(requestDto.getInbornDisease())
@@ -232,6 +233,7 @@ public class NoncontactDiagService {
             .reservationTime(reservationTime)
             .diagType(requestDto.getDiagType())
             .isConsent(requestDto.getIsConsent())
+            .status(ReservationStatus.SIGN_UP)
             .doctor(doctor)
             .paymentMethod(paymentMethod)
             .user(user)

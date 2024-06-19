@@ -20,7 +20,7 @@ public class NoncontactDiagAppointmentRequestDto {
     @Size(min = 5, max = 255, message = "알레르기 증상 정보는 5자 이상, 255자 이하로 입력해 주세요.")
     private String allergicSymptom;
     @NotNull(message = "알레르기 증상 여부는 필수 입력 항목입니다.")
-    private Boolean isAllergicSymtom;
+    private Boolean isAllergicSymptom;
 
     @Size(min = 5, max = 255, message = "선척적 질환 정보는 5자 이상, 255자 이하로 입력해 주세요.")
     private String inbornDisease;

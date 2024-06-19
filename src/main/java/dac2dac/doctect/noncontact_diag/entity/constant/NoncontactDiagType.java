@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum NoncontactDiagType {
     VOICE("음성진료"),
-    VEDIO("화상진료");
+    VIDEO("화상진료");
 
     private final String NoncontactDiagType;
 }

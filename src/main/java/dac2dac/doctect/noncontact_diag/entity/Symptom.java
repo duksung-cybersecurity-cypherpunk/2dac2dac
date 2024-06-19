@@ -20,7 +20,7 @@ public class Symptom {
     private Long id;
 
     private Boolean isPrescribedDrug;
-    private Boolean isAllergicSymtom;
+    private Boolean isAllergicSymptom;
     private Boolean isInbornDisease;
 
     @Lob
@@ -42,11 +42,11 @@ public class Symptom {
     private String symptomImage5;
 
     @Builder
-    public Symptom(Boolean isPrescribedDrug, Boolean isAllergicSymtom, Boolean isInbornDisease, String prescribedDrug, String allergicSymptom, String inbornDisease,
+    public Symptom(Boolean isPrescribedDrug, Boolean isAllergicSymptom, Boolean isInbornDisease, String prescribedDrug, String allergicSymptom, String inbornDisease,
         String additionalInformation,
         String symptomImage1, String symptomImage2, String symptomImage3, String symptomImage4, String symptomImage5) {
         this.isPrescribedDrug = isPrescribedDrug;
-        this.isAllergicSymtom = isAllergicSymtom;
+        this.isAllergicSymptom = isAllergicSymptom;
         this.isInbornDisease = isInbornDisease;
         this.prescribedDrug = prescribedDrug;
         this.allergicSymptom = allergicSymptom;
