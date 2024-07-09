@@ -63,6 +63,6 @@ jobs:
           envs: APP, COMPOSE
           script_stop: true
           script: |
-            sudo docker-compose -f $COMPOSE down
-            sudo docker pull ${{ secrets.DOCKER_ID }}/doctech
-            sudo docker-compose -f $COMPOSE up -d
+            docker-compose -f $COMPOSE down
+            docker pull ${{ secrets.DOCKER_ID }}/doctech
+            docker-compose -f $COMPOSE up -d
