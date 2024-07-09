@@ -25,6 +25,7 @@ jobs:
       # (3) Application.yml 파일 세팅
       - name: Make application.yml
         run: |
+          mkdir ./src/main/resources
           cd ./src/main/resources
           touch ./application.yml
           echo "${{ secrets.APPLICATION }}" > ./application.yml
