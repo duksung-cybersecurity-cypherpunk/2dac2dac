@@ -1,6 +1,7 @@
 package dac2dac.doctect.user.entity;
 
 import dac2dac.doctect.user.entity.constant.PaymentType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -30,7 +31,8 @@ public class PaymentMethod {
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 
-    private Integer cardNum;
+    @Column(name = "card_last_4_digits")
+    private Integer cardLast4Digits;
     private String cardCompany;
 
 }

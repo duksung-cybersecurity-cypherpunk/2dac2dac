@@ -5,11 +5,14 @@ import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayOpenTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.isAgencyOpenNow;
 
 import dac2dac.doctect.common.constant.ErrorCode;
+import dac2dac.doctect.common.entity.DiagTime;
+import dac2dac.doctect.common.error.exception.BadRequestException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DepartmentRepository;
 import dac2dac.doctect.doctor.repository.DepartmentTagRepository;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
+import dac2dac.doctect.noncontact_diag.dto.request.NoncontactDiagAppointmentRequestDto;
 import dac2dac.doctect.noncontact_diag.dto.response.DepartmentInfo;
 import dac2dac.doctect.noncontact_diag.dto.response.DepartmentListDto;
 import dac2dac.doctect.noncontact_diag.dto.response.DoctorDto;
@@ -20,10 +23,21 @@ import dac2dac.doctect.noncontact_diag.dto.response.DoctorListDto;
 import dac2dac.doctect.noncontact_diag.dto.response.DoctorReview;
 import dac2dac.doctect.noncontact_diag.dto.response.DoctorReviewList;
 import dac2dac.doctect.noncontact_diag.dto.response.Top3ReviewTagInfo;
+import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
+import dac2dac.doctect.noncontact_diag.entity.Symptom;
+import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
+import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
+import dac2dac.doctect.noncontact_diag.repository.SymptomRepository;
 import dac2dac.doctect.review.entity.Review;
 import dac2dac.doctect.review.entity.ReviewTag;
 import dac2dac.doctect.review.repository.ReviewRepository;
 import dac2dac.doctect.review.repository.ReviewReviewTagRepository;
+import dac2dac.doctect.user.entity.PaymentMethod;
+import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.user.repository.PaymentMethodRepository;
+import dac2dac.doctect.user.repository.UserRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +54,10 @@ public class NoncontactDiagService {
     private final DoctorRepository doctorRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewReviewTagRepository reviewReviewTagRepository;
+    private final UserRepository userRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
+    private final SymptomRepository symptomRepository;
+    private final NoncontactDiagReservationRepository noncontactDiagReservationRepository;
 
     public DepartmentListDto getDepartmentList() {
         List<DepartmentInfo> departmentInfoList = departmentRepository.findAll().stream()
@@ -175,5 +193,73 @@ public class NoncontactDiagService {
             .collect(Collectors.toList());
 
         return tagInfos;
+    }
+
+    public void appointNoncontactDiag(Long userId, NoncontactDiagAppointmentRequestDto requestDto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        Doctor doctor = doctorRepository.findById(requestDto.getDoctorId())
+            .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
+
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(requestDto.getPaymentId())
+            .orElseThrow(() -> new NotFoundException(ErrorCode.PAYMENT_METHOD_NOT_FOUND));
+
+        int timeValue = Integer.parseInt(requestDto.getReservationTime());
+        LocalTime reservationTime = LocalTime.of(timeValue / 100, timeValue % 100);
+
+        //* 유효한 진료 예약 날짜 및 시간인지 검증
+        isValidReservation(requestDto.getReservationDate(), reservationTime, doctor.getDiagTime());
+
+        //* 동의 여부 확인
+        if (!requestDto.getIsConsent()) {
+            new BadRequestException(ErrorCode.CONSENT_BAD_REQUEST);
+        }
+
+        Symptom symptom = Symptom.builder()
+            .isPrescribedDrug(requestDto.getIsPrescribedDrug())
+            .prescribedDrug(requestDto.getPrescribedDrug())
+            .isAllergicSymptom(requestDto.getIsAllergicSymptom())
+            .allergicSymptom(requestDto.getAllergicSymptom())
+            .isInbornDisease(requestDto.getIsInbornDisease())
+            .inbornDisease(requestDto.getInbornDisease())
+            .additionalInformation(requestDto.getAdditionalInformation())
+            .build();
+
+        symptomRepository.save(symptom);
+
+        NoncontactDiagReservation noncontactDiagReservation = NoncontactDiagReservation.builder()
+            .reservationDate(requestDto.getReservationDate())
+            .reservationTime(reservationTime)
+            .diagType(requestDto.getDiagType())
+            .isConsent(requestDto.getIsConsent())
+            .status(ReservationStatus.SIGN_UP)
+            .doctor(doctor)
+            .paymentMethod(paymentMethod)
+            .user(user)
+            .symptom(symptom)
+            .build();
+
+        noncontactDiagReservationRepository.save(noncontactDiagReservation);
+    }
+
+    public static void isValidReservation(LocalDate reservationDate, LocalTime reservationTime, DiagTime diagTime) {
+        // 진료 예약 날짜 확인
+        LocalDate today = LocalDate.now();
+        if (reservationDate.isBefore(today) || reservationDate.isAfter(today.plusDays(6))) {
+            new BadRequestException(ErrorCode.RESERVATION_DATE_BAD_REQUEST);
+        }
+
+        // 진료 예약 시간 확인
+        Integer openTime = findTodayOpenTime(diagTime);
+        Integer closeTime = findTodayCloseTime(diagTime);
+
+        LocalTime reservationTimeInMinutes = LocalTime.of(reservationTime.getHour(), reservationTime.getMinute());
+        LocalTime openTimeInMinutes = LocalTime.of(openTime / 100, openTime % 100);
+        LocalTime closeTimeInMinutes = LocalTime.of(closeTime / 100, closeTime % 100);
+
+        if (reservationTimeInMinutes.isBefore(openTimeInMinutes) || reservationTimeInMinutes.isAfter(closeTimeInMinutes)) {
+            new BadRequestException(ErrorCode.RESERVATION_TIME_BAD_REQUEST);
+        }
     }
 }
