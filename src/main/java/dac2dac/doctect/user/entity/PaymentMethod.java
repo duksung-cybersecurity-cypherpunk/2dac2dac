@@ -34,5 +34,6 @@ public class PaymentMethod {
     @Column(name = "card_last_4_digits")
     private Integer cardLast4Digits;
     private String cardCompany;
+    private String billingKey;
 
 }
