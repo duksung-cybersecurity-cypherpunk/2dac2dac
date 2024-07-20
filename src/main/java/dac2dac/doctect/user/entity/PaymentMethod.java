@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,8 +33,16 @@ public class PaymentMethod {
     private PaymentType paymentType;
 
     @Column(name = "card_last_4_digits")
-    private Integer cardLast4Digits;
+    private String cardLast4Digits;
     private String cardCompany;
     private String billingKey;
 
+    @Builder
+    public PaymentMethod(User user, PaymentType paymentType, String cardLast4Digits, String cardCompany, String billingKey) {
+        this.user = user;
+        this.paymentType = paymentType;
+        this.cardLast4Digits = cardLast4Digits;
+        this.cardCompany = cardCompany;
+        this.billingKey = billingKey;
+    }
 }
