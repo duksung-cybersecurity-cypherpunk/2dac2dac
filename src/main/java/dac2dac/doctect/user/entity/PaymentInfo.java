@@ -3,6 +3,7 @@ package dac2dac.doctect.user.entity;
 import dac2dac.doctect.user.entity.constant.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,4 +30,12 @@ public class PaymentInfo {
 
     private Integer price;
     private PaymentStatus status;
+
+    @Builder
+    public PaymentInfo(PaymentMethod paymentMethod, LocalDateTime createDate, Integer price, PaymentStatus status) {
+        this.paymentMethod = paymentMethod;
+        this.createDate = createDate;
+        this.price = price;
+        this.status = status;
+    }
 }
