@@ -92,6 +92,14 @@ public class BootpayService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
+        PaymentMethod paymentMethod = paymentMethodRepository.findPaymentMethodByBillingKey(bootpayPayDto.getBillingKey())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PAYMENT_METHOD_NOT_FOUND));
+
+        //* 결제 방식이 활성화되어 있는지 확인한다.
+        if (paymentMethod.getStatus() == ActiveStatus.INACTIVE) {
+            throw new UnauthorizedException(ErrorCode.PAYMENT_METHOD_NOT_FOUND);
+        }
+
         bootpay.getAccessToken();
 
         SubscribePayload payload = new SubscribePayload();
@@ -107,8 +115,7 @@ public class BootpayService {
 
             PaymentInfo paymentInfo = PaymentInfo.builder()
                     .price(Integer.valueOf(json.get("price").toString()))
-                    .paymentMethod(paymentMethodRepository.findPaymentMethodByBillingKey(bootpayPayDto.getBillingKey())
-                            .orElseThrow(() -> new NotFoundException(ErrorCode.PAYMENT_METHOD_NOT_FOUND)))
+                    .paymentMethod(paymentMethod)
                     .createDate(offsetDateTime.toLocalDateTime())
                     .status(PaymentStatus.COMPLETE)
                     .build();
