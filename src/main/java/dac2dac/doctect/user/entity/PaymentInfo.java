@@ -29,6 +29,8 @@ public class PaymentInfo {
     private LocalDateTime createDate;
 
     private Integer price;
+
+    @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
     @Builder
