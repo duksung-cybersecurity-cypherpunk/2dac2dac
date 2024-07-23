@@ -1,6 +1,6 @@
-package dac2dac.doctect.user.entity;
+package dac2dac.doctect.bootpay.entity;
 
-import dac2dac.doctect.user.entity.constant.PaymentStatus;
+import dac2dac.doctect.bootpay.entity.constant.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Entity
 @Getter

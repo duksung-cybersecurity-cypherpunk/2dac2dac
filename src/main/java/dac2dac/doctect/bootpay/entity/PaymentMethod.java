@@ -1,7 +1,8 @@
-package dac2dac.doctect.user.entity;
+package dac2dac.doctect.bootpay.entity;
 
-import dac2dac.doctect.user.entity.constant.ActiveStatus;
-import dac2dac.doctect.user.entity.constant.PaymentType;
+import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.bootpay.entity.constant.ActiveStatus;
+import dac2dac.doctect.bootpay.entity.constant.PaymentType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -1,4 +1,4 @@
-package dac2dac.doctect.user.entity.constant;
+package dac2dac.doctect.bootpay.entity.constant;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

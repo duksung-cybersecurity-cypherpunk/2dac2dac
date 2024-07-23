@@ -4,7 +4,7 @@ import dac2dac.doctect.common.entity.BaseEntity;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.noncontact_diag.entity.constant.NoncontactDiagType;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
-import dac2dac.doctect.user.entity.PaymentMethod;
+import dac2dac.doctect.bootpay.entity.PaymentMethod;
 import dac2dac.doctect.user.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

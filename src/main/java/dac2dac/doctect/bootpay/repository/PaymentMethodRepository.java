@@ -1,6 +1,6 @@
-package dac2dac.doctect.user.repository;
+package dac2dac.doctect.bootpay.repository;
 
-import dac2dac.doctect.user.entity.PaymentMethod;
+import dac2dac.doctect.bootpay.entity.PaymentMethod;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
