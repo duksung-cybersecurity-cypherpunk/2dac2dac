@@ -4,10 +4,12 @@ import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayCloseTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayOpenTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.isAgencyOpenNow;
 
+import dac2dac.doctect.bootpay.entity.constant.ActiveStatus;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.entity.DiagTime;
 import dac2dac.doctect.common.error.exception.BadRequestException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
+import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DepartmentRepository;
 import dac2dac.doctect.doctor.repository.DepartmentTagRepository;
@@ -202,8 +204,13 @@ public class NoncontactDiagService {
         Doctor doctor = doctorRepository.findById(requestDto.getDoctorId())
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
 
-        PaymentMethod paymentMethod = paymentMethodRepository.findById(requestDto.getPaymentId())
+        PaymentMethod paymentMethod = paymentMethodRepository.findPaymentMethodByBillingKey(requestDto.getBillingKey())
             .orElseThrow(() -> new NotFoundException(ErrorCode.PAYMENT_METHOD_NOT_FOUND));
+
+        //* 결제 방식이 활성화되어 있는지 확인한다.
+        if (paymentMethod.getStatus() == ActiveStatus.INACTIVE) {
+            throw new UnauthorizedException(ErrorCode.PAYMENT_METHOD_NOT_FOUND);
+        }
 
         int timeValue = Integer.parseInt(requestDto.getReservationTime());
         LocalTime reservationTime = LocalTime.of(timeValue / 100, timeValue % 100);
@@ -218,11 +225,11 @@ public class NoncontactDiagService {
 
         Symptom symptom = Symptom.builder()
             .isPrescribedDrug(requestDto.getIsPrescribedDrug())
-            .prescribedDrug(requestDto.getPrescribedDrug())
+            .prescribedDrug(requestDto.getIsPrescribedDrug() ? requestDto.getPrescribedDrug() : "")
             .isAllergicSymptom(requestDto.getIsAllergicSymptom())
-            .allergicSymptom(requestDto.getAllergicSymptom())
+            .allergicSymptom(requestDto.getIsAllergicSymptom() ? requestDto.getAllergicSymptom() : "")
             .isInbornDisease(requestDto.getIsInbornDisease())
-            .inbornDisease(requestDto.getInbornDisease())
+            .inbornDisease(requestDto.getIsInbornDisease() ? requestDto.getInbornDisease() : "")
             .additionalInformation(requestDto.getAdditionalInformation())
             .build();
 

@@ -41,12 +41,13 @@ public class NoncontactDiagAppointmentRequestDto {
     @NotNull(message = "진료 방식은 필수 입력 항목입니다.")
     private NoncontactDiagType diagType;
 
+    @NotNull(message = "빌링키는 필수 입력 항목입니다.")
+    private String billingKey;
+
     //* 약관 동의 여부
     @NotNull(message = "약관 동의 여부는 필수 입력 항목입니다.")
     private Boolean isConsent;
 
     @NotNull(message = "의사 ID는 필수 입력 항목입니다.")
     private Long doctorId;
-    @NotNull(message = "결제 ID는 필수 입력 항목입니다.")
-    private Long paymentId;
 }
