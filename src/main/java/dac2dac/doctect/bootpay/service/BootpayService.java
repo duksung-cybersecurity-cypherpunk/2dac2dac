@@ -1,6 +1,6 @@
 package dac2dac.doctect.bootpay.service;
 
-import dac2dac.doctect.bootpay.dto.request.BootpayBiilingKeyDto;
+import dac2dac.doctect.bootpay.dto.request.BootpaySubscribeBiilingKeyDto;
 import dac2dac.doctect.bootpay.dto.request.BootpayPayDto;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
@@ -8,6 +8,7 @@ import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.user.entity.PaymentInfo;
 import dac2dac.doctect.user.entity.PaymentMethod;
 import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.user.entity.constant.ActiveStatus;
 import dac2dac.doctect.user.entity.constant.PaymentStatus;
 import dac2dac.doctect.user.entity.constant.PaymentType;
 import dac2dac.doctect.user.repository.PaymentInfoRepository;
@@ -23,9 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 @Service
@@ -49,8 +48,7 @@ public class BootpayService {
         bootpay = new Bootpay(applicationId, privateKey);
     }
 
-
-    public void subscribeBillingkey(BootpayBiilingKeyDto bootpayBiilingKeyDto, Long userId) throws Exception {
+    public void subscribeBillingKey(BootpaySubscribeBiilingKeyDto bootpaySubscribeBiilingKeyDto, Long userId) throws Exception {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
@@ -60,11 +58,11 @@ public class BootpayService {
         subscribe.orderName = "새 결제방식 등록";
         subscribe.subscriptionId = "" + (System.currentTimeMillis() / 1000);
         subscribe.pg = "nicepay";
-        subscribe.cardNo = bootpayBiilingKeyDto.getCardNo();
-        subscribe.cardPw = bootpayBiilingKeyDto.getCardPw();
-        subscribe.cardExpireYear = bootpayBiilingKeyDto.getCardExpireYear();
-        subscribe.cardExpireMonth = bootpayBiilingKeyDto.getCardExpireMonth();
-        subscribe.cardIdentityNo = bootpayBiilingKeyDto.getCardIdentityNo();
+        subscribe.cardNo = bootpaySubscribeBiilingKeyDto.getCardNo();
+        subscribe.cardPw = bootpaySubscribeBiilingKeyDto.getCardPw();
+        subscribe.cardExpireYear = bootpaySubscribeBiilingKeyDto.getCardExpireYear();
+        subscribe.cardExpireMonth = bootpaySubscribeBiilingKeyDto.getCardExpireMonth();
+        subscribe.cardIdentityNo = bootpaySubscribeBiilingKeyDto.getCardIdentityNo();
 
         HashMap<String, Object> res = bootpay.getBillingKey(subscribe);
         if (res.get("error_code") == null) {
@@ -79,6 +77,7 @@ public class BootpayService {
                     .cardCompany(cardCompany)
                     .cardLast4Digits(lastFourDigits)
                     .paymentType(PaymentType.CREDIT_CARD)
+                    .status(ActiveStatus.ACTIVE)
                     .user(user)
                     .build();
 
@@ -115,6 +114,26 @@ public class BootpayService {
                     .build();
 
             paymentInfoRepository.save(paymentInfo);
+        } else {
+            String errorMessage = res.get("message") != null ? res.get("message").toString() : "Unknown error occurred.";
+            throw new UnauthorizedException(HttpStatus.UNAUTHORIZED, errorMessage);
+        }
+    }
+
+    public void deleteBillingKey(Long userId, String billingKey) throws Exception {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        bootpay.getAccessToken();
+
+        HashMap res = bootpay.destroyBillingKey(billingKey);
+        if(res.get("error_code") == null) {
+            //* DB에 등록된 결제 방식 삭제(결제 방식의 status를 ACTIVE -> INACTIVE로 변경)
+            PaymentMethod paymentMethod = paymentMethodRepository.findPaymentMethodByBillingKey(billingKey)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.PAYMENT_METHOD_NOT_FOUND));
+
+            paymentMethod.deletePayment();
+            paymentMethodRepository.save(paymentMethod);
         } else {
             String errorMessage = res.get("message") != null ? res.get("message").toString() : "Unknown error occurred.";
             throw new UnauthorizedException(HttpStatus.UNAUTHORIZED, errorMessage);

@@ -1,5 +1,6 @@
 package dac2dac.doctect.user.entity;
 
+import dac2dac.doctect.user.entity.constant.ActiveStatus;
 import dac2dac.doctect.user.entity.constant.PaymentType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,12 +38,20 @@ public class PaymentMethod {
     private String cardCompany;
     private String billingKey;
 
+    @Enumerated(EnumType.STRING)
+    private ActiveStatus status;
+
     @Builder
-    public PaymentMethod(User user, PaymentType paymentType, String cardLast4Digits, String cardCompany, String billingKey) {
+    public PaymentMethod(User user, PaymentType paymentType, String cardLast4Digits, String cardCompany, String billingKey, ActiveStatus status) {
         this.user = user;
         this.paymentType = paymentType;
         this.cardLast4Digits = cardLast4Digits;
         this.cardCompany = cardCompany;
         this.billingKey = billingKey;
+        this.status = status;
+    }
+
+    public void deletePayment() {
+        this.status = ActiveStatus.INACTIVE;
     }
 }

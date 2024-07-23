@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class BootpayBiilingKeyDto {
+public class BootpaySubscribeBiilingKeyDto {
 
     @NotBlank(message = "카드 번호는 필수입니다.")
     @Pattern(regexp = "^[0-9]{16}$", message = "카드 번호는 16자리 숫자여야 합니다.")
