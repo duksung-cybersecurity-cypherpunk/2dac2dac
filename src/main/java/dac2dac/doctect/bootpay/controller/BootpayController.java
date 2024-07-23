@@ -39,4 +39,12 @@ public class BootpayController {
         bootpayService.deleteBillingKey(userId, billingKey);
         return ApiResult.success(SuccessCode.DELETE_SUCCESS);
     }
+
+    @Operation(summary = "결제방식 조회 API", description = "등록된 유저의 결제 방식을 모두 조회한다.")
+    @GetMapping("/billingKey/{userId}")
+    public ApiResult getPaymentMethods(@PathVariable Long userId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, bootpayService.getPaymentMethods(userId));
+    }
+
+
 }

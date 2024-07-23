@@ -2,6 +2,8 @@ package dac2dac.doctect.bootpay.service;
 
 import dac2dac.doctect.bootpay.dto.request.BootpaySubscribeBiilingKeyDto;
 import dac2dac.doctect.bootpay.dto.request.BootpayPayDto;
+import dac2dac.doctect.bootpay.dto.response.PaymentMethodItem;
+import dac2dac.doctect.bootpay.dto.response.PaymentMethodListDto;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
@@ -26,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -145,5 +148,27 @@ public class BootpayService {
             String errorMessage = res.get("message") != null ? res.get("message").toString() : "Unknown error occurred.";
             throw new UnauthorizedException(HttpStatus.UNAUTHORIZED, errorMessage);
         }
+    }
+
+    public PaymentMethodListDto getPaymentMethods(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        //* userId에 해당하면서 status가 ACTIVE인 결제 방식 조회
+        List<PaymentMethodItem> activePaymentMethodItems =  paymentMethodRepository.findPaymentMethodByUserIdAndStatus(userId, ActiveStatus.ACTIVE)
+                .stream()
+                .map(apm -> (PaymentMethodItem.builder()
+                        .id(apm.getId())
+                        .billingKey(apm.getBillingKey())
+                        .paymentType(apm.getPaymentType().getPaymentTypeName())
+                        .cardLast4Digits(apm.getCardLast4Digits())
+                        .cardCompany(apm.getCardCompany())
+                        .build()))
+                .toList();
+
+        return PaymentMethodListDto.builder()
+                .cnt(activePaymentMethodItems.size())
+                .paymentMethodList(activePaymentMethodItems)
+                .build();
     }
 }
