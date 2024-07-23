@@ -28,15 +28,17 @@ public class PaymentInfo {
     private LocalDateTime createDate;
 
     private Integer price;
+    private String orderName;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
     @Builder
-    public PaymentInfo(PaymentMethod paymentMethod, LocalDateTime createDate, Integer price, PaymentStatus status) {
+    public PaymentInfo(PaymentMethod paymentMethod, LocalDateTime createDate, Integer price, String orderName, PaymentStatus status) {
         this.paymentMethod = paymentMethod;
         this.createDate = createDate;
         this.price = price;
+        this.orderName = orderName;
         this.status = status;
     }
 }

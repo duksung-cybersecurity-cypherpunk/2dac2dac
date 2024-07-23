@@ -118,6 +118,7 @@ public class BootpayService {
 
             PaymentInfo paymentInfo = PaymentInfo.builder()
                     .price(Integer.valueOf(json.get("price").toString()))
+                    .orderName(json.get("order_name").toString())
                     .paymentMethod(paymentMethod)
                     .createDate(offsetDateTime.toLocalDateTime())
                     .status(PaymentStatus.COMPLETE)
