@@ -1,10 +1,10 @@
 package dac2dac.doctect.noncontact_diag.entity;
 
-import dac2dac.doctect.agency.entity.Hospital;
+import dac2dac.doctect.common.entity.BaseEntity;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.noncontact_diag.entity.constant.NoncontactDiagType;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
-import dac2dac.doctect.user.entity.PaymentMethod;
+import dac2dac.doctect.bootpay.entity.PaymentMethod;
 import dac2dac.doctect.user.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,27 +14,23 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class NoncontactDiagReservation {
+public class NoncontactDiagReservation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "noncontact_diag_id")
-    private NoncontactDiagSymptomImage noncontactDiagSymptomImage;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -44,26 +40,38 @@ public class NoncontactDiagReservation {
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hospital_id")
-    private Hospital hospital;
+    @OneToOne
+    @JoinColumn(name = "symptom_id")
+    private Symptom symptom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id")
+    @OneToOne
+    @JoinColumn(name = "payment_method_id")
     private PaymentMethod paymentMethod;
 
-    private boolean isVisitWithin6;
-    private Integer pin;
-
-    @Lob
-    private String symptom;
-
     private LocalDate reservationDate;
-    private Time reservationTime;
+    private LocalTime reservationTime;
 
     @Enumerated(EnumType.STRING)
     private NoncontactDiagType diagType;
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+
+    private Boolean isConsent;
+
+    @Builder
+    public NoncontactDiagReservation(User user, Doctor doctor, Symptom symptom, PaymentMethod paymentMethod, LocalDate reservationDate, LocalTime reservationTime, NoncontactDiagType diagType,
+        ReservationStatus status, Boolean isConsent) {
+        this.user = user;
+        this.doctor = doctor;
+        this.symptom = symptom;
+        this.paymentMethod = paymentMethod;
+        this.reservationDate = reservationDate;
+        this.reservationTime = reservationTime;
+        this.diagType = diagType;
+        this.status = status;
+        this.isConsent = isConsent;
+    }
 }
+
+

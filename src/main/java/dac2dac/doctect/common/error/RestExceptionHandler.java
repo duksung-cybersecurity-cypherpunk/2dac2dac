@@ -40,7 +40,7 @@ public class RestExceptionHandler {
     protected ApiResult<String> handleUnauthorizedException(UnauthorizedException exception,
         HttpServletRequest request) {
         logInfo(request, exception.getMessage());
-        return ApiResult.error(exception.getCode());
+        return ApiResult.error(exception.getStatusCode(), exception.getMessage());
     }
 
     // Custom Internal Server Error

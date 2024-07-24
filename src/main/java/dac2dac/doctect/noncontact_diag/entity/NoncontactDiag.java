@@ -12,8 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +36,7 @@ public class NoncontactDiag {
     private Doctor doctor;
 
     private LocalDate diagDate;
-    private Time diagTime;
+    private LocalTime diagTime;
 
     @Enumerated(EnumType.STRING)
     private DiagStatus status;
