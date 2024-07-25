@@ -25,6 +25,7 @@ import dac2dac.doctect.noncontact_diag.dto.response.DoctorListDto;
 import dac2dac.doctect.noncontact_diag.dto.response.DoctorReview;
 import dac2dac.doctect.noncontact_diag.dto.response.DoctorReviewList;
 import dac2dac.doctect.noncontact_diag.dto.response.Top3ReviewTagInfo;
+import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
@@ -250,6 +251,22 @@ public class NoncontactDiagService {
         noncontactDiagReservationRepository.save(noncontactDiagReservation);
     }
 
+    public void cancelNoncontactDiag(Long userId, Long diagId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        NoncontactDiagReservation findNoncontactDiagReservation = noncontactDiagReservationRepository.findById(diagId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
+
+        //* 유저와 조회한 진료 내역에 해당하는 유저가 다를 경우에 대한 예외처리를 수행한다.
+        if (!user.getId().equals(findNoncontactDiagReservation.getUser().getId())) {
+            new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        findNoncontactDiagReservation.cancelReservation();
+        noncontactDiagReservationRepository.save(findNoncontactDiagReservation);
+    }
+
     public static void isValidReservation(LocalDate reservationDate, LocalTime reservationTime, DiagTime diagTime) {
         // 진료 예약 날짜 확인
         LocalDate today = LocalDate.now();
@@ -269,4 +286,5 @@ public class NoncontactDiagService {
             new BadRequestException(ErrorCode.RESERVATION_TIME_BAD_REQUEST);
         }
     }
+
 }

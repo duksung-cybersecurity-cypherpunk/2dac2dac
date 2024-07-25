@@ -257,7 +257,7 @@ public class HealthListService {
         NoncontactDiag findNoncontactDiag = noncontactDiagRepository.findById(diagId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_NOT_FOUND));
 
-        //* 유저와 조회한 진료 내역에 해당하는 유저가 다를 경우
+        //* 유저와 조회한 진료 내역에 해당하는 유저가 다를 경우에 대한 예외처리를 수행한다.
         if (!user.getId().equals(findNoncontactDiag.getUser().getId())) {
             new UnauthorizedException(ErrorCode.UNAUTHORIZED);
         }
