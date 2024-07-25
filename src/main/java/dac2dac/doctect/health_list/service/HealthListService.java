@@ -56,11 +56,12 @@ import dac2dac.doctect.health_list.repository.PrescriptionDrugRepository;
 import dac2dac.doctect.health_list.repository.PrescriptionRepository;
 import dac2dac.doctect.health_list.repository.VaccinationRepository;
 import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
+import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
+import dac2dac.doctect.review.repository.ReviewRepository;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -76,12 +77,14 @@ public class HealthListService {
     private final MydataJdbcRepository mydataJdbcRepository;
     private final UserRepository userRepository;
     private final ContactDiagRepository contactDiagRepository;
+    private final NoncontactDiagRepository noncontactDiagRepository;
     private final PrescriptionRepository prescriptionRepository;
     private final HealthScreeningRepository healthScreeningRepository;
     private final VaccinationRepository vaccinationRepository;
     private final HospitalRepository hospitalRepository;
     private final PharmacyRepository pharmacyRepository;
     private final PrescriptionDrugRepository prescriptionDrugRepository;
+    private final ReviewRepository reviewRepository;
 
     @Transactional
     public void syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
@@ -146,7 +149,26 @@ public class HealthListService {
             .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         //* 비대면 진료 내역
-        List<NoncontactDiagItem> noncontactDiagItemList = new ArrayList<>();
+        List<NoncontactDiagItem> noncontactDiagItemList = noncontactDiagRepository.findByUserId(userId)
+            .stream()
+            .map(nc -> {
+                int reviewCnt = reviewRepository.findByDoctorId(nc.getDoctor().getId()).size();
+
+                LocalDateTime diagDateTime = LocalDateTime.of(nc.getDiagDate(), nc.getDiagTime());
+                return NoncontactDiagItem.builder()
+                    .diagDate(diagDateTime)
+                    .doctorName(nc.getDoctor().getName())
+                    .doctorHostpital(nc.getDoctor().getHospital().getName())
+                    .doctorThumnail(nc.getDoctor().getProfileImagePath())
+                    .reviewCnt(reviewCnt)
+                    .doctorAverageRating(nc.getDoctor().getAverageRating())
+                    .doctorIsOpenNow(isAgencyOpenNow(nc.getDoctor().getDiagTime()))
+                    .doctorTodayOpenTime(findTodayOpenTime(nc.getDoctor().getDiagTime()))
+                    .doctorTodayCloseTime(findTodayCloseTime(nc.getDoctor().getDiagTime()))
+                    .build();
+            })
+            .sorted(Comparator.comparing(NoncontactDiagItem::getDiagDate).reversed())
+            .collect(Collectors.toList());
 
         NoncontactDiagItemList noncontactDiagItemListDto = NoncontactDiagItemList.builder()
             .totalCnt(noncontactDiagItemList.size())
