@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NoncontactDiagItem {
 
+    private Long diagId;
+
     private LocalDateTime diagDate;
 
     private String doctorName;
@@ -23,8 +25,8 @@ public class NoncontactDiagItem {
     private boolean doctorIsOpenNow;
 
     @Builder
-    public NoncontactDiagItem(LocalDateTime diagDate, String doctorName, String doctorHostpital, String doctorThumnail, Double doctorAverageRating, int reviewCnt, Integer doctorTodayOpenTime,
-        Integer doctorTodayCloseTime, boolean doctorIsOpenNow) {
+    public NoncontactDiagItem(Long diagId, LocalDateTime diagDate, String doctorName, String doctorHostpital, String doctorThumnail, Double doctorAverageRating, int reviewCnt, Integer doctorTodayOpenTime, Integer doctorTodayCloseTime, boolean doctorIsOpenNow) {
+        this.diagId = diagId;
         this.diagDate = diagDate;
         this.doctorName = doctorName;
         this.doctorHostpital = doctorHostpital;
