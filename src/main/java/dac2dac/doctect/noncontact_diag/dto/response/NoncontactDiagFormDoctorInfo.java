@@ -1,17 +1,15 @@
-package dac2dac.doctect.health_list.dto.response.diagnosis;
+package dac2dac.doctect.noncontact_diag.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class NoncontactDoctorInfo {
+public class NoncontactDiagFormDoctorInfo {
 
     private Long doctorId;
-    private LocalDateTime diagDate;
 
     private String doctorName;
     private String doctorHospitalName;
@@ -23,9 +21,8 @@ public class NoncontactDoctorInfo {
     private boolean doctorIsOpenNow;
 
     @Builder
-    public NoncontactDoctorInfo(Long doctorId, LocalDateTime diagDate, String doctorName, String doctorHospitalName, String doctorThumbnail, Integer doctorTodayOpenTime, Integer doctorTodayCloseTime, boolean doctorIsOpenNow) {
+    public NoncontactDiagFormDoctorInfo(Long doctorId, String doctorName, String doctorHospitalName, String doctorThumbnail, Integer doctorTodayOpenTime, Integer doctorTodayCloseTime, boolean doctorIsOpenNow) {
         this.doctorId = doctorId;
-        this.diagDate = diagDate;
         this.doctorName = doctorName;
         this.doctorHospitalName = doctorHospitalName;
         this.doctorThumbnail = doctorThumbnail;

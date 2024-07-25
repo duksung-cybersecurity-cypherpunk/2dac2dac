@@ -1,6 +1,5 @@
 package dac2dac.doctect.health_list.dto.response.diagnosis;
 
-import dac2dac.doctect.health_list.dto.response.DoctorInfo;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

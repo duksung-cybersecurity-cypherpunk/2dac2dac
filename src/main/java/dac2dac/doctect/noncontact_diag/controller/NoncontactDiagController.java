@@ -53,4 +53,10 @@ public class NoncontactDiagController {
         return ApiResult.success(SuccessCode.DELETE_SUCCESS);
     }
 
+    @Operation(summary = "예약 신청서 조회 API", description = "예약한 비대면 진료에 대한 예약 신청서를 조회한다.")
+    @GetMapping("/form/{userId}/{diagId}")
+    public ApiResult getNoncontactDiagForm(@PathVariable Long userId, @PathVariable Long diagId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, noncontactDiagService.getNoncontactDiagForm(userId, diagId));
+    }
+
 }

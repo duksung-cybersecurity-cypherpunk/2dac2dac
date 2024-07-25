@@ -19,7 +19,7 @@ import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
 import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
 import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
 import dac2dac.doctect.health_list.dto.request.VaccinationDto;
-import dac2dac.doctect.health_list.dto.response.DoctorInfo;
+import dac2dac.doctect.health_list.dto.response.healthScreening.DoctorInfo;
 import dac2dac.doctect.health_list.dto.response.HostpitalInfo;
 import dac2dac.doctect.health_list.dto.response.PharmacyInfo;
 import dac2dac.doctect.health_list.dto.response.diagnosis.*;
@@ -266,6 +266,7 @@ public class HealthListService {
 
         //* 의사 정보
         NoncontactDoctorInfo noncontactDoctorInfo = NoncontactDoctorInfo.builder()
+                .doctorId(findDoctor.getId())
                 .diagDate(LocalDateTime.of(findNoncontactDiag.getDiagDate(), findNoncontactDiag.getDiagTime()))
                 .doctorName(findDoctor.getName())
                 .doctorHospitalName(findDoctor.getHospital().getName())
