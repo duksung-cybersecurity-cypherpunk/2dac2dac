@@ -27,8 +27,9 @@ open-api:
   hospital:
     key: dLQnuKPjPiEMKrca60jg3f28s5bFSpVGACzbhwSFoUek2RaXv7OpW00pvUhaaV1jgWbjpkwVsL2G6EPq8JZbuA==
     endpoint: HsptlAsembySearchService/getHsptlMdcncFullDown
-
-FROM openjdk:17
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+    
+bootpay:
+  application-id: 668e21966a325f79257ef366
+  private-key: mPg/wmGVmvF/xb5hGf1nn8oh5jXIG1QF+YR7sUVlayc=
+  
+ 
