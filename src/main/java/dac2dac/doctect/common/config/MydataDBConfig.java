@@ -43,6 +43,9 @@ public class MydataDBConfig {
     public LocalContainerEntityManagerFactoryBean secondaryEntityManagerFactory(
         EntityManagerFactoryBuilder builder, @Qualifier("secondaryDataSource") DataSource dataSource) {
         Map<String, Object> properties = hibernateProperties.determineHibernateProperties(jpaProperties.getProperties(), new HibernateSettings());
+        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect"); // 필요한 Hibernate 방언 추가
+
+
         return builder
             .dataSource(dataSource)
             .packages("dac2dac.doctect.mydata")
