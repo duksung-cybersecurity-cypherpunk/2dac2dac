@@ -19,7 +19,7 @@ public class LoginController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
-    @PostMapping("/register")
+    @PostMapping("/api/v1/register")
     public ResponseEntity<String> registerUser(@RequestBody UserDTO userDTO) {
         try {
             userService.registerUser(
@@ -36,7 +36,7 @@ public class LoginController {
         }
     }
 
-    @PostMapping("/api/login")
+    @PostMapping("/api/v1/login")
     public ResponseEntity<String> loginUser(@RequestBody UserDTO userDTO) {
         //System.out.println("loginUser 호출됨"); // 로그 추가
         try {
