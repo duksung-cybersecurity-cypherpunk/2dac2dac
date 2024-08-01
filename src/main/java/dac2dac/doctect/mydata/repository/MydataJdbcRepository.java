@@ -24,13 +24,16 @@ import dac2dac.doctect.health_list.entity.constant.healthScreening.hepB.HepBSurf
 import dac2dac.doctect.health_list.entity.constant.healthScreening.hepB.HepBSurfaceAntigen;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -47,15 +50,25 @@ public class MydataJdbcRepository {
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
-    public Optional<Long> findByNameAndPin(String name, String pin) {
-        String sql = "SELECT id FROM user WHERE name = ? AND pin = ?";
+    public Optional<Map<String, Object>> findByNameAndPin(String name, String pin) {
+        String sql = "SELECT id, name, pin FROM user WHERE name = ? AND pin = ?";
+
         try {
-            // queryForObject가 결과를 찾으면 그 결과를 Optional로 감싸 반환
-            Long userId = jdbcTemplate.queryForObject(sql, new Object[]{name, pin}, Long.class);
-            return Optional.ofNullable(userId);
+            Map<String, Object> userData = jdbcTemplate.queryForObject(sql, new Object[]{name, pin}, new UserRowMapper());
+            return Optional.ofNullable(userData);
         } catch (EmptyResultDataAccessException e) {
-            // 결과가 없을 경우 Optional.empty를 반환
             return Optional.empty();
+        }
+    }
+
+    private static class UserRowMapper implements RowMapper<Map<String, Object>> {
+        @Override
+        public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("id", rs.getLong("id"));
+            userData.put("name", rs.getString("name"));
+            userData.put("pin", rs.getString("pin"));
+            return userData;
         }
     }
 

@@ -63,6 +63,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -84,7 +85,6 @@ public class HealthListService {
     private final PharmacyRepository pharmacyRepository;
     private final PrescriptionDrugRepository prescriptionDrugRepository;
     private final ReviewRepository reviewRepository;
-    private final DoctorRepository doctorRepository;
 
     @Transactional
     public void syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
@@ -92,7 +92,7 @@ public class HealthListService {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         // 유저 정보(이름, 주민등록번호)를 통해 마이데이터 DB의 유저 아이디 가져오기 (본인 인증)
-        Long mydataUserId = authenticateUser(userAuthenticationDto, user);
+        Long mydataUserId = authenticateUser(userAuthenticationDto);
 
         // 마이데이터 유저의 아이디를 이용하여 마이데이터 조회 후 Doc'tech 서버 DB에 저장한다.
         //* 진료 내역
@@ -584,15 +584,18 @@ public class HealthListService {
             .build();
     }
 
-    private Long authenticateUser(UserAuthenticationDto userAuthenticationDto, User user) {
-        // 유저 아이디가 존재할 경우 본인 인증에 성공한 것으로 간주한다.
-        Long mydataUserId = mydataJdbcRepository.findByNameAndPin(userAuthenticationDto.getName(), userAuthenticationDto.getPin())
+    private Long authenticateUser(UserAuthenticationDto userAuthenticationDto) {
+        Map<String, Object> mydataUser = mydataJdbcRepository
+                .findByNameAndPin(userAuthenticationDto.getName(), userAuthenticationDto.getPin())
                 .orElseThrow(() -> new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED));
 
-        if (user.getPin().equals(userAuthenticationDto.getPin()) && user.getName().equals(userAuthenticationDto.getName())) {
-            return mydataUserId;
-        } else {
+        // 마이데이터 DB에 존재하는 name, pin이 사용자가 입력한 name, pin과 같다면 본인 인증에 성공한 것으로 한다.
+        boolean isNameValid = mydataUser.get("name").equals(userAuthenticationDto.getName());
+        boolean isPinValid = mydataUser.get("pin").equals(userAuthenticationDto.getPin());
+
+        if (!isNameValid || !isPinValid) {
             throw new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED);
         }
+        return (Long) mydataUser.get("id");
     }
 }

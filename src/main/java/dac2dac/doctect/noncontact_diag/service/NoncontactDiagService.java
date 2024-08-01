@@ -310,6 +310,56 @@ public class NoncontactDiagService {
                 .build();
     }
 
+    public NoncontactDiagShortFormDto getNoncontactDiagSimpleForm(Long userId, Long diagId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        NoncontactDiagReservation findNoncontactDiagReservation = noncontactDiagReservationRepository.findById(diagId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
+
+        //* 유저와 조회한 진료 내역에 해당하는 유저가 다를 경우에 대한 예외처리를 수행한다.
+        if (!user.getId().equals(findNoncontactDiagReservation.getUser().getId())) {
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        //* 예약한 비대면 진료의 상태가 예약 취소인 경우에 대한 예외처리를 수행한다.
+        if (findNoncontactDiagReservation.getStatus() == ReservationStatus.CANCEL) {
+            throw new BadRequestException(ErrorCode.CANCELED_FORM_BAD_REQUEST);
+        }
+
+        return NoncontactDiagShortFormDto.builder()
+                .signupDate(findNoncontactDiagReservation.getCreateDate())
+                .reservationDate(LocalDateTime.of(findNoncontactDiagReservation.getReservationDate(), findNoncontactDiagReservation.getReservationTime()))
+                .department(findNoncontactDiagReservation.getDoctor().getDepartment().getDepartmentName())
+                .diagType(findNoncontactDiagReservation.getDiagType().getNoncontactDiagTypeName())
+                .build();
+    }
+
+    public NoncontactDiagShortFormDto getApproachingNoncontactDiag(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        // 현재 시간 이후의 COMPLETE 상태인 예약 중에서 가장 가까운 예약 찾기
+        LocalDateTime now = LocalDateTime.now();
+        NoncontactDiagReservation closestNoncontactDiagReservation = noncontactDiagReservationRepository.findByUserIdAndStatus(userId, ReservationStatus.COMPLETE).stream()
+                .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isAfter(now))
+                .sorted(Comparator.comparing(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime())))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
+
+        //* 유저와 조회한 진료 내역에 해당하는 유저가 다를 경우에 대한 예외처리를 수행한다.
+        if (!user.getId().equals(closestNoncontactDiagReservation.getUser().getId())) {
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        return NoncontactDiagShortFormDto.builder()
+                .signupDate(closestNoncontactDiagReservation.getCreateDate())
+                .reservationDate(LocalDateTime.of(closestNoncontactDiagReservation.getReservationDate(), closestNoncontactDiagReservation.getReservationTime()))
+                .department(closestNoncontactDiagReservation.getDoctor().getDepartment().getDepartmentName())
+                .diagType(closestNoncontactDiagReservation.getDiagType().getNoncontactDiagTypeName())
+                .build();
+    }
+
     public static void isValidReservation(LocalDate reservationDate, LocalTime reservationTime, DiagTime diagTime) {
         // 진료 예약 날짜 확인
         LocalDate today = LocalDate.now();
@@ -329,4 +379,5 @@ public class NoncontactDiagService {
             new BadRequestException(ErrorCode.RESERVATION_TIME_BAD_REQUEST);
         }
     }
+
 }

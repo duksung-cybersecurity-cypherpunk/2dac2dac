@@ -29,7 +29,6 @@ public class User extends BaseEntity {
     private String username;
     private String email;
     private String phoneNumber;
-    private String pin;
 
     private String code; // 구글, 카카오의 로그아웃, 탈퇴를 위한 코드
 
