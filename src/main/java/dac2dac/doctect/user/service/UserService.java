@@ -1,6 +1,10 @@
 package dac2dac.doctect.user.service;
 
 import ch.qos.logback.core.boolex.Matcher;
+import dac2dac.doctect.bootpay.repository.PaymentMethodRepository;
+import dac2dac.doctect.common.constant.ErrorCode;
+import dac2dac.doctect.common.error.exception.NotFoundException;
+import dac2dac.doctect.user.dto.response.UserInfoDto;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +19,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PaymentMethodRepository paymentMethodRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -49,6 +56,20 @@ public class UserService {
             return passwordEncoder.matches(password, user.getPassword());
         }
         return false;
+    }
+
+    public UserInfoDto getUserInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        Integer paymentMethodCnt = paymentMethodRepository.countAllByUserId(userId);
+
+        return UserInfoDto.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .paymentMethodCnt(paymentMethodCnt)
+                .build();
     }
 }
 

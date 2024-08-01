@@ -12,4 +12,7 @@ public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, Lo
     Optional<PaymentMethod> findPaymentMethodByBillingKey(String billingKey);
 
     List<PaymentMethod> findPaymentMethodByUserIdAndStatus(Long userId, ActiveStatus activeStatus);
+
+    Integer countAllByUserId(Long userId);
+
 }
