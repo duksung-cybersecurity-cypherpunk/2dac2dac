@@ -13,7 +13,8 @@ import org.slf4j.LoggerFactory;
 @Tag(name = "유저", description = "회원가입")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1")
+@CrossOrigin(origins = "http://192.168.219.180:8081")
 public class LoginController {
 
     @Autowired
