@@ -3,7 +3,6 @@ package dac2dac.doctect.user.controller;
 import dac2dac.doctect.user.dto.UserDTO;
 import dac2dac.doctect.user.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +11,7 @@ import org.slf4j.LoggerFactory;
 
 @Tag(name = "유저", description = "회원가입")
 @RestController
-@RequiredArgsConstructor
-@RequestMapping("/api/v1")
-@CrossOrigin(origins = "http://192.168.219.180:8081")
+@CrossOrigin(origins = "http://192.168.219.180:8081") // Expo 개발 서버 주소
 public class LoginController {
 
     @Autowired
@@ -22,7 +19,7 @@ public class LoginController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
-    @PostMapping("/register")
+    @PostMapping("/api/v1/register")
     public ResponseEntity<String> registerUser(@RequestBody UserDTO userDTO) {
         try {
             userService.registerUser(
@@ -40,7 +37,7 @@ public class LoginController {
         }
     }
 
-    @PostMapping("/login")
+    @PostMapping("/api/v1/login")
     public ResponseEntity<String> loginUser(@RequestBody UserDTO userDTO) {
         //System.out.println("loginUser 호출됨"); // 로그 추가
         try {
