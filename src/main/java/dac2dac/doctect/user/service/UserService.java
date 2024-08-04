@@ -6,6 +6,7 @@ import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.user.dto.response.UserInfoDto;
 import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.user.entity.constant.SocialType;
 import dac2dac.doctect.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,7 +29,7 @@ public class UserService {
 
     // 회원가입
     @Transactional
-    public User registerUser(String username,  String email, String password, String phoneNumber, String code) {
+    public User registerUser(String username,  String email, String password, String phoneNumber, String code, SocialType socialType) {
         // 이메일 중복 체크
         if (userRepository.findByUsername(username) != null) {
             throw new RuntimeException("username is already registered.");
@@ -42,6 +43,7 @@ public class UserService {
         user.setCode(code);
         user.setCreateDate(LocalDateTime.now()); // 생성
         user.setUpdateDate(LocalDateTime.now()); // 업데이트
+        user.setSocialType(socialType);
         // 사용자 저장
         return userRepository.save(user);
     }
