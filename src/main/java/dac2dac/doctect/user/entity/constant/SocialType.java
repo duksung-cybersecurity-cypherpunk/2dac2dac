@@ -7,5 +7,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SocialType {
     GOOGLE,
+    GENERAL,
     KAKAO;
 }
