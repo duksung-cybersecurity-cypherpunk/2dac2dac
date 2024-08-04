@@ -1,13 +1,13 @@
 package dac2dac.doctect.user.dto;
 
 
+import dac2dac.doctect.user.entity.constant.SocialType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
@@ -16,5 +16,6 @@ public class UserDTO {
     private String password;
     private String phoneNumber;
     private String code;
+    private SocialType socialType;
 }
 

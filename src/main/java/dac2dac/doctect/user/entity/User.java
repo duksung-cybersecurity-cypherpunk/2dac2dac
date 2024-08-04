@@ -2,17 +2,9 @@ package dac2dac.doctect.user.entity;
 
 import dac2dac.doctect.common.entity.BaseEntity;
 import dac2dac.doctect.user.entity.constant.SocialType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 
 @Entity
 @Getter
@@ -51,9 +43,6 @@ public class User extends BaseEntity {
     public void setPassword(String password) {
         this.password = password;
     }
-    public String getPassword() {
-        return password; // 비밀번호를 반환하는 메서드
-    }
 
     public String getName() {
         return username; // 비밀번호를 반환하는 메서드
@@ -70,4 +59,6 @@ public class User extends BaseEntity {
     public void setCode(String code) {
         this.code=code;
     }
+
+    public void setSocialType(SocialType socialType) {this.socialType = socialType;}
 }

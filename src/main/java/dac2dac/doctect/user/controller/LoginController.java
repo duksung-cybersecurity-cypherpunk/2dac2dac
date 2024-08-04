@@ -27,7 +27,8 @@ public class LoginController {
                     userDTO.getEmail(),
                     userDTO.getPassword(),
                     userDTO.getPhoneNumber(),
-                    userDTO.getCode()
+                    userDTO.getCode(),
+                    userDTO.getSocialType()
             );
             return ResponseEntity.ok("Registration successful!!");
         } catch (Exception e) {
