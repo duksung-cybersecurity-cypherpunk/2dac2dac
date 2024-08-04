@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 @Tag(name = "유저", description = "회원가입")
 @RestController
-@CrossOrigin(origins = "http://10.67.76.33:8081") // Expo 개발 서버 주소
+@CrossOrigin(origins = "http://127.0.0.1:8081") // Expo 개발 서버 주소
 public class LoginController {
 
     @Autowired
