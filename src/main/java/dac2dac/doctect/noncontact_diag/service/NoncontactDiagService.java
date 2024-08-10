@@ -4,6 +4,7 @@ import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayCloseTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayOpenTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.isAgencyOpenNow;
 
+import dac2dac.doctect.agency.entity.Hospital;
 import dac2dac.doctect.bootpay.entity.constant.ActiveStatus;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.entity.DiagTime;
@@ -21,10 +22,6 @@ import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
 import dac2dac.doctect.noncontact_diag.repository.SymptomRepository;
-import dac2dac.doctect.review.entity.Review;
-import dac2dac.doctect.review.entity.ReviewTag;
-import dac2dac.doctect.review.repository.ReviewRepository;
-import dac2dac.doctect.review.repository.ReviewReviewTagRepository;
 import dac2dac.doctect.bootpay.entity.PaymentMethod;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.bootpay.repository.PaymentMethodRepository;
@@ -46,8 +43,6 @@ public class NoncontactDiagService {
     private final DepartmentRepository departmentRepository;
     private final DepartmentTagRepository departmentTagRepository;
     private final DoctorRepository doctorRepository;
-    private final ReviewRepository reviewRepository;
-    private final ReviewReviewTagRepository reviewReviewTagRepository;
     private final UserRepository userRepository;
     private final PaymentMethodRepository paymentMethodRepository;
     private final SymptomRepository symptomRepository;
@@ -78,15 +73,11 @@ public class NoncontactDiagService {
     public DoctorListDto getDoctorList(Long departmentId) {
         List<DoctorItem> doctorItemList = doctorRepository.findByDepartmentId(departmentId).stream()
             .map(doctor -> {
-                Integer reviewCnt = reviewRepository.findByDoctorId(doctor.getId()).size();
-
                 return DoctorItem.builder()
                     .id(doctor.getId())
                     .name(doctor.getName())
                     .hospitalName(doctor.getHospital().getName())
                     .profilePath(doctor.getProfileImagePath())
-                    .averageRating(doctor.getAverageRating())
-                    .reviewCnt(reviewCnt)
                     .isOpen(isAgencyOpenNow(doctor.getDiagTime()))
                     .todayOpenTime(findTodayOpenTime(doctor.getDiagTime()))
                     .todayCloseTime(findTodayCloseTime(doctor.getDiagTime()))
@@ -104,32 +95,15 @@ public class NoncontactDiagService {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
 
-        List<Review> findDoctorReviews = reviewRepository.findByDoctorId(doctorId);
-
-        List<DoctorReview> doctorReviews = findDoctorReviews.stream()
-            .map(r -> {
-                List<String> reviewTagList = reviewReviewTagRepository.findReviewTagNameByReviewId(r.getId());
-
-                return DoctorReview.builder()
-                    .reviewTagList(reviewTagList)
-                    .createdAt(r.getCreateDate())
-                    .rating(r.getRating())
-                    .contents(r.getContent())
-                    .build();
-            })
-            .sorted(Comparator.comparing(DoctorReview::getCreatedAt).reversed())
-            .collect(Collectors.toList());
+        Hospital doctorHospital = doctor.getHospital();
 
         DoctorInfo doctorInfo = DoctorInfo.builder()
             .name(doctor.getName())
-            .hospitalName(doctor.getHospital().getName())
+            .hospitalName(doctorHospital.getName())
             .profilePath(doctor.getProfileImagePath())
-            .averageRating(doctor.getAverageRating())
-            .reviewCnt(doctorReviews.size())
             .isOpen(isAgencyOpenNow(doctor.getDiagTime()))
             .todayOpenTime(findTodayOpenTime(doctor.getDiagTime()))
             .todayCloseTime(findTodayCloseTime(doctor.getDiagTime()))
-            .top3ReviewTagList(calTop3ReviewTag(findDoctorReviews))
             .build();
 
         DoctorIntroduction doctorIntroduction = DoctorIntroduction.builder()
@@ -137,56 +111,18 @@ public class NoncontactDiagService {
             .diagTime(doctor.getDiagTime())
             .oneLiner(doctor.getOneLiner())
             .experience(doctor.getExperience())
-            .hospitalId(doctor.getHospital().getId())
-            .hospitalName(doctor.getHospital().getName())
-            .hospitalAddress(doctor.getHospital().getAddress())
+            .hospitalId(doctorHospital.getId())
+            .hospitalName(doctorHospital.getName())
+            .hospitalAddress(doctorHospital.getAddress())
+            .hospitalLongitude(doctorHospital.getLongitude())
+            .hospitalLatitude(doctorHospital.getLatitude())
             .hospitalThumnail(doctor.getHospital().getThumnail())
-            .build();
-
-        DoctorReviewList doctorReviewList = DoctorReviewList.builder()
-            .cnt(doctorReviews.size())
-            .doctorReviewList(doctorReviews)
             .build();
 
         return DoctorDto.builder()
             .doctorInfo(doctorInfo)
             .doctorIntroduction(doctorIntroduction)
-            .doctorReviewList(doctorReviewList)
             .build();
-    }
-
-    public List<Top3ReviewTagInfo> calTop3ReviewTag(List<Review> findDoctorReviews) {
-        // 리뷰 ID를 기반으로 리뷰 태그들을 추출
-        List<ReviewTag> reviewTagList = findDoctorReviews.stream()
-            .flatMap(r -> reviewReviewTagRepository.findReviewTagByReviewId(r.getId()).stream())
-            .filter(rt -> rt.getIsPositive())
-            .collect(Collectors.toList());
-
-        // 각 리뷰 태그별로 개수 집계
-        Map<String, Long> tagCountMap = reviewTagList.stream()
-            .collect(Collectors.groupingBy(tag -> tag.getReviewTagName(), Collectors.counting()));
-
-        // 전체 리뷰 태그 수 계산
-        long totalReviews = findDoctorReviews.size();
-
-        // 각 리뷰 태그의 비율 계산 및 Top3ReviewTagInfo 객체 생성
-        List<Top3ReviewTagInfo> tagInfos = tagCountMap.entrySet().stream()
-            .map(entry -> {
-                String tagName = entry.getKey();
-                long count = entry.getValue();
-                double percentage = (double) count / totalReviews * 100;
-
-                return Top3ReviewTagInfo.builder()
-                    .reviewTagName(tagName)
-                    .percentage(percentage)
-                    .cnt((int) count)
-                    .build();
-            })
-            .sorted(Comparator.comparing(Top3ReviewTagInfo::getCnt).reversed())
-            .limit(3)
-            .collect(Collectors.toList());
-
-        return tagInfos;
     }
 
     public void appointNoncontactDiag(Long userId, NoncontactDiagAppointmentRequestDto requestDto) {

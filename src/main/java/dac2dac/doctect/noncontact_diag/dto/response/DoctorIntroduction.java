@@ -21,10 +21,12 @@ public class DoctorIntroduction {
     private Long hospitalId;
     private String hospitalName;
     private String hospitalAddress;
+    private Double hospitalLongitude;
+    private Double hospitalLatitude;
     private String hospitalThumnail;
 
     @Builder
-    public DoctorIntroduction(String department, String oneLiner, String experience, DiagTime diagTime, Long hospitalId, String hospitalName, String hospitalAddress, String hospitalThumnail) {
+    public DoctorIntroduction(String department, String oneLiner, String experience, DiagTime diagTime, Long hospitalId, String hospitalName, String hospitalAddress, Double hospitalLongitude, Double hospitalLatitude, String hospitalThumnail) {
         this.department = department;
         this.oneLiner = oneLiner;
         this.experience = experience;
@@ -32,6 +34,8 @@ public class DoctorIntroduction {
         this.hospitalId = hospitalId;
         this.hospitalName = hospitalName;
         this.hospitalAddress = hospitalAddress;
+        this.hospitalLongitude = hospitalLongitude;
+        this.hospitalLatitude = hospitalLatitude;
         this.hospitalThumnail = hospitalThumnail;
     }
 }

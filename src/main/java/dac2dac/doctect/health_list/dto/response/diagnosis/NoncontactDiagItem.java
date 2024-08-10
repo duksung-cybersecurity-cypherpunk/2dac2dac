@@ -17,22 +17,17 @@ public class NoncontactDiagItem {
     private String doctorHostpital;
     private String doctorThumnail;
 
-    private Double doctorAverageRating;
-    private int reviewCnt;
-
     private Integer doctorTodayOpenTime;
     private Integer doctorTodayCloseTime;
     private boolean doctorIsOpenNow;
 
     @Builder
-    public NoncontactDiagItem(Long diagId, LocalDateTime diagDate, String doctorName, String doctorHostpital, String doctorThumnail, Double doctorAverageRating, int reviewCnt, Integer doctorTodayOpenTime, Integer doctorTodayCloseTime, boolean doctorIsOpenNow) {
+    public NoncontactDiagItem(Long diagId, LocalDateTime diagDate, String doctorName, String doctorHostpital, String doctorThumnail, Integer doctorTodayOpenTime, Integer doctorTodayCloseTime, boolean doctorIsOpenNow) {
         this.diagId = diagId;
         this.diagDate = diagDate;
         this.doctorName = doctorName;
         this.doctorHostpital = doctorHostpital;
         this.doctorThumnail = doctorThumnail;
-        this.doctorAverageRating = doctorAverageRating;
-        this.reviewCnt = reviewCnt;
         this.doctorTodayOpenTime = doctorTodayOpenTime;
         this.doctorTodayCloseTime = doctorTodayCloseTime;
         this.doctorIsOpenNow = doctorIsOpenNow;

@@ -55,7 +55,7 @@ public class DoctechDBConfig {
 
         return builder
             .dataSource(dataSource)
-            .packages("dac2dac.doctect.agency", "dac2dac.doctect.bootpay", "dac2dac.doctect.common", "dac2dac.doctect.doctor", "dac2dac.doctect.health_list", "dac2dac.doctect.noncontact_diag", "dac2dac.doctect.review",
+            .packages("dac2dac.doctect.agency", "dac2dac.doctect.bootpay", "dac2dac.doctect.common", "dac2dac.doctect.doctor", "dac2dac.doctect.health_list", "dac2dac.doctect.noncontact_diag",
                 "dac2dac.doctect.user")
             .persistenceUnit("primary")
             .properties(properties)
