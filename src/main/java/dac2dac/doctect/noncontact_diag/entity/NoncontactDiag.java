@@ -50,6 +50,4 @@ public class NoncontactDiag {
     @Enumerated(EnumType.STRING)
     private DiagStatus status;
 
-    private boolean isReviewWrited;
-
 }

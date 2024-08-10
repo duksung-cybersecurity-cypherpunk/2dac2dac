@@ -11,13 +11,9 @@ public class DoctorDto {
     private DoctorInfo doctorInfo;
 
     private DoctorIntroduction doctorIntroduction;
-
-    private DoctorReviewList doctorReviewList;
-
     @Builder
-    public DoctorDto(DoctorInfo doctorInfo, DoctorIntroduction doctorIntroduction, DoctorReviewList doctorReviewList) {
+    public DoctorDto(DoctorInfo doctorInfo, DoctorIntroduction doctorIntroduction) {
         this.doctorInfo = doctorInfo;
         this.doctorIntroduction = doctorIntroduction;
-        this.doctorReviewList = doctorReviewList;
     }
 }

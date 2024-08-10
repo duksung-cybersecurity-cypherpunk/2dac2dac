@@ -37,8 +37,6 @@ public class Doctor {
     private String email;
     private String password;
 
-    private Double averageRating;
-
     private Boolean isLicenseCertificated;
     private String profileImagePath;
 

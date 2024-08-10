@@ -56,7 +56,6 @@ import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
-import dac2dac.doctect.review.repository.ReviewRepository;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.repository.UserRepository;
 import java.time.LocalDateTime;
@@ -84,7 +83,6 @@ public class HealthListService {
     private final HospitalRepository hospitalRepository;
     private final PharmacyRepository pharmacyRepository;
     private final PrescriptionDrugRepository prescriptionDrugRepository;
-    private final ReviewRepository reviewRepository;
 
     @Transactional
     public void syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
@@ -152,8 +150,6 @@ public class HealthListService {
         List<NoncontactDiagItem> noncontactDiagItemList = noncontactDiagRepository.findByUserId(userId)
             .stream()
             .map(nc -> {
-                int reviewCnt = reviewRepository.findByDoctorId(nc.getDoctor().getId()).size();
-
                 LocalDateTime diagDateTime = LocalDateTime.of(nc.getDiagDate(), nc.getDiagTime());
                 return NoncontactDiagItem.builder()
                     .diagId(nc.getId())
@@ -161,8 +157,6 @@ public class HealthListService {
                     .doctorName(nc.getDoctor().getName())
                     .doctorHostpital(nc.getDoctor().getHospital().getName())
                     .doctorThumnail(nc.getDoctor().getProfileImagePath())
-                    .reviewCnt(reviewCnt)
-                    .doctorAverageRating(nc.getDoctor().getAverageRating())
                     .doctorIsOpenNow(isAgencyOpenNow(nc.getDoctor().getDiagTime()))
                     .doctorTodayOpenTime(findTodayOpenTime(nc.getDoctor().getDiagTime()))
                     .doctorTodayCloseTime(findTodayCloseTime(nc.getDoctor().getDiagTime()))
