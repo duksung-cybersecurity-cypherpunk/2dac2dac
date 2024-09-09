@@ -75,4 +75,9 @@ public class KeyHashMap implements Map<String, String> {
     public static KeyHashMap toKeyHashMap(Map<String, String> map) {
         return new KeyHashMap(map);
     }
+
+    @Override
+    public String toString() {
+        return "KeyHashMap{" + "map=" + map + '}';
+    }
 }
