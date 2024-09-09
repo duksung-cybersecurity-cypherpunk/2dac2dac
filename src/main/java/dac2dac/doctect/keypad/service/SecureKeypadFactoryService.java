@@ -99,7 +99,6 @@ public class SecureKeypadFactoryService {
             .mapToObj(i -> BLANK)
             .collect(Collectors.toList());
         keys.addAll(KEY_RANGE);
-        keys.add(BLANK);
         Collections.shuffle(keys, new Random());
         return keys;
     }

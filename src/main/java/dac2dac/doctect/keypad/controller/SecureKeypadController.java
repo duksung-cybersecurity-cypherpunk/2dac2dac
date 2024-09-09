@@ -26,6 +26,6 @@ public class SecureKeypadController {
 
     @PostMapping("/auth")
     public String handleKeypadInput(@RequestBody SecureKeypadAuthRequest secureKeypadAuthRequest) {
-        return secureKeypadAuthService.sendKeypadInput(secureKeypadAuthRequest);
+        return secureKeypadAuthService.authKeypadInput(secureKeypadAuthRequest);
     }
 }

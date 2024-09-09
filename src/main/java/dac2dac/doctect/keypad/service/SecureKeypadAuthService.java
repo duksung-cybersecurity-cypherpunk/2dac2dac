@@ -4,6 +4,7 @@ import dac2dac.doctect.keypad.dto.SecureKeypadAuthRequest;
 import dac2dac.doctect.keypad.entity.IntegrityId;
 import dac2dac.doctect.keypad.entity.KeyHashMap;
 import dac2dac.doctect.keypad.repository.KeypadRepository;
+import jakarta.validation.Valid;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -28,16 +29,13 @@ public class SecureKeypadAuthService {
     private static final Duration EXPIRES_IN = Duration.ofMinutes(15);
     private static final int HASH_LENGTH = 40;
 
-    public String sendKeypadInput(SecureKeypadAuthRequest secureKeypadAuthRequest) {
+    public String authKeypadInput(@Valid SecureKeypadAuthRequest secureKeypadAuthRequest) {
         checkIntegrity(secureKeypadAuthRequest.getIntegrityId());
         KeyHashMap keyHashMap = keypadRepository.getKeypad(secureKeypadAuthRequest.getIntegrityId());
-
-        System.out.println("keyHashMap = " + keyHashMap);
 
         String decryptedInput = decryptUserInputWithPrivateKey(secureKeypadAuthRequest.getUserInput());
         String originalValues = decryptUserInput(decryptedInput, keyHashMap);
 
-        System.out.println("원본 값: " + originalValues);
         return originalValues;
     }
 
