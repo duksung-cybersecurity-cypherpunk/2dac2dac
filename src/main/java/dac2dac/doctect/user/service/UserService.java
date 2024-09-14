@@ -56,7 +56,9 @@ public class UserService {
         // 사용자 저장
         return userRepository.save(user);
     }
-
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
     // 인증 서비스 구축
     // 로그인 메서드
     public boolean authenticateUser(String username, String password) {

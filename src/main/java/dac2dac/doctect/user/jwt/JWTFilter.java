@@ -31,12 +31,12 @@ public class JWTFilter extends OncePerRequestFilter {
         try {
             // Request에서 Authorization 헤더를 찾음
             String authorization = request.getHeader("Authorization");
-            System.out.println("Authorization Header"+ authorization);
+            //System.out.println("Authorization Header"+ authorization);
 
             // Authorization 헤더 검증
             if (authorization == null || !authorization.startsWith("Bearer ")) {
-                System.out.println("여기로 들어오면 안되는데");
-                System.out.println("Authoriazion"+ authorization);
+                //System.out.println("여기로 들어오면 안되는데");
+                //System.out.println("Authoriazion"+ authorization);
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -49,7 +49,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
             // 토큰 소멸 시간 검증
             if (jwtUtil.isExpired(token)) {
-                System.out.println("Token이 만료됨");
+                ///System.out.println("Token이 만료됨");
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -63,7 +63,7 @@ public class JWTFilter extends OncePerRequestFilter {
             String email = jwtUtil.getEmail(token);
 
 
-            System.out.println("Token parsed successfully. Username: {}, ID: {}"+username);
+            //System.out.println("Token parsed successfully. Username: {}, ID: {}"+username);
 
             // UserEntity를 생성하여 값 set
             User userEntity = new User();
