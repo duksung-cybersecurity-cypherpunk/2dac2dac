@@ -2,6 +2,8 @@
 src/main/resources
 !src/main/resources/keypad/
 !src/main/resources/keypad/**
+!src/main/resources/templates/
+!src/main/resources/templates/**
 
 HELP.md
 .gradle
