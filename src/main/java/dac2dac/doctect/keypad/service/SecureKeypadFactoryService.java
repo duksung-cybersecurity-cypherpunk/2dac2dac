@@ -58,7 +58,8 @@ public class SecureKeypadFactoryService {
                     try {
                         return getKeyPadImageFile(key);
                     } catch (IOException e) {
-                        return null;
+                        e.printStackTrace();  // 예외를 출력하여 디버깅 정보를 제공
+                        return new BufferedImage(KEY_WIDTH, KEY_HEIGHT, BufferedImage.TYPE_INT_ARGB);
                     }
                 }
             ));
