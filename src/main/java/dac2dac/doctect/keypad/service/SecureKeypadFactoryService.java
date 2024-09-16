@@ -8,8 +8,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -138,7 +138,10 @@ public class SecureKeypadFactoryService {
 
     private BufferedImage getKeyPadImageFile(String key) throws IOException {
         String fileName = key.equals(BLANK) ? "_blank.png" : "_" + key + ".png";
-        File file = new ClassPathResource("keypad/" + fileName).getFile();
-        return ImageIO.read(file);
+        ClassPathResource resource = new ClassPathResource("keypad/" + fileName);
+
+        try (InputStream inputStream = resource.getInputStream()) {
+            return ImageIO.read(inputStream);
+        }
     }
 }
