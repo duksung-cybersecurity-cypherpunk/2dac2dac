@@ -13,17 +13,25 @@ import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.doctor.entity.Doctor;
-import dac2dac.doctect.doctor.repository.DoctorRepository;
 import dac2dac.doctect.health_list.dto.request.DiagnosisDto;
 import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
 import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
 import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
 import dac2dac.doctect.health_list.dto.request.VaccinationDto;
-import dac2dac.doctect.health_list.dto.response.healthScreening.DoctorInfo;
 import dac2dac.doctect.health_list.dto.response.HostpitalInfo;
 import dac2dac.doctect.health_list.dto.response.PharmacyInfo;
-import dac2dac.doctect.health_list.dto.response.diagnosis.*;
+import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagDetailDto;
+import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagItem;
+import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagItemList;
+import dac2dac.doctect.health_list.dto.response.diagnosis.DiagDetailInfo;
+import dac2dac.doctect.health_list.dto.response.diagnosis.DiagnosisListDto;
+import dac2dac.doctect.health_list.dto.response.diagnosis.NoncontactDiagDetailDto;
+import dac2dac.doctect.health_list.dto.response.diagnosis.NoncontactDiagDetailInfo;
+import dac2dac.doctect.health_list.dto.response.diagnosis.NoncontactDiagItem;
+import dac2dac.doctect.health_list.dto.response.diagnosis.NoncontactDiagItemList;
+import dac2dac.doctect.health_list.dto.response.diagnosis.NoncontactDoctorInfo;
 import dac2dac.doctect.health_list.dto.response.healthScreening.BloodTestInfo;
+import dac2dac.doctect.health_list.dto.response.healthScreening.DoctorInfo;
 import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningDetailDto;
 import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningInfo;
 import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningItem;
@@ -52,11 +60,13 @@ import dac2dac.doctect.health_list.repository.HealthScreeningRepository;
 import dac2dac.doctect.health_list.repository.PrescriptionDrugRepository;
 import dac2dac.doctect.health_list.repository.PrescriptionRepository;
 import dac2dac.doctect.health_list.repository.VaccinationRepository;
+import dac2dac.doctect.keypad.service.SecureKeypadAuthService;
 import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
 import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.user.entity.constant.Gender;
 import dac2dac.doctect.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -73,6 +83,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class HealthListService {
 
+    private final SecureKeypadAuthService secureKeypadAuthService;
     private final MydataJdbcRepository mydataJdbcRepository;
     private final UserRepository userRepository;
     private final ContactDiagRepository contactDiagRepository;
@@ -89,8 +100,18 @@ public class HealthListService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
+        // 주민등록번호 뒷자리 복호화
+        String pinFront = userAuthenticationDto.getPinFront();
+        String pinBack = secureKeypadAuthService.authKeypadInput(userAuthenticationDto.getPinBack());
+        String pin = pinFront + pinBack;
+
         // 유저 정보(이름, 주민등록번호)를 통해 마이데이터 DB의 유저 아이디 가져오기 (본인 인증)
-        Long mydataUserId = authenticateUser(userAuthenticationDto);
+        Long mydataUserId = authenticateUser(userAuthenticationDto.getName(), pin);
+
+        // 유저의 생년월일과 성별 저장
+        user.setBirthDate(pinFront);
+        user.setGender(determineGenderByPinBack(pinBack));
+        userRepository.save(user);
 
         // 마이데이터 유저의 아이디를 이용하여 마이데이터 조회 후 Doc'tech 서버 DB에 저장한다.
         //* 진료 내역
@@ -246,10 +267,10 @@ public class HealthListService {
 
     public NoncontactDiagDetailDto getDetailNoncontactDiagnosis(Long userId, Long diagId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         NoncontactDiag findNoncontactDiag = noncontactDiagRepository.findById(diagId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_NOT_FOUND));
 
         //* 유저와 조회한 진료 내역에 해당하는 유저가 다를 경우에 대한 예외처리를 수행한다.
         if (!user.getId().equals(findNoncontactDiag.getUser().getId())) {
@@ -260,32 +281,32 @@ public class HealthListService {
 
         //* 의사 정보
         NoncontactDoctorInfo noncontactDoctorInfo = NoncontactDoctorInfo.builder()
-                .doctorId(findDoctor.getId())
-                .diagDate(LocalDateTime.of(findNoncontactDiag.getDiagDate(), findNoncontactDiag.getDiagTime()))
-                .doctorName(findDoctor.getName())
-                .doctorHospitalName(findDoctor.getHospital().getName())
-                .doctorIsOpenNow(isAgencyOpenNow(findDoctor.getDiagTime()))
-                .doctorTodayOpenTime(findTodayOpenTime(findDoctor.getDiagTime()))
-                .doctorTodayCloseTime(findTodayCloseTime(findDoctor.getDiagTime()))
-                .build();
+            .doctorId(findDoctor.getId())
+            .diagDate(LocalDateTime.of(findNoncontactDiag.getDiagDate(), findNoncontactDiag.getDiagTime()))
+            .doctorName(findDoctor.getName())
+            .doctorHospitalName(findDoctor.getHospital().getName())
+            .doctorIsOpenNow(isAgencyOpenNow(findDoctor.getDiagTime()))
+            .doctorTodayOpenTime(findTodayOpenTime(findDoctor.getDiagTime()))
+            .doctorTodayCloseTime(findTodayCloseTime(findDoctor.getDiagTime()))
+            .build();
 
         Symptom findSymptom = findNoncontactDiag.getNoncontactDiagReservation().getSymptom();
         PaymentInfo findPaymentInfo = findNoncontactDiag.getPaymentInfo();
 
         //* 비대면 진료 세부 정보
         NoncontactDiagDetailInfo noncontactDiagDetailInfo = NoncontactDiagDetailInfo.builder()
-                .isPrescribedDrug(findSymptom.getIsPrescribedDrug())
-                .isAllergicSymptom(findSymptom.getIsAllergicSymptom())
-                .isInbornDisease(findSymptom.getIsInbornDisease())
-                .price(findPaymentInfo.getPrice())
-                .paymentType(findPaymentInfo.getPaymentMethod().getPaymentType().getPaymentTypeName())
-                .approvalDate(findPaymentInfo.getCreateDate())
-                .build();
+            .isPrescribedDrug(findSymptom.getIsPrescribedDrug())
+            .isAllergicSymptom(findSymptom.getIsAllergicSymptom())
+            .isInbornDisease(findSymptom.getIsInbornDisease())
+            .price(findPaymentInfo.getPrice())
+            .paymentType(findPaymentInfo.getPaymentMethod().getPaymentType().getPaymentTypeName())
+            .approvalDate(findPaymentInfo.getCreateDate())
+            .build();
 
         return NoncontactDiagDetailDto.builder()
-                .noncontactDoctorInfo(noncontactDoctorInfo)
-                .noncontactDiagDetailInfo(noncontactDiagDetailInfo)
-                .build();
+            .noncontactDoctorInfo(noncontactDoctorInfo)
+            .noncontactDiagDetailInfo(noncontactDiagDetailInfo)
+            .build();
     }
 
     public PrescriptionItemListDto getPrescriptionList(Long userId) {
@@ -578,18 +599,33 @@ public class HealthListService {
             .build();
     }
 
-    private Long authenticateUser(UserAuthenticationDto userAuthenticationDto) {
+    private Long authenticateUser(String name, String pin) {
         Map<String, Object> mydataUser = mydataJdbcRepository
-                .findByNameAndPin(userAuthenticationDto.getName(), userAuthenticationDto.getPin())
-                .orElseThrow(() -> new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED));
+            .findByNameAndPin(name, pin)
+            .orElseThrow(() -> new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED));
 
         // 마이데이터 DB에 존재하는 name, pin이 사용자가 입력한 name, pin과 같다면 본인 인증에 성공한 것으로 한다.
-        boolean isNameValid = mydataUser.get("name").equals(userAuthenticationDto.getName());
-        boolean isPinValid = mydataUser.get("pin").equals(userAuthenticationDto.getPin());
+        boolean isNameValid = mydataUser.get("name").equals(name);
+        boolean isPinValid = mydataUser.get("pin").equals(pin);
 
         if (!isNameValid || !isPinValid) {
             throw new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED);
         }
         return (Long) mydataUser.get("id");
+    }
+
+    private Gender determineGenderByPinBack(String pinBack) {
+        char genderCode = pinBack.charAt(0);  // 뒷자리 첫 번째 문자 추출
+
+        switch (genderCode) {
+            case '1':
+            case '3':
+                return Gender.Male;  // 1, 3은 남성
+            case '2':
+            case '4':
+                return Gender.Female;  // 2, 4는 여성
+            default:
+                throw new IllegalArgumentException("유효하지 않은 성별 코드입니다: " + genderCode);
+        }
     }
 }
