@@ -70,4 +70,12 @@ public class User extends BaseEntity {
     public void setSocialType(SocialType socialType) {
         this.socialType = socialType;
     }
+
+    public void setBirthDate(String birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
 }

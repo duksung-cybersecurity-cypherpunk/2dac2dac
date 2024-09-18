@@ -173,8 +173,8 @@ public class DoctorService {
         return PatientInfoDto.builder()
             .userId(user.getId())
             .userName(maskName(user.getUsername()))
-//            .age(convertBirthDateToAgeGroup(user.getBirthDate()))
-//            .gender(getGenderCode(user.getGender()))
+            .age(convertBirthDateToAgeGroup(user.getBirthDate()))
+            .gender(getGenderCode(user.getGender()))
             .phoneNumber(user.getPhoneNumber())
             .build();
     }
@@ -197,14 +197,14 @@ public class DoctorService {
     public static String convertBirthDateToAgeGroup(String birthDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         LocalDate birthDateLocalDate = LocalDate.parse(birthDate, formatter);
-
         int birthYear = birthDateLocalDate.getYear();
         int currentYear = LocalDate.now().getYear();
 
-        // 2000년 이후 태어난 경우 처리 (현재 연도를 기준으로 2000년 이후인지 계산)
-        birthYear = (birthYear > currentYear % 100) ? birthYear + 1900 : birthYear + 2000;
+        if ((birthYear % 100) > (currentYear % 100)) {
+            birthYear -= 100;  // 1900년대 출생자
+        }
 
-        int age = currentYear - birthYear;
+        int age = currentYear - birthYear + 1;
         return calculateAgeGroup(age);
     }
 
@@ -213,7 +213,7 @@ public class DoctorService {
         if (age < 10) {
             return "연령대 미상";
         }
-        int ageGroup = age / 10 * 10;
+        int ageGroup = age / 10 * 10;  // 10 단위로 나이대 계산
         return ageGroup + "대";
     }
 }
