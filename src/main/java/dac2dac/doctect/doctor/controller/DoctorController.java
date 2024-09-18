@@ -25,4 +25,10 @@ class DoctorController {
     public ApiResult getReservations(@PathVariable Long doctorId, @PathVariable("reservationDate") @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}") String reservationDate) {
         return ApiResult.success(SuccessCode.GET_SUCCESS, doctorService.getReservations(doctorId, reservationDate));
     }
+
+    @Operation(summary = "예약 신청서 조회 API", description = "예약 신청서를 조회한다.")
+    @PostMapping("/form/{doctorId}/{reservationId}")
+    public ApiResult getReservations(@PathVariable Long doctorId, @PathVariable Long reservationId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, doctorService.getReservationForm(doctorId, reservationId));
+    }
 }
