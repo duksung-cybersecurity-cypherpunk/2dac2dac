@@ -121,4 +121,15 @@ public class DoctorService {
             .noncontactDiagFormInfo(noncontactDiagFormInfo)
             .build();
     }
+
+    public void acceptReservation(Long doctorId, Long reservationId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
+
+        NoncontactDiagReservation findNoncontactDiagReservation = noncontactDiagReservationRepository.findById(reservationId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
+
+        findNoncontactDiagReservation.acceptReservation();
+        noncontactDiagReservationRepository.save(findNoncontactDiagReservation);
+    }
 }
