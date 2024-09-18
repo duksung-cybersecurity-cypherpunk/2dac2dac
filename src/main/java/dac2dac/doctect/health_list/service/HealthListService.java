@@ -620,10 +620,10 @@ public class HealthListService {
         switch (genderCode) {
             case '1':
             case '3':
-                return Gender.Male;  // 1, 3은 남성
+                return Gender.MALE;  // 1, 3은 남성
             case '2':
             case '4':
-                return Gender.Female;  // 2, 4는 여성
+                return Gender.FEMALE;  // 2, 4는 여성
             default:
                 throw new IllegalArgumentException("유효하지 않은 성별 코드입니다: " + genderCode);
         }
