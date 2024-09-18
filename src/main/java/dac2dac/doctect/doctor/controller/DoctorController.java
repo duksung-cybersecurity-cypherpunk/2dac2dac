@@ -48,4 +48,10 @@ class DoctorController {
         doctorService.rejectReservation(doctorId, reservationId, request);
         return ApiResult.success(SuccessCode.REJECT_SUCCESS);
     }
+
+    @Operation(summary = "예약 환자 정보 조회 API", description = "비식별화 처리된 환자 정보를 조회한다.")
+    @GetMapping("/{doctorId}/{reservationId}/patientInfo")
+    public ApiResult getPatientInfo(@PathVariable Long doctorId, @PathVariable Long reservationId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, doctorService.getPatientInfo(doctorId, reservationId));
+    }
 }

@@ -1,8 +1,15 @@
 package dac2dac.doctect.user.entity;
 
 import dac2dac.doctect.common.entity.BaseEntity;
+import dac2dac.doctect.user.entity.constant.Gender;
 import dac2dac.doctect.user.entity.constant.SocialType;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 
@@ -20,11 +27,14 @@ public class User extends BaseEntity {
     private String username;
     private String email;
     private String phoneNumber;
-    private String code; // 구글, 카카오의 로그아웃, 탈퇴를 위한 코드
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+    private String birthDate;
+    private String code;
     private Double longitude;
     private Double latitude;
     private String password;
-
 
     public void setLocation(Double longitude, Double latitude) {
         this.longitude = longitude;
@@ -57,10 +67,7 @@ public class User extends BaseEntity {
         this.id = Long.parseLong(id);
     }
 
-
     public void setSocialType(SocialType socialType) {
         this.socialType = socialType;
     }
-
-
 }
