@@ -9,6 +9,7 @@ import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -37,6 +38,7 @@ public class DoctorService {
                 .patientName(r.getUser().getUsername())
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
+            .sorted(Comparator.comparing(ReservationItem::getSignupDate))
             .collect(Collectors.toList());
 
         RequestReservationItemList requestReservationItemList = RequestReservationItemList.builder()
@@ -56,6 +58,7 @@ public class DoctorService {
                 .patientName(r.getUser().getUsername())
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
+            .sorted(Comparator.comparing(ReservationItem::getReservationDate))
             .collect(Collectors.toList());
 
         AcceptedReservationItemList acceptedReservationItemList = AcceptedReservationItemList.builder()
