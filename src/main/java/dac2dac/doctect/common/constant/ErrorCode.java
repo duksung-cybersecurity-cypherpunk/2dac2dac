@@ -16,6 +16,7 @@ public enum ErrorCode {
     RESERVATION_TIME_BAD_REQUEST(HttpStatus.BAD_REQUEST, "선택한 의사가 가능한 진료 예약 시간이 아닙니다."),
     CONSENT_BAD_REQUEST(HttpStatus.BAD_REQUEST, "사용자로부터 필수 약관 동의를 받지 못했습니다."),
     CANCELED_FORM_BAD_REQUEST(HttpStatus.BAD_REQUEST, "예약취소 상태의 비대면 진료 예약 신청서입니다."),
+    INVALID_RESERVATION_STATUS(HttpStatus.BAD_REQUEST, "예약신청완료(SIGN_UP) 상태에서만 상태 변경이 가능합니다."),
 
     /**
      * 401 Unauthorized

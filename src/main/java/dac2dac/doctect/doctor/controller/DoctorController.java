@@ -39,4 +39,11 @@ class DoctorController {
         doctorService.acceptReservation(doctorId, reservationId);
         return ApiResult.success(SuccessCode.ACCEPT_SUCCESS);
     }
+
+    @Operation(summary = "예약 거절 API", description = "예약을 거절한다.")
+    @PostMapping("/reject/{doctorId}/{reservationId}")
+    public ApiResult rejectReservation(@PathVariable Long doctorId, @PathVariable Long reservationId) {
+        doctorService.rejectReservation(doctorId, reservationId);
+        return ApiResult.success(SuccessCode.REJECT_SUCCESS);
+    }
 }

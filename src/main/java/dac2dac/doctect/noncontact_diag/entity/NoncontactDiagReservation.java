@@ -80,6 +80,10 @@ public class NoncontactDiagReservation extends BaseEntity {
     public void acceptReservation() {
         this.status = ReservationStatus.COMPLETE;
     }
+
+    public void rejectReservation() {
+        this.status = ReservationStatus.REJECT;
+    }
 }
 
 

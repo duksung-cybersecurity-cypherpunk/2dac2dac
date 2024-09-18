@@ -13,6 +13,7 @@ public enum SuccessCode {
     PAYMENT_SUCCESS(HttpStatus.OK, "결제 성공"),
     CREATED_SUCCESS(HttpStatus.CREATED, "생성 성공"),
     ACCEPT_SUCCESS(HttpStatus.ACCEPTED, "수락 성공"),
+    REJECT_SUCCESS(HttpStatus.ACCEPTED, "거절 성공"),
     DELETE_SUCCESS(HttpStatus.OK, "삭제 성공");
 
     private final HttpStatus status;
