@@ -3,6 +3,7 @@ package dac2dac.doctect.doctor.service;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.BadRequestException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
+import dac2dac.doctect.doctor.dto.request.RejectReservationRequest;
 import dac2dac.doctect.doctor.dto.response.AcceptedReservationItemList;
 import dac2dac.doctect.doctor.dto.response.RequestReservationFormDto;
 import dac2dac.doctect.doctor.dto.response.RequestReservationItemList;
@@ -139,7 +140,7 @@ public class DoctorService {
         }
     }
 
-    public void rejectReservation(Long doctorId, Long reservationId) {
+    public void rejectReservation(Long doctorId, Long reservationId, RejectReservationRequest request) {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
 
@@ -147,11 +148,12 @@ public class DoctorService {
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
 
         // 예약 상태가 SIGN_UP인 경우만 거절 가능
-        if (ReservationStatus.SIGN_UP.equals(reservation.getStatus())) {
-            reservation.rejectReservation();
-            noncontactDiagReservationRepository.save(reservation);
-        } else {
+        if (!ReservationStatus.SIGN_UP.equals(reservation.getStatus())) {
             throw new BadRequestException(ErrorCode.INVALID_RESERVATION_STATUS);
         }
+
+        // 예약 상태를 거절로 변경하고 거절 사유 저장
+        reservation.rejectReservation(request.getRejectionReason(), request.getAdditionalReason());
+        noncontactDiagReservationRepository.save(reservation);
     }
 }

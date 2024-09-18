@@ -2,6 +2,7 @@ package dac2dac.doctect.doctor.controller;
 
 import dac2dac.doctect.common.constant.SuccessCode;
 import dac2dac.doctect.common.response.ApiResult;
+import dac2dac.doctect.doctor.dto.request.RejectReservationRequest;
 import dac2dac.doctect.doctor.service.DoctorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,8 +44,8 @@ class DoctorController {
 
     @Operation(summary = "예약 거절 API", description = "예약을 거절한다.")
     @PostMapping("/reject/{doctorId}/{reservationId}")
-    public ApiResult rejectReservation(@PathVariable Long doctorId, @PathVariable Long reservationId) {
-        doctorService.rejectReservation(doctorId, reservationId);
+    public ApiResult rejectReservation(@PathVariable Long doctorId, @PathVariable Long reservationId, @RequestBody RejectReservationRequest request) {
+        doctorService.rejectReservation(doctorId, reservationId, request);
         return ApiResult.success(SuccessCode.REJECT_SUCCESS);
     }
 }
