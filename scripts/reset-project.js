@@ -2,72 +2,88 @@
 
 /**
  * This script is used to reset the project to a blank state.
- * It moves the /app directory to /app-example and creates a new /app directory with an index.tsx and _layout.tsx file.
- * You can remove the `reset-project` script from package.json and safely delete this file after running it.
+ * It deletes the /app directory if it exists.
+ * It ensures that App.js is created in the root directory if it does not already exist.
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 const root = process.cwd();
-const oldDirPath = path.join(root, 'app');
-const newDirPath = path.join(root, 'app-example');
-const newAppDirPath = path.join(root, 'app');
+const oldDirPath = path.join(root, "app");
+const appPath = path.join(root, "App.js");
 
-const indexContent = `import { Text, View } from "react-native";
+// Function to handle directory operations
+const resetProject = () => {
+  if (fs.existsSync(oldDirPath)) {
+    fs.rm(oldDirPath, { recursive: true, force: true }, (error) => {
+      if (error) {
+        return console.error(`Error removing directory: ${error}`);
+      }
+      console.log("/app directory deleted.");
 
-export default function Index() {
+      // Create App.js if it does not already exist
+      if (!fs.existsSync(appPath)) {
+        const appContent = `import React from 'react';
+import { Text, View } from 'react-native';
+
+export default function App() {
   return (
     <View
       style={{
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+      <Text>Edit App.js to change this screen.</Text>
     </View>
   );
 }
 `;
 
-const layoutContent = `import { Stack } from "expo-router";
+        fs.writeFile(appPath, appContent, (error) => {
+          if (error) {
+            return console.error(`Error creating App.js: ${error}`);
+          }
+          console.log("App.js created in the root directory.");
+        });
+      } else {
+        console.log("App.js already exists in the root directory.");
+      }
+    });
+  } else {
+    console.log("/app directory does not exist.");
 
-export default function RootLayout() {
+    // Ensure App.js is created if it does not exist
+    if (!fs.existsSync(appPath)) {
+      const appContent = `import React from 'react';
+import { Text, View } from 'react-native';
+
+export default function App() {
   return (
-    <Stack>
-      <Stack.Screen name="index" />
-    </Stack>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Text>Edit App.js to change this screen.</Text>
+    </View>
   );
 }
 `;
 
-fs.rename(oldDirPath, newDirPath, (error) => {
-  if (error) {
-    return console.error(`Error renaming directory: ${error}`);
-  }
-  console.log('/app moved to /app-example.');
-
-  fs.mkdir(newAppDirPath, { recursive: true }, (error) => {
-    if (error) {
-      return console.error(`Error creating new app directory: ${error}`);
-    }
-    console.log('New /app directory created.');
-
-    const indexPath = path.join(newAppDirPath, 'index.tsx');
-    fs.writeFile(indexPath, indexContent, (error) => {
-      if (error) {
-        return console.error(`Error creating index.tsx: ${error}`);
-      }
-      console.log('app/index.tsx created.');
-
-      const layoutPath = path.join(newAppDirPath, '_layout.tsx');
-      fs.writeFile(layoutPath, layoutContent, (error) => {
+      fs.writeFile(appPath, appContent, (error) => {
         if (error) {
-          return console.error(`Error creating _layout.tsx: ${error}`);
+          return console.error(`Error creating App.js: ${error}`);
         }
-        console.log('app/_layout.tsx created.');
+        console.log("App.js created in the root directory.");
       });
-    });
-  });
-});
+    }
+  }
+};
+
+// Execute the function
+resetProject();
