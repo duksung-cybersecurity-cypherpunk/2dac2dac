@@ -48,4 +48,12 @@ public class AgencyController {
         return ApiResult.success(SuccessCode.GET_SUCCESS, agencyService.getDetailHospital(userId, hospitalId));
     }
 
+    @Operation(summary = "병원 리스트 조회 API", description = "모든 병원의 정보를 조회한다.")
+    @GetMapping("/hospitals")
+    public ApiResult getAllHospitals() {
+
+        return ApiResult.success(SuccessCode.GET_SUCCESS, agencyService.getAllHospitals());
+    }
+
+
 }

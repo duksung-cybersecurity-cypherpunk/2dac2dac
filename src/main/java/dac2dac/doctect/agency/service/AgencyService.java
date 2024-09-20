@@ -31,6 +31,9 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 @Service
 @RequiredArgsConstructor
 public class AgencyService {
@@ -250,4 +253,19 @@ public class AgencyService {
         double earthRadius = 6371; // Kilometers
         return earthRadius * Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));
     }
+    
+    public List<HospitalDto> getAllHospitals() {
+        Pageable pageable = PageRequest.of(0, 100); // 첫 번째 페이지, 100개
+        List<Hospital> hospitals = hospitalRepository.findAll(pageable).getContent();
+
+        return hospitals.stream()
+                .map(hospital -> HospitalDto.builder()
+                        .id(hospital.getId())
+                        .name(hospital.getName())
+                        .address(hospital.getAddress())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+
 }
