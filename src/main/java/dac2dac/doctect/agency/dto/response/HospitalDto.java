@@ -31,17 +31,11 @@ public class HospitalDto {
     private Double longtitude;
 
 
-    @Builder
-    public HospitalDto(Long id, String name, String address) {
-        this.id = id;
-        this.name = name;
-        this.address = address;
-    }
-
 
     @Builder
-    public HospitalDto( String name, String tel, String address, Double distance, String thumnail, Integer recentVisitDays, Boolean isFavorite, boolean isOpen, Integer todayOpenTime,
+    public HospitalDto(Long id,String name, String tel, String address, Double distance, String thumnail, Integer recentVisitDays, Boolean isFavorite, boolean isOpen, Integer todayOpenTime,
         Integer todayCloseTime, Double latitude, Double longtitude) {
+        this.id = id;
         this.name = name;
         this.tel = tel;
         this.address = address;
@@ -55,6 +49,7 @@ public class HospitalDto {
         this.latitude = latitude;
         this.longtitude = longtitude;
     }
+
 
 
 }
