@@ -51,6 +51,7 @@ public class DoctorService {
 
         List<ReservationItem> requestReservationItems = requestReservations.stream()
             .map(r -> ReservationItem.builder()
+                .userId(r.getUser().getId())
                 .reservationId(r.getId())
                 .signupDate(r.getCreateDate())
                 .patientName(r.getUser().getUsername())
@@ -71,6 +72,7 @@ public class DoctorService {
 
         List<ReservationItem> acceptedReservationItems = acceptedReservations.stream()
             .map(r -> ReservationItem.builder()
+                .userId(r.getUser().getId())
                 .reservationId(r.getId())
                 .signupDate(r.getCreateDate())
                 .patientName(r.getUser().getUsername())
