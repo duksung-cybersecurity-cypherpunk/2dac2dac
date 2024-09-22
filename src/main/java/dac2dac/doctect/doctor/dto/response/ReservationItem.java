@@ -9,13 +9,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReservationItem {
 
+    private Long userId;
     private Long reservationId;
     private LocalDateTime signupDate;
     private String patientName;
     private LocalDateTime reservationDate;
 
     @Builder
-    public ReservationItem(Long reservationId, LocalDateTime signupDate, String patientName, LocalDateTime reservationDate) {
+    public ReservationItem(Long userId, Long reservationId, LocalDateTime signupDate, String patientName, LocalDateTime reservationDate) {
+        this.userId = userId;
         this.reservationId = reservationId;
         this.signupDate = signupDate;
         this.patientName = patientName;
