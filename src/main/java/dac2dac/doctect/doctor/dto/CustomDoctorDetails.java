@@ -1,47 +1,45 @@
-package dac2dac.doctect.user.dto;
+package dac2dac.doctect.doctor.dto;
 
-import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.doctor.entity.Doctor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
-public class CustomUserDetails implements UserDetails {
+public class CustomDoctorDetails implements UserDetails {
 
-    private User user;
+    private Doctor doctor;
 
-    public CustomUserDetails(User user) {
-        this.user = user;
+    public CustomDoctorDetails(Doctor doctor) {
+        this.doctor = doctor;
     }
 
-//    @Override
+    //    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList(); // 권한 로직 필요
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return doctor.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return doctor.getName();
     }
 
     public String getId() {
-        return user.getId().toString();
+        return doctor.getId().toString();
     }
 
     public String getEmail() {
-        return user.getEmail();
+        return doctor.getEmail();
     }
 
-    public String getPhoneNumber() {
-        return user.getPhoneNumber();
+    public String getOneLiner() {
+        return doctor.getOneLiner();
     }
 
     @Override
