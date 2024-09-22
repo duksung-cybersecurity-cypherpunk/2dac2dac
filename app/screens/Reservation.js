@@ -7,25 +7,40 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-// Helper function to get days of the week
+// Function to get the current week's weekday names
 const getCurrentWeekDays = () => {
-  const days = ["일", "월", "화", "수", "목", "금", "토"];
-  const today = new Date();
-  const currentDayIndex = today.getDay();
+  const currentDate = new Date();
+  const currentDayIndex = currentDate.getDay(); // Get the current day index (0 for Sunday, 6 for Saturday)
+  const week = [];
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
 
-  // Start week from Monday
-  const weekDays = Array(7)
-    .fill(0)
-    .map((_, idx) => days[(currentDayIndex + idx) % 7]);
+  for (let i = 0; i < 7; i++) {
+    const dayIndex = (currentDayIndex + i) % 7; // Ensure index stays within the 0-6 range
+    week.push({
+      name: daysOfWeek[dayIndex],
+      isToday: i === 0, // Mark today as true for the first day
+    });
+  }
 
-  return weekDays;
+  return week;
 };
 
 const Reservation = () => {
+  const navigation = useNavigation(); // Access navigation
+
   // Current Week Dates
-  const [selectedDate, setSelectedDate] = useState(getCurrentWeekDays()[0]);
   const dates = getCurrentWeekDays();
+  const [selectedDate, setSelectedDate] = useState(dates[0].name);
 
   // Tabs: "요청된 예약" and "수락된 예약"
   const [selectedTab, setSelectedTab] = useState("요청된 예약");
@@ -68,7 +83,15 @@ const Reservation = () => {
         <TouchableOpacity style={styles.rejectButton}>
           <Text style={styles.buttonText}>예약 거절</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.acceptButton}>
+        <TouchableOpacity
+          style={styles.acceptButton}
+          onPress={() =>
+            navigation.navigate("ReservationStack", {
+              screen: "PatientInfo",
+              params: { patient: item },
+            })
+          }
+        >
           <Text style={styles.buttonText2}>예약 수락</Text>
         </TouchableOpacity>
       </View>
@@ -85,16 +108,23 @@ const Reservation = () => {
       >
         {dates.map((date) => (
           <TouchableOpacity
-            key={date}
+            key={date.name}
             style={[
               styles.dateBox,
-              date === selectedDate
+              date.name === selectedDate
                 ? styles.selectedDate
                 : styles.unselectedDate,
             ]}
-            onPress={() => setSelectedDate(date)}
+            onPress={() => setSelectedDate(date.name)}
           >
-            <Text style={styles.dateText}>{date}</Text>
+            <Text
+              style={[
+                styles.dateText,
+                date.isToday ? styles.todayText : null, // Highlight today's date
+              ]}
+            >
+              {date.name}
+            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -160,6 +190,10 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 16,
     color: "#000",
+  },
+  todayText: {
+    fontWeight: "bold", // Highlight today's date
+    color: "#FF0000", // Red color for today
   },
   tabHeader: {
     flexDirection: "row",
