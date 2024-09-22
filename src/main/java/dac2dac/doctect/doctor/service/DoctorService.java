@@ -13,6 +13,8 @@ import dac2dac.doctect.doctor.dto.response.RequestReservationFormDto;
 import dac2dac.doctect.doctor.dto.response.RequestReservationItemList;
 import dac2dac.doctect.doctor.dto.response.ReservationItem;
 import dac2dac.doctect.doctor.dto.response.ReservationListDto;
+import dac2dac.doctect.doctor.dto.response.TodayReservationDto;
+import dac2dac.doctect.doctor.dto.response.UpcomingReservationDto;
 import dac2dac.doctect.doctor.entity.Department;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DepartmentRepository;
@@ -277,5 +279,41 @@ public class DoctorService {
         } else {
             throw new RuntimeException("Invalid username or password");
         }
+    }
+
+    public UpcomingReservationDto getUpcomingReservation(Long doctorId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
+
+        NoncontactDiagReservation reservation = noncontactDiagReservationRepository.findNearestReservationByDoctorIdAndStatus(doctorId, ReservationStatus.COMPLETE.name())
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
+
+        return UpcomingReservationDto.builder()
+            .reservationId(reservation.getId())
+            .reservationDate(LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()))
+            .patientName(reservation.getUser().getUsername())
+            .build();
+    }
+
+    public TodayReservationDto getTodayReservation(Long doctorId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
+
+        List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByReservationDateAndDoctorId(LocalDate.now(), doctorId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
+
+        List<ReservationItem> reservationItemList = reservationList.stream()
+            .map(r -> ReservationItem.builder()
+                .userId(r.getUser().getId())
+                .patientName(r.getUser().getUsername())
+                .reservationId(r.getId())
+                .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
+                .build())
+            .toList();
+
+        return TodayReservationDto.builder()
+            .totalCnt(reservationItemList.size())
+            .reservationItemList(reservationItemList)
+            .build();
     }
 }
