@@ -64,6 +64,11 @@ public class DoctorService {
         return false;
     }
 
+    public Doctor findByName(String username) {
+        return doctorRepository.findByName(username);
+    }
+    // 인증 서비스 구축
+
 
     public String authenticateAndGenerateToken(String username, String password) {
         // 사용자 인증 로직
