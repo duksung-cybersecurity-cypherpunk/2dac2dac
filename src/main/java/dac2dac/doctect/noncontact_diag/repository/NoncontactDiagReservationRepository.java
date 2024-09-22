@@ -36,4 +36,6 @@ public interface NoncontactDiagReservationRepository extends JpaRepository<Nonco
         "ORDER BY reservation_date ASC, reservation_time ASC " +
         "LIMIT 1", nativeQuery = true)
     Optional<NoncontactDiagReservation> findNearestReservationByDoctorIdAndStatus(@Param("doctorId") Long doctorId, @Param("status") String status);
+
+    Optional<List<NoncontactDiagReservation>> findByReservationDateAndDoctorId(LocalDate today, @Param("doctorId") Long doctorId);
 }
