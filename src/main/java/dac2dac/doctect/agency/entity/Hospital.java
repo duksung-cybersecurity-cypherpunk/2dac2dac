@@ -26,10 +26,11 @@ public class Hospital extends Agency {
     private String hpid;
 
     @Builder
-    public Hospital(String name, String address, String tel, String thumnail, String diagDiv, Boolean isErOperate, Double longitude, Double latitude, String hpid, Integer diagTimeMonOpen,
-        Integer diagTimeMonClose,
-        Integer diagTimeTuesOpen, Integer diagTimeTuesClose, Integer diagTimeWedsOpen, Integer diagTimeWedsClose, Integer diagTimeThursOpen, Integer diagTimeThursClose, Integer diagTimeFriOpen,
-        Integer diagTimeFriClose, Integer diagTimeSatOpen, Integer diagTimeSatClose, Integer diagTimeSunOpen, Integer diagTimeSunClose, Integer diagTimeHolidayOpen, Integer diagTimeHolidayClose) {
+    public Hospital(Long id, String name, String address, String tel, String thumnail, String diagDiv, Boolean isErOperate, Double longitude, Double latitude, String hpid, Integer diagTimeMonOpen,
+                    Integer diagTimeMonClose,
+                    Integer diagTimeTuesOpen, Integer diagTimeTuesClose, Integer diagTimeWedsOpen, Integer diagTimeWedsClose, Integer diagTimeThursOpen, Integer diagTimeThursClose, Integer diagTimeFriOpen,
+                    Integer diagTimeFriClose, Integer diagTimeSatOpen, Integer diagTimeSatClose, Integer diagTimeSunOpen, Integer diagTimeSunClose, Integer diagTimeHolidayOpen, Integer diagTimeHolidayClose) {
+        this.id = id;
         this.name = name;
         this.address = address;
         this.tel = tel;
@@ -40,8 +41,8 @@ public class Hospital extends Agency {
         this.latitude = latitude;
         this.hpid = hpid;
         this.diagTime = new DiagTime(diagTimeMonOpen, diagTimeMonClose, diagTimeTuesOpen, diagTimeTuesClose, diagTimeWedsOpen, diagTimeWedsClose,
-            diagTimeThursOpen, diagTimeThursClose, diagTimeFriOpen, diagTimeFriClose, diagTimeSatOpen, diagTimeSatClose,
-            diagTimeSunOpen, diagTimeSunClose, diagTimeHolidayOpen, diagTimeHolidayClose);
+                diagTimeThursOpen, diagTimeThursClose, diagTimeFriOpen, diagTimeFriClose, diagTimeSatOpen, diagTimeSatClose,
+                diagTimeSunOpen, diagTimeSunClose, diagTimeHolidayOpen, diagTimeHolidayClose);
 
     }
 
