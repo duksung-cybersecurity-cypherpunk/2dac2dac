@@ -33,4 +33,10 @@ public class UserController {
         return ApiResult.success(SuccessCode.GET_SUCCESS, userService.getUserInfo(userId));
     }
 
+    @Operation(summary = "다가오는 진료 예약 조회 API", description = "메인에 보여지는 다가오는 환자의 진료 예약 정보를 조회한다.")
+    @GetMapping("/{userId}/reservation/upcoming")
+    public ApiResult getUpcomingReservation(@PathVariable Long userId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, userService.getUpcomingReservation(userId));
+    }
+
 }
