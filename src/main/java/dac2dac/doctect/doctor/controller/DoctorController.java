@@ -1,35 +1,29 @@
 package dac2dac.doctect.doctor.controller;
 
 
+import dac2dac.doctect.common.constant.SuccessCode;
+import dac2dac.doctect.common.response.ApiResult;
 import dac2dac.doctect.doctor.dto.CustomDoctorDetails;
 import dac2dac.doctect.doctor.dto.DoctorDTO;
+import dac2dac.doctect.doctor.dto.request.RejectReservationRequest;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
 import dac2dac.doctect.doctor.service.DoctorService;
 import dac2dac.doctect.user.controller.LoginController;
 import dac2dac.doctect.user.dto.UserDTO;
-import dac2dac.doctect.user.jwt.JWTUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.Pattern;
+import java.util.HashMap;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import dac2dac.doctect.common.constant.SuccessCode;
-import dac2dac.doctect.common.response.ApiResult;
-import dac2dac.doctect.doctor.dto.request.RejectReservationRequest;
-import dac2dac.doctect.doctor.service.DoctorService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.Pattern;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,18 +33,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "예약", description = "의사 예약 조회 API")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/reservations")
 class DoctorController {
 
     private final DoctorService doctorService;
-    
-
-    @Autowired
-    private DoctorRepository doctorRepository; // 세미콜론 추가
-
+    private final DoctorRepository doctorRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
-
 
     @Operation(summary = "날짜별 예약 조회 API", description = "날짜별 요청된 예약과 수락된 예약을 조회한다.")
     @GetMapping("/{doctorId}/{reservationDate}")
@@ -84,12 +74,13 @@ class DoctorController {
         return ApiResult.success(SuccessCode.GET_SUCCESS, doctorService.getPatientInfo(doctorId, reservationId));
     }
 
-    @Autowired
-    public DoctorController(DoctorService doctorService) {
-        this.doctorService = doctorService;
+    @Operation(summary = "다가오는 진료 예약 조회 API", description = "메인에 보여지는 다가오는 의사의 진료 예약 정보를 조회한다.")
+    @GetMapping("/{doctorId}/upcoming")
+    public ApiResult getUpcomingReservation(@PathVariable Long doctorId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, doctorService.getUpcomingReservation(doctorId));
     }
 
-    // Endpoint to register a new doctor
+
     @PostMapping("/doctors/signup")
     public ResponseEntity<String> registerDoctor(@RequestBody DoctorDTO doctorDTO) {
 
@@ -117,7 +108,7 @@ class DoctorController {
 
 
     @GetMapping("/doctors/login/jwt")
-    public ResponseEntity<Map<String, String>>  getProtectedResource() {
+    public ResponseEntity<Map<String, String>> getProtectedResource() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
@@ -125,7 +116,7 @@ class DoctorController {
 
             String name = customDoctorDetails.getUsername();
             String email = customDoctorDetails.getEmail(); // CustomUserDetails에서 이메일 가져오기
-            String oneLiner= customDoctorDetails.getOneLiner();
+            String oneLiner = customDoctorDetails.getOneLiner();
             String id = customDoctorDetails.getId();
 
             Map<String, String> response = new HashMap<>();

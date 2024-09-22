@@ -120,7 +120,7 @@ public class UserService {
             .reservationDate(LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()))
             .doctorName(doctor.getName())
             .department(doctor.getDepartment().getDepartmentName())
-            .paymentMethod(reservation.getDiagType().getNoncontactDiagTypeName())
+            .diagType(reservation.getDiagType().getNoncontactDiagTypeName())
             .build();
     }
 }

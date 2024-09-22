@@ -13,14 +13,14 @@ public class UpcomingReservationDto {
     private LocalDateTime reservationDate;
     private String doctorName;
     private String department;
-    private String paymentMethod;
+    private String diagType;
 
     @Builder
-    public UpcomingReservationDto(Long reservationId, LocalDateTime reservationDate, String doctorName, String department, String paymentMethod) {
+    public UpcomingReservationDto(Long reservationId, LocalDateTime reservationDate, String doctorName, String department, String diagType) {
         this.reservationId = reservationId;
         this.reservationDate = reservationDate;
         this.doctorName = doctorName;
         this.department = department;
-        this.paymentMethod = paymentMethod;
+        this.diagType = diagType;
     }
 }
