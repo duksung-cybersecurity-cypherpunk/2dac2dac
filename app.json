@@ -16,6 +16,7 @@
     "ios": {
       "supportsTablet": true
     },
+    "proxy": "http://localhost:8080",
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
