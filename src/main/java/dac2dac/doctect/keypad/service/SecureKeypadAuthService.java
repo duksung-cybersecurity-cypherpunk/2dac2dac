@@ -45,12 +45,19 @@ public class SecureKeypadAuthService {
 
     private String decryptUserInput(String userInput, KeyHashMap keyHashMap) {
         StringBuilder originalValues = new StringBuilder();
+
         for (int i = 0; i <= userInput.length() - HASH_LENGTH; i += HASH_LENGTH) {
             String hash = userInput.substring(i, i + HASH_LENGTH);
+            boolean found = false;
             for (Map.Entry<String, String> entry : keyHashMap.entrySet()) {
                 if (entry.getValue().equals(hash)) {
                     originalValues.append(entry.getKey());
+                    found = true;
+                    break; // 해시 값이 일치하면 바로 루프를 빠져나감
                 }
+            }
+            if (!found) {
+                System.err.println("해시 값이 매칭되지 않았습니다: " + hash);
             }
         }
         return originalValues.toString();
