@@ -49,7 +49,7 @@ export default function Vaccination() {
           <View style={styles.row}>
             {
               cnt === 0 ? (
-                <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}>
+                <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}> 
                   <Image source={require("../../../assets/images/PatientInfo/ListNonExist.png")} />
                   <Text style={[styles.hospitalName, { paddingTop: 20 }, { paddingBottom: 10 }]}> 확인된 예방 접종 내역이 없습니다. </Text>
                 </View>

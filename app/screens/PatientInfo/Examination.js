@@ -42,7 +42,7 @@ export default function Examination() {
             {
               cnt === 0 ? (
                 <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}>
-                  <Image source={require("../../assets/images/medicalHistory/ListNonExist.png")} />
+                  <Image source={require("../../../assets/images/PatientInfo/ListNonExist.png")} />
                   <Text style={[styles.hospitalName, { paddingTop: 20 }, { paddingBottom: 10 }]}> 확인된 건강 검진 내역이 없어요. </Text>
                   <Text> 확인된 건강 검진 내역이 없습니다. </Text>
                 </View>

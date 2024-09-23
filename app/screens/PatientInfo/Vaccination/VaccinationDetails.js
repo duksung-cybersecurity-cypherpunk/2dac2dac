@@ -50,7 +50,7 @@ export default function VaccinationDetails({ route }) {
         <Text style={styles.timeText}>{date}</Text>
         <View style={styles.hospitalInfoContainer}>
           <Image
-            source={require("../../../../assets/images/hospital/hospital.png")}
+            source={require("../../../../assets/images/hospital/Hospital.png")}
             style={styles.hospitalImage}
           />
           <View style={[{padding: 10}]}>

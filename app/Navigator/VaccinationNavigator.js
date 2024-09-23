@@ -14,7 +14,7 @@ export default function VaccinationNavigator({ route }) {
         <VaccinationInfoStack.Navigator>
         {
             id === 1 ? (
-                <History4Stack.Screen 
+                <VaccinationInfoStack.Screen 
                     name="VaccinationDetails"
                     component={VaccinationDetails}
                     options={{
@@ -22,7 +22,7 @@ export default function VaccinationNavigator({ route }) {
                     }} 
                     initialParams={{ data }}
                 />
-            ) : <History4Stack.Screen 
+            ) : <VaccinationInfoStack.Screen 
                     name="예방 접종" 
                     component={Vaccination} 
                     options={{

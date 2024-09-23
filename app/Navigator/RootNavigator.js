@@ -6,7 +6,7 @@ import BottomTabNavigator from "./TabNavigator"; // Bottom Tab Navigator
 import PatientInfoStack from "./PatientInfoNavigator";
 import TreatmentInfoStack from "./TreatmentNavigator";
 import VaccinationInfoStack from "./VaccinationNavigator";
-import PresciptionInfoStack from "./PrescriptionNavigator";
+import PrescriptionInfoStack from "./PrescriptionNavigator";
 import ExaminationInfoStack from "./ExaminationNavigator";
 
 const RootStack = createNativeStackNavigator();
@@ -40,8 +40,8 @@ export default function RootNavigator() {
         }}
       />
       <RootStack.Screen
-        name="PresciptionInfoStack"
-        component={PresciptionInfoStack}
+        name="PrescriptionInfoStack"
+        component={PrescriptionInfoStack}
         options={{
           tabBarVisible: true, // Tab 바 표시
         }}

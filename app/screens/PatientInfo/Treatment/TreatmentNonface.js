@@ -16,7 +16,7 @@ export default function TreatmentNonface() {
   const [cnt, setCnt] = useState();
 
   const handleBlockPress = (data) => {
-    navigation.navigate("History1Stack", { id: 6, data }); // 비대면 진료 상세페이지
+    navigation.navigate("TreatmentInfoStack", { id: 1, data }); // 비대면 진료 상세페이지
   };
 
   const getDayOfWeek = () => {
