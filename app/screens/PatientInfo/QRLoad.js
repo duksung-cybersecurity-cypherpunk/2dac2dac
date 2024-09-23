@@ -59,10 +59,6 @@ export default function QRLoad() {
                 <Text style={styles.infoSubText}>성별   </Text>
                 <Text style={styles.text}></Text>
             </View>
-            <View style={styles.row}>
-                <Text style={styles.infoSubText}>주소   </Text>
-                <Text style={styles.text}></Text>
-            </View>
         </View>
 
         <View style={styles.listBlock}>
@@ -108,17 +104,17 @@ const styles = StyleSheet.create({
   },
   infoBlock: { 
     width: "90%",
-    height: "15%",
+    height: "12%",
     backgroundColor: "#F5F5F5",
     borderRadius: 8,
-    margin: 15,
-    paddingTop: 20,
-    paddingRight: 20,
+    margin: 20,
+    paddingTop: 12,
     paddingLeft: 20,
   },
   infoSubText: {
     fontSize: 14,
     fontWeight: "bold",
+    paddingTop: 3,
   },
   listBlock: {
     paddingRight: 20,
@@ -132,7 +128,7 @@ const styles = StyleSheet.create({
     height: "10%",
     backgroundColor: "#EBF2EA",
     borderRadius: 6,
-    marginTop: 20,
+    marginTop: 15,
   },
   bottomBlocks: {
     alignItems: 'center',
