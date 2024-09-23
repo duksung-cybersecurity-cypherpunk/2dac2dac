@@ -11,14 +11,13 @@ export default function RootNavigator() {
   return (
     <RootStack.Navigator
       screenOptions={{ headerShown: false }}
-
-      //initialRouteName="Onboarding" // Set the initial route here
+      initialRouteName="Onboarding" // Set the initial route here
     >
-      {/*<RootStack.Screen
+      <RootStack.Screen
         screenOptions={{ headerShown: false }}
         name="Onboarding" // Name must match the initialRouteName
         component={OnboardingStack}
-  />*/}
+      />
 
       <RootStack.Screen
         name="BottomTabNavigator"

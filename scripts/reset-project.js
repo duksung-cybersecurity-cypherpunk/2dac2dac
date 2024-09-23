@@ -24,23 +24,23 @@ const resetProject = () => {
 
       // Create App.js if it does not already exist
       if (!fs.existsSync(appPath)) {
-        const appContent = `import React from 'react';
-import { Text, View } from 'react-native';
+          const appContent = `import React from 'react';
+  import { Text, View } from 'react-native';
 
-export default function App() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Text>Edit App.js to change this screen.</Text>
-    </View>
-  );
-}
-`;
+  export default function App() {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Text>Edit App.js to change this screen.</Text>
+      </View>
+    );
+  }
+  `;
 
         fs.writeFile(appPath, appContent, (error) => {
           if (error) {

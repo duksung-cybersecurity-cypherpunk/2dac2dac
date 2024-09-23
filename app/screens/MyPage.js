@@ -35,7 +35,7 @@ export default function MyPage() {
             </View>
 
             <View style={styles.infoRow}>
-              <Text style={styles.label}>연락처</Text>
+              <Text style={styles.label}>한줄소개</Text>
               <Text style={styles.value}>{userInfo.oneLiner}</Text>
             </View>
           </View>
