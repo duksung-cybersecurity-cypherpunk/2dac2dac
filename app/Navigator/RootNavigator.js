@@ -1,8 +1,12 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-{/* Navigator list. . . */}
+// stack
 import BottomTabNavigator from "./TabNavigator"; // Bottom Tab Navigator
+import OnboardingStack from "./OnboardingNavigation";
+import ReservationStack from "./ReservationNavigator";
+
+{/* Patient Infomation Navigator list. . . */}
 import PatientInfoStack from "./PatientInfoNavigator";
 import TreatmentInfoStack from "./TreatmentNavigator";
 import VaccinationInfoStack from "./VaccinationNavigator";
@@ -13,10 +17,26 @@ const RootStack = createNativeStackNavigator();
 
 export default function RootNavigator() {
   return (
-    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+    <RootStack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName="Onboarding" // Set the initial route here
+    >
+      <RootStack.Screen
+        screenOptions={{ headerShown: false }}
+        name="Onboarding" // Name must match the initialRouteName
+        component={OnboardingStack}
+      />
+
       <RootStack.Screen
         name="BottomTabNavigator"
         component={BottomTabNavigator}
+      />
+      <RootStack.Screen
+        name="ReservationStack"
+        component={ReservationStack}
+        options={{
+          tabBarVisible: true, // Tab 바 표시
+        }}
       />
       <RootStack.Screen
         name="PatientInfoStack"
