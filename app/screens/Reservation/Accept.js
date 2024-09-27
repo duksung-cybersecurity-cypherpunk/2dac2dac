@@ -1,17 +1,12 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
-import {
-  getCurrentWeekDays,
-  formatDate,
-  ReservationDate,
-} from "../../Components/weeks";
+import { formatDate } from "../../Components/weeks";
+import { useNavigation } from "@react-navigation/native";
 
 const Accept = ({ route }) => {
-  const { modalVisible, setModalVisible, selectedReservation, doctorId } =
-    route.params;
-
-  console.log("Received selectedReservation:", selectedReservation, doctorId); // 여기에 확인 로그 추가
+  const { selectedReservation, doctorId } = route.params;
+  const navigation = useNavigation();
 
   const handleAcceptReservation = async () => {
     try {
@@ -20,7 +15,7 @@ const Accept = ({ route }) => {
 
       if (response.status === 200) {
         console.log("Reservation accepted successfully!");
-        setModalVisible(false); // Close modal after successful acceptance
+        navigation.goBack();
       } else {
         console.error("Failed to accept the reservation.");
       }
@@ -30,70 +25,45 @@ const Accept = ({ route }) => {
   };
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={modalVisible}
-      onRequestClose={() => setModalVisible(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>예약을 수락하시겠습니까?</Text>
-          <Text style={styles.modalSubtitle}>
-            예약을 수락하는 즉시 환자에게 알림이 전송됩니다.
+    <View style={styles.container}>
+      <Text style={styles.title}>예약을 수락하시겠습니까?</Text>
+      <Text style={styles.subtitle}>
+        예약을 수락하는 즉시 환자에게 알림이 전송됩니다.
+      </Text>
+
+      {selectedReservation && (
+        <View style={styles.detailsBox}>
+          <Text>신청자 명: {selectedReservation.patientName}</Text>
+          <Text>신청 일시: {formatDate(selectedReservation.signUpDate)}</Text>
+          <Text>
+            희망 일시: {formatDate(selectedReservation.reservationDate)}
           </Text>
-
-          {selectedReservation && (
-            <View style={styles.detailsBox}>
-              <Text>신청자 명: {selectedReservation.patientName}</Text>
-              <Text>
-                신청 일시: {formatDate(selectedReservation.signUpDate)}
-              </Text>
-              <Text>
-                희망 일시: {formatDate(selectedReservation.reservationDate)}
-              </Text>
-            </View>
-          )}
-
-          <TouchableOpacity
-            style={styles.confirmButton}
-            onPress={handleAcceptReservation} // Call the API on button press
-          >
-            <Text style={styles.confirmButtonText}>예약 수락하기</Text>
-          </TouchableOpacity>
         </View>
-      </View>
-    </Modal>
+      )}
+
+      <TouchableOpacity
+        style={styles.confirmButton}
+        onPress={handleAcceptReservation}
+      >
+        <Text style={styles.confirmButtonText}>예약 수락하기</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  modalOverlay: {
+  container: {
     flex: 1,
-    justifyContent: "center", // Centers the modal vertically
-    alignItems: "center", // Centers the modal horizontally
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-  },
-  modalContent: {
-    width: "80%",
+    justifyContent: "center", // Centers the content vertically
     padding: 20,
-    backgroundColor: "white", // White background for the modal
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5, // Adds shadow for Android
+    backgroundColor: "#fff",
   },
-  modalTitle: {
+  title: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
   },
-  modalSubtitle: {
+  subtitle: {
     fontSize: 14,
     marginBottom: 20,
     color: "#666",

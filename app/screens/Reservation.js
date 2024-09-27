@@ -37,9 +37,9 @@ export default function Reservation() {
       const userData = JSON.parse(userInfo);
       console.log("userId", userData, ReservationDate(selectedDate));
       setDoctorId(userData.id);
-      const apiUrl = `http://203.252.213.209:8080/api/v1/reservations/${doctorId}/${ReservationDate(
-        selectedDate
-      )}`;
+      const apiUrl = `http://203.252.213.209:8080/api/v1/reservations/${
+        userData.id
+      }/${ReservationDate(selectedDate)}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === 200) {
@@ -85,8 +85,6 @@ export default function Reservation() {
 
                 // Navigate to the Accept screen with the selected reservation item
                 navigation.navigate("Reject", {
-                  modalVisiblae: true, // Show modal
-                  setModalVisible, // Modal visibility function
                   selectedReservation: item, // Pass the selected reservation item
                   doctorId: doctorId, // Pass the doctor's ID
                 });
@@ -102,8 +100,6 @@ export default function Reservation() {
 
                 // Navigate to the Accept screen with the selected reservation item
                 navigation.navigate("Accept", {
-                  modalVisiblae: true, // Show modal
-                  setModalVisible, // Modal visibility function
                   selectedReservation: item, // Pass the selected reservation item
                   doctorId: doctorId, // Pass the doctor's ID
                 });
