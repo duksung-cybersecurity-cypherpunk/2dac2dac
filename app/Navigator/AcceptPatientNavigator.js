@@ -16,13 +16,7 @@ export default function AcceptPatientNavigator() {
         }}
       />
 
-      <AcceptPatientStack.Screen
-        name="Accept"
-        component={Accept}
-        options={{
-          headerTitle: "예약 수락",
-        }}
-      />
+     
     </AcceptPatientStack.Navigator>
   );
 }
