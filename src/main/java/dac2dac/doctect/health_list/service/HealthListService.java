@@ -278,6 +278,7 @@ public class HealthListService {
         }
 
         Doctor findDoctor = findNoncontactDiag.getDoctor();
+        Hospital doctorHospital = findDoctor.getHospital();
 
         //* 의사 정보
         NoncontactDoctorInfo noncontactDoctorInfo = NoncontactDoctorInfo.builder()
@@ -285,9 +286,9 @@ public class HealthListService {
             .diagDate(LocalDateTime.of(findNoncontactDiag.getDiagDate(), findNoncontactDiag.getDiagTime()))
             .doctorName(findDoctor.getName())
             .doctorHospitalName(findDoctor.getHospital().getName())
-            .doctorIsOpenNow(isAgencyOpenNow(findDoctor.getDiagTime()))
-            .doctorTodayOpenTime(findTodayOpenTime(findDoctor.getDiagTime()))
-            .doctorTodayCloseTime(findTodayCloseTime(findDoctor.getDiagTime()))
+            .doctorIsOpenNow(isAgencyOpenNow(doctorHospital.getDiagTime()))
+            .doctorTodayOpenTime(findTodayOpenTime(doctorHospital.getDiagTime()))
+            .doctorTodayCloseTime(findTodayCloseTime(doctorHospital.getDiagTime()))
             .build();
 
         Symptom findSymptom = findNoncontactDiag.getNoncontactDiagReservation().getSymptom();
