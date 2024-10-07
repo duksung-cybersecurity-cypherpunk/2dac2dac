@@ -94,6 +94,12 @@ class DoctorController {
         return ApiResult.success(SuccessCode.GET_SUCCESS, doctorService.getTodayReservation(doctorId));
     }
 
+    @Operation(summary = "진료 완료 내역 조회 API", description = "진료가 완료된 내역을 조회한다.")
+    @GetMapping("/completed/{doctorId}")
+    public ApiResult getCompletedReservation(@PathVariable Long doctorId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, doctorService.getCompletedReservation(doctorId));
+    }
+
 
     @PostMapping("/doctors/signup")
     public ResponseEntity<String> registerDoctor(@RequestBody DoctorDTO doctorDTO) {
