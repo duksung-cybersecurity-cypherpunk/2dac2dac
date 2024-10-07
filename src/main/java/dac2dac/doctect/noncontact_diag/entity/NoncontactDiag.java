@@ -2,11 +2,8 @@ package dac2dac.doctect.noncontact_diag.entity;
 
 import dac2dac.doctect.bootpay.entity.PaymentInfo;
 import dac2dac.doctect.doctor.entity.Doctor;
-import dac2dac.doctect.noncontact_diag.entity.constant.DiagStatus;
 import dac2dac.doctect.user.entity.User;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,7 +45,25 @@ public class NoncontactDiag {
     private LocalDate diagDate;
     private LocalTime diagTime;
 
-    @Enumerated(EnumType.STRING)
-    private DiagStatus status;
+    @Builder
+    public NoncontactDiag(User user, Doctor doctor, NoncontactDiagReservation noncontactDiagReservation, PaymentInfo paymentInfo, LocalDate diagDate, LocalTime diagTime) {
+        this.user = user;
+        this.doctor = doctor;
+        this.noncontactDiagReservation = noncontactDiagReservation;
+        this.paymentInfo = paymentInfo;
+        this.diagDate = diagDate;
+        this.diagTime = diagTime;
+    }
+
+    public static NoncontactDiag createNoncontactDiag(User user, Doctor doctor, NoncontactDiagReservation noncontactDiagReservation, PaymentInfo paymentInfo, LocalDate diagDate, LocalTime diagTime) {
+        NoncontactDiag noncontactDiag = new NoncontactDiag();
+        noncontactDiag.user = user;
+        noncontactDiag.doctor = doctor;
+        noncontactDiag.noncontactDiagReservation = noncontactDiagReservation;
+        noncontactDiag.paymentInfo = paymentInfo;
+        noncontactDiag.diagDate = diagDate;
+        noncontactDiag.diagTime = diagTime;
+        return noncontactDiag;
+    }
 
 }

@@ -1,11 +1,12 @@
 package dac2dac.doctect.doctor.service;
 
-import dac2dac.doctect.agency.entity.Hospital;
-import dac2dac.doctect.agency.repository.HospitalRepository;
+import dac2dac.doctect.bootpay.entity.PaymentInfo;
+import dac2dac.doctect.bootpay.entity.PaymentMethod;
+import dac2dac.doctect.bootpay.service.BootpayService;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.BadRequestException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
-import dac2dac.doctect.doctor.dto.DoctorDTO;
+import dac2dac.doctect.doctor.dto.request.DiagCompleteRequestDto;
 import dac2dac.doctect.doctor.dto.request.RejectReservationRequest;
 import dac2dac.doctect.doctor.dto.response.AcceptedReservationItemList;
 import dac2dac.doctect.doctor.dto.response.PatientInfoDto;
@@ -15,18 +16,17 @@ import dac2dac.doctect.doctor.dto.response.ReservationItem;
 import dac2dac.doctect.doctor.dto.response.ReservationListDto;
 import dac2dac.doctect.doctor.dto.response.TodayReservationDto;
 import dac2dac.doctect.doctor.dto.response.UpcomingReservationDto;
-import dac2dac.doctect.doctor.entity.Department;
 import dac2dac.doctect.doctor.entity.Doctor;
-import dac2dac.doctect.doctor.repository.DepartmentRepository;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
 import dac2dac.doctect.noncontact_diag.dto.response.NoncontactDiagFormInfo;
+import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
+import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.entity.constant.Gender;
-import dac2dac.doctect.user.jwt.JWTUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,11 +40,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DoctorService {
 
+    private final BootpayService bootpayService;
     private final NoncontactDiagReservationRepository noncontactDiagReservationRepository;
+    private final NoncontactDiagRepository noncontactDiagRepository;
     private final DoctorRepository doctorRepository;
-    private final HospitalRepository hospitalRepository;
-    private final DepartmentRepository departmentRepository;
-    private final JWTUtil jwtUtil;
 
     public ReservationListDto getReservations(Long doctorId, String reservationDate) {
         Doctor doctor = doctorRepository.findById(doctorId)
@@ -230,57 +229,6 @@ public class DoctorService {
         return ageGroup + "대";
     }
 
-    public Doctor registerDoctor(DoctorDTO doctorDTO) {
-        // Fetch the Hospital and Department using their IDs
-        Hospital hospital = hospitalRepository.findById(doctorDTO.getHospitalId())
-            .orElseThrow(() -> new IllegalArgumentException("Invalid hospital ID"));
-        Department department = departmentRepository.findById(doctorDTO.getDepartmentId())
-            .orElseThrow(() -> new IllegalArgumentException("Invalid department ID"));
-
-        // Create the Doctor entity
-        Doctor newDoctor = Doctor.createDoctor(
-            hospital,
-            department,
-            doctorDTO.getName(),
-            doctorDTO.getEmail(),
-            doctorDTO.getPassword(),
-            doctorDTO.getIsLicenseCertificated(),
-            doctorDTO.getProfileImagePath(),
-            doctorDTO.getOneLiner(),
-            doctorDTO.getExperience(),
-            doctorDTO.getDiagTime()
-        );
-
-        return doctorRepository.save(newDoctor);
-    }
-
-    public boolean authenticateUser(String username, String password) {
-        Doctor doctor = doctorRepository.findByName(username);
-        if (doctor != null) {
-            // 비밀번호 확인
-            return doctor.getPassword().equals(password); // 입력된 비밀번호와 저장된 비밀번호 비교
-        }
-        return false;
-    }
-
-    public Doctor findByName(String username) {
-        return doctorRepository.findByName(username);
-    }
-    // 인증 서비스 구축
-
-
-    public String authenticateAndGenerateToken(String username, String password) {
-        // 사용자 인증 로직
-        boolean authenticate = authenticateUser(username, password);
-        Doctor doctor = doctorRepository.findByName(username);
-        if (authenticate) {
-            // DB에서 조회한 사용자 ID를 사용하여 JWT 생성
-            return jwtUtil.DoctorcreateJwt(username, doctor.getId().toString(), doctor.getOneLiner(), doctor.getEmail(), "doctor", 36000L); // 1시간 유효한 토큰 생성
-        } else {
-            throw new RuntimeException("Invalid username or password");
-        }
-    }
-
     public UpcomingReservationDto getUpcomingReservation(Long doctorId) {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
@@ -299,21 +247,68 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
 
+        // 오늘 예약 목록 가져오기
         List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByReservationDateAndDoctorId(LocalDate.now(), doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
 
-        List<ReservationItem> reservationItemList = reservationList.stream()
+        LocalDateTime now = LocalDateTime.now(); // 현재 시간 가져오기
+
+        // 예약을 현재 시간 기준으로 나눔
+        List<ReservationItem> scheduledReservation = reservationList.stream()
+            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isAfter(now))
             .map(r -> ReservationItem.builder()
                 .userId(r.getUser().getId())
                 .patientName(r.getUser().getUsername())
                 .reservationId(r.getId())
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
-            .toList();
+            .collect(Collectors.toList());
+
+        List<ReservationItem> completedReservation = reservationList.stream()
+            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isBefore(now))
+            .map(r -> ReservationItem.builder()
+                .userId(r.getUser().getId())
+                .patientName(r.getUser().getUsername())
+                .reservationId(r.getId())
+                .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
+                .build())
+            .collect(Collectors.toList());
 
         return TodayReservationDto.builder()
-            .totalCnt(reservationItemList.size())
-            .reservationItemList(reservationItemList)
+            .totalCnt(scheduledReservation.size() + completedReservation.size())
+            .completedReservationItemList(completedReservation)
+            .scheduledReservationItemList(scheduledReservation)
             .build();
+    }
+
+    public void completeReservation(DiagCompleteRequestDto request, Long doctorId, Long reservationId) throws Exception {
+        Doctor doctor = doctorRepository.findById(doctorId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
+
+        NoncontactDiagReservation reservation = noncontactDiagReservationRepository.findById(reservationId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
+
+        LocalDateTime reservationDateTime = LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime());
+        LocalDateTime now = LocalDateTime.now();
+
+        // 예약 시간이 현재 시간보다 이후일 경우 예외 처리
+        if (reservationDateTime.isAfter(now)) {
+            throw new BadRequestException(ErrorCode.RESERVATION_NOT_STARTED);
+        }
+
+        // 결제 수행
+        PaymentMethod paymentMethod = reservation.getPaymentMethod();
+        PaymentInfo paymentInfo = bootpayService.payWithBillingKey(paymentMethod, request.getPrice());
+
+        // 진료 완료된 건에 대해서는 진료 테이블에 저장
+        NoncontactDiag noncontactDiag = NoncontactDiag.builder()
+            .user(reservation.getUser())
+            .doctor(reservation.getDoctor())
+            .noncontactDiagReservation(reservation)
+            .paymentInfo(paymentInfo)
+            .diagDate(reservation.getReservationDate())
+            .diagTime(reservation.getReservationTime())
+            .build();
+        noncontactDiagRepository.save(noncontactDiag);
     }
 }

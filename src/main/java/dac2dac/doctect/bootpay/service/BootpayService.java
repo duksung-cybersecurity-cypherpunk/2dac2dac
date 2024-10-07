@@ -1,6 +1,5 @@
 package dac2dac.doctect.bootpay.service;
 
-import dac2dac.doctect.bootpay.dto.request.BootpayPayDto;
 import dac2dac.doctect.bootpay.dto.request.BootpaySubscribeBiilingKeyWithSecureKeypadDto;
 import dac2dac.doctect.bootpay.dto.response.PaymentMethodItem;
 import dac2dac.doctect.bootpay.dto.response.PaymentMethodListDto;
@@ -105,13 +104,7 @@ public class BootpayService {
         }
     }
 
-    public void payWithBillingKey(BootpayPayDto bootpayPayDto, Long userId) throws Exception {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-
-        PaymentMethod paymentMethod = paymentMethodRepository.findPaymentMethodByBillingKey(bootpayPayDto.getBillingKey())
-            .orElseThrow(() -> new NotFoundException(ErrorCode.PAYMENT_METHOD_NOT_FOUND));
-
+    public PaymentInfo payWithBillingKey(PaymentMethod paymentMethod, Integer price) throws Exception {
         //* 결제 방식이 활성화되어 있는지 확인한다.
         if (paymentMethod.getStatus() == ActiveStatus.INACTIVE) {
             throw new UnauthorizedException(ErrorCode.PAYMENT_METHOD_NOT_FOUND);
@@ -120,9 +113,9 @@ public class BootpayService {
         bootpay.getAccessToken();
 
         SubscribePayload payload = new SubscribePayload();
-        payload.billingKey = bootpayPayDto.getBillingKey();
-        payload.orderName = bootpayPayDto.getOrderName();
-        payload.price = bootpayPayDto.getPrice();
+        payload.billingKey = paymentMethod.getBillingKey();
+        payload.orderName = "비대면진료 결제";
+        payload.price = price;
         payload.orderId = "" + (System.currentTimeMillis() / 1000);
 
         HashMap res = bootpay.requestSubscribe(payload);
@@ -139,6 +132,7 @@ public class BootpayService {
                 .build();
 
             paymentInfoRepository.save(paymentInfo);
+            return paymentInfo;
         } else {
             String errorMessage = res.get("message") != null ? res.get("message").toString() : "Unknown error occurred.";
             throw new UnauthorizedException(HttpStatus.UNAUTHORIZED, errorMessage);
