@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 public class CompletedReservationListDto {
 
     private int totalCnt;
-    private List<UpcomingReservationDto> completedReservationList = new ArrayList<>();
+    private List<PrescriptionItem> completedReservationList = new ArrayList<>();
 
     @Builder
-    public CompletedReservationListDto(int totalCnt, List<UpcomingReservationDto> completedReservationList) {
+    public CompletedReservationListDto(int totalCnt, List<PrescriptionItem> completedReservationList) {
         this.totalCnt = totalCnt;
         this.completedReservationList = completedReservationList;
     }

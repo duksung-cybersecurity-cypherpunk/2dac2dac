@@ -5,7 +5,7 @@ import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.doctor.dto.response.CompletedReservationListDto;
 import dac2dac.doctect.doctor.dto.response.PrescriptionDto;
-import dac2dac.doctect.doctor.dto.response.UpcomingReservationDto;
+import dac2dac.doctect.doctor.dto.response.PrescriptionItem;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
@@ -28,13 +28,13 @@ public class DoctorNoncontactDiagService {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
 
-        List<UpcomingReservationDto> noncontactDiagList = noncontactDiagRepository.findByDoctorId(doctorId).stream()
-            .map(n -> UpcomingReservationDto.builder()
-                .reservationId(n.getNoncontactDiagReservation().getId())
-                .patientName(n.getNoncontactDiagReservation().getUser().getUsername())
+        List<PrescriptionItem> noncontactDiagList = noncontactDiagRepository.findByDoctorId(doctorId).stream()
+            .map(n -> PrescriptionItem.builder()
+                .noncontactDiagId(n.getId())
+                .patientName(n.getUser().getUsername())
                 .reservationDate(LocalDateTime.of(n.getDiagDate(), n.getDiagTime()))
                 .build())
-            .sorted(Comparator.comparing(UpcomingReservationDto::getReservationDate).reversed())
+            .sorted(Comparator.comparing(PrescriptionItem::getReservationDate).reversed())
             .toList();
 
         return CompletedReservationListDto.builder()
