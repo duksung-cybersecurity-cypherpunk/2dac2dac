@@ -2,20 +2,18 @@ package dac2dac.doctect.user.controller;
 
 import dac2dac.doctect.doctor.dto.DoctorDTO;
 import dac2dac.doctect.doctor.entity.Doctor;
-import dac2dac.doctect.doctor.service.DoctorService;
+import dac2dac.doctect.doctor.service.DoctorLoginService;
 import dac2dac.doctect.user.dto.EmailAuthRequestDto;
 import dac2dac.doctect.user.dto.UserDTO;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.service.MailService;
 import dac2dac.doctect.user.service.UserService;
 import jakarta.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.UnsupportedEncodingException;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +21,7 @@ public class EmailController {
 
     private final MailService mailService;
     private final UserService userService;
-    private final DoctorService doctorService;
+    private final DoctorLoginService doctorService;
 
     // Endpoint for sending email without user authentication
     @PostMapping("/api/v1/login/mailConfirm")
@@ -49,7 +47,6 @@ public class EmailController {
         }
 
         // If authentication is successful, send the confirmation email
-        //System.out.println("user's email: " + user.getEmail());
         String authCode = mailService.sendEmail(user.getEmail());
         return authCode;
     }
@@ -70,15 +67,8 @@ public class EmailController {
         }
 
         // If authentication is successful, send the confirmation email
-        //System.out.println("user's email: " + user.getEmail());
         String authCode = mailService.sendEmail(doctor.getEmail());
         return authCode;
     }
 
-
-    // Endpoint for verifying the auth code
-//    @PostMapping("/api/v1/login/verifyAuthCode")
-//    public boolean verifyAuthCode(@RequestBody EmailAuthRequestDto emailDto) {
-//        return mailService.verifyAuthCode(emailDto.getEmail(), emailDto.getAuthCode());
-//    }
 }

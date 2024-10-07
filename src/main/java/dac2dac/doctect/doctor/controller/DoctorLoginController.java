@@ -4,7 +4,7 @@ import dac2dac.doctect.doctor.dto.CustomDoctorDetails;
 import dac2dac.doctect.doctor.dto.DoctorDTO;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
-import dac2dac.doctect.doctor.service.DoctorService;
+import dac2dac.doctect.doctor.service.DoctorLoginService;
 import dac2dac.doctect.user.controller.LoginController;
 import dac2dac.doctect.user.dto.UserDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/doctors")
 public class DoctorLoginController {
 
-    private final DoctorService doctorService;
+    private final DoctorLoginService doctorService;
     private final DoctorRepository doctorRepository;
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
