@@ -5,6 +5,7 @@ import dac2dac.doctect.common.constant.SuccessCode;
 import dac2dac.doctect.common.response.ApiResult;
 import dac2dac.doctect.doctor.dto.CustomDoctorDetails;
 import dac2dac.doctect.doctor.dto.DoctorDTO;
+import dac2dac.doctect.doctor.dto.request.DiagCompleteRequestDto;
 import dac2dac.doctect.doctor.dto.request.RejectReservationRequest;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
@@ -78,6 +79,13 @@ class DoctorController {
     @GetMapping("/{doctorId}/upcoming")
     public ApiResult getUpcomingReservation(@PathVariable Long doctorId) {
         return ApiResult.success(SuccessCode.GET_SUCCESS, doctorService.getUpcomingReservation(doctorId));
+    }
+
+    @Operation(summary = "진료 완료 API", description = "진료가 끝난 건에 대해 완료 처리한다.")
+    @PostMapping("/complete/{doctorId}/{reservationId}")
+    public ApiResult completeReservation(@RequestBody DiagCompleteRequestDto request, @PathVariable Long doctorId, @PathVariable Long reservationId) throws Exception {
+        doctorService.completeReservation(request, doctorId, reservationId);
+        return ApiResult.success(SuccessCode.PAYMENT_SUCCESS);
     }
 
     @Operation(summary = "오늘 진료 예약 목록 조회 API", description = "메인에 보여지는 오늘 진료 예약 목록을 조회한다.")

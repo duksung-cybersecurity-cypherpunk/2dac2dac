@@ -2,10 +2,14 @@ package dac2dac.doctect.doctor.service;
 
 import dac2dac.doctect.agency.entity.Hospital;
 import dac2dac.doctect.agency.repository.HospitalRepository;
+import dac2dac.doctect.bootpay.entity.PaymentInfo;
+import dac2dac.doctect.bootpay.entity.PaymentMethod;
+import dac2dac.doctect.bootpay.service.BootpayService;
 import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.BadRequestException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.doctor.dto.DoctorDTO;
+import dac2dac.doctect.doctor.dto.request.DiagCompleteRequestDto;
 import dac2dac.doctect.doctor.dto.request.RejectReservationRequest;
 import dac2dac.doctect.doctor.dto.response.AcceptedReservationItemList;
 import dac2dac.doctect.doctor.dto.response.PatientInfoDto;
@@ -20,9 +24,11 @@ import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DepartmentRepository;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
 import dac2dac.doctect.noncontact_diag.dto.response.NoncontactDiagFormInfo;
+import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
+import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.entity.constant.Gender;
@@ -40,7 +46,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DoctorService {
 
+    private final BootpayService bootpayService;
     private final NoncontactDiagReservationRepository noncontactDiagReservationRepository;
+    private final NoncontactDiagRepository noncontactDiagRepository;
     private final DoctorRepository doctorRepository;
     private final HospitalRepository hospitalRepository;
     private final DepartmentRepository departmentRepository;
@@ -331,5 +339,36 @@ public class DoctorService {
             .completedReservationItemList(completedReservation)
             .scheduledReservationItemList(scheduledReservation)
             .build();
+    }
+
+    public void completeReservation(DiagCompleteRequestDto request, Long doctorId, Long reservationId) throws Exception {
+        Doctor doctor = doctorRepository.findById(doctorId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
+
+        NoncontactDiagReservation reservation = noncontactDiagReservationRepository.findById(reservationId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
+
+        LocalDateTime reservationDateTime = LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime());
+        LocalDateTime now = LocalDateTime.now();
+
+        // 예약 시간이 현재 시간보다 이후일 경우 예외 처리
+        if (reservationDateTime.isAfter(now)) {
+            throw new BadRequestException(ErrorCode.RESERVATION_NOT_STARTED);
+        }
+
+        // 결제 수행
+        PaymentMethod paymentMethod = reservation.getPaymentMethod();
+        PaymentInfo paymentInfo = bootpayService.payWithBillingKey(paymentMethod, request.getPrice());
+
+        // 진료 완료된 건에 대해서는 진료 테이블에 저장
+        NoncontactDiag noncontactDiag = NoncontactDiag.builder()
+            .user(reservation.getUser())
+            .doctor(reservation.getDoctor())
+            .noncontactDiagReservation(reservation)
+            .paymentInfo(paymentInfo)
+            .diagDate(reservation.getReservationDate())
+            .diagTime(reservation.getReservationTime())
+            .build();
+        noncontactDiagRepository.save(noncontactDiag);
     }
 }

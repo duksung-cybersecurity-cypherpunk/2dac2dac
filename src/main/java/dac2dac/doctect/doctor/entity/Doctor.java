@@ -12,9 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -50,30 +48,25 @@ public class Doctor {
     @Embedded
     private DiagTime diagTime;
 
-    // Remove these two fields:
-    // private Long hospitalId;
-    // private Long departmentId;
-
-    // Modify getters if needed
     public Long getHospitalId() {
-        return hospital != null ? hospital.getId() : null; // Handle null case
+        return hospital != null ? hospital.getId() : null;
     }
 
     public Long getDepartmentId() {
-        return department != null ? department.getId() : null; // Handle null case
+        return department != null ? department.getId() : null;
     }
 
     public static Doctor createDoctor(
-            Hospital hospital,
-            Department department,
-            String name,
-            String email,
-            String password,
-            Boolean isLicenseCertificated,
-            String profileImagePath,
-            String oneLiner,
-            String experience,
-            DiagTime diagTime) {
+        Hospital hospital,
+        Department department,
+        String name,
+        String email,
+        String password,
+        Boolean isLicenseCertificated,
+        String profileImagePath,
+        String oneLiner,
+        String experience,
+        DiagTime diagTime) {
         Doctor doctor = new Doctor();
         doctor.hospital = hospital;
         doctor.department = department;
@@ -91,6 +84,7 @@ public class Doctor {
     public void setName(String name) {
         this.name = name;
     }
+
     public void setId(String id) {
         this.id = Long.parseLong(id);
     }
@@ -102,6 +96,7 @@ public class Doctor {
     public void setPassword(String password) {
         this.password = password;
     }
+
     public void setOneLiner(String oneLiner) {
         this.oneLiner = oneLiner;
     }
