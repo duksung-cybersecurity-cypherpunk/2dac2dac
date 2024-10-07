@@ -299,21 +299,37 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
 
+        // 오늘 예약 목록 가져오기
         List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByReservationDateAndDoctorId(LocalDate.now(), doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
 
-        List<ReservationItem> reservationItemList = reservationList.stream()
+        LocalDateTime now = LocalDateTime.now(); // 현재 시간 가져오기
+
+        // 예약을 현재 시간 기준으로 나눔
+        List<ReservationItem> scheduledReservation = reservationList.stream()
+            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isAfter(now))
             .map(r -> ReservationItem.builder()
                 .userId(r.getUser().getId())
                 .patientName(r.getUser().getUsername())
                 .reservationId(r.getId())
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
-            .toList();
+            .collect(Collectors.toList());
+
+        List<ReservationItem> completedReservation = reservationList.stream()
+            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isBefore(now))
+            .map(r -> ReservationItem.builder()
+                .userId(r.getUser().getId())
+                .patientName(r.getUser().getUsername())
+                .reservationId(r.getId())
+                .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
+                .build())
+            .collect(Collectors.toList());
 
         return TodayReservationDto.builder()
-            .totalCnt(reservationItemList.size())
-            .reservationItemList(reservationItemList)
+            .totalCnt(scheduledReservation.size() + completedReservation.size())
+            .completedReservationItemList(completedReservation)
+            .scheduledReservationItemList(scheduledReservation)
             .build();
     }
 }
