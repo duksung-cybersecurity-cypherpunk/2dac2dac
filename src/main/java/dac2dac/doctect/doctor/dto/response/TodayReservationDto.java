@@ -13,11 +13,13 @@ public class TodayReservationDto {
     private int totalCnt;
     private List<ReservationItem> completedReservationItemList = new ArrayList<>();
     private List<ReservationItem> scheduledReservationItemList = new ArrayList<>();
+    private List<ReservationItem> toBeCompleteReservationItemList = new ArrayList<>();
 
     @Builder
-    public TodayReservationDto(int totalCnt, List<ReservationItem> completedReservationItemList, List<ReservationItem> scheduledReservationItemList) {
+    public TodayReservationDto(int totalCnt, List<ReservationItem> completedReservationItemList, List<ReservationItem> toBeCompleteReservationItemList, List<ReservationItem> scheduledReservationItemList) {
         this.totalCnt = totalCnt;
         this.completedReservationItemList = completedReservationItemList;
+        this.toBeCompleteReservationItemList = toBeCompleteReservationItemList;
         this.scheduledReservationItemList = scheduledReservationItemList;
     }
 }
