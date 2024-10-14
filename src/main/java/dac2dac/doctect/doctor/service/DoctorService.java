@@ -211,15 +211,32 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
 
+        LocalDateTime nowDateTime = LocalDateTime.now();
+        LocalDate nowDate = LocalDate.now();
+
         // 오늘 예약 목록 가져오기
-        List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByReservationDateAndDoctorId(LocalDate.now(), doctorId)
+        List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByReservationDateAndDoctorId(nowDate, doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
 
-        LocalDateTime now = LocalDateTime.now(); // 현재 시간 가져오기
+        // 완료된(처방전 작성된) 오늘 예약 아이디 가져오기
+        List<Long> completedReservationIdList = noncontactDiagRepository.findByDiagDateAndDoctorId(nowDate, doctorId).stream()
+                .map(nd -> nd.getNoncontactDiagReservation().getId())
+                .collect(Collectors.toList());
 
         // 예약을 현재 시간 기준으로 나눔
         List<ReservationItem> scheduledReservation = reservationList.stream()
-            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isAfter(now))
+            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isAfter(nowDateTime))
+            .map(r -> ReservationItem.builder()
+                .userId(r.getUser().getId())
+                .patientName(maskName(r.getUser().getUsername()))
+                .reservationId(r.getId())
+                .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
+                .build())
+            .collect(Collectors.toList());
+
+        List<ReservationItem> toBeCompleteReservation = reservationList.stream()
+            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isBefore(nowDateTime)
+                    && !completedReservationIdList.contains(reservation.getId()))
             .map(r -> ReservationItem.builder()
                 .userId(r.getUser().getId())
                 .patientName(maskName(r.getUser().getUsername()))
@@ -229,7 +246,8 @@ public class DoctorService {
             .collect(Collectors.toList());
 
         List<ReservationItem> completedReservation = reservationList.stream()
-            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isBefore(now))
+            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isBefore(nowDateTime)
+                    && completedReservationIdList.contains(reservation.getId()))
             .map(r -> ReservationItem.builder()
                 .userId(r.getUser().getId())
                 .patientName(maskName(r.getUser().getUsername()))
@@ -239,10 +257,11 @@ public class DoctorService {
             .collect(Collectors.toList());
 
         return TodayReservationDto.builder()
-            .totalCnt(scheduledReservation.size() + completedReservation.size())
-            .completedReservationItemList(completedReservation)
-            .scheduledReservationItemList(scheduledReservation)
-            .build();
+                .totalCnt(scheduledReservation.size() + completedReservation.size() + toBeCompleteReservation.size())
+                .toBeCompleteReservationItemList(toBeCompleteReservation)
+                .completedReservationItemList(completedReservation)
+                .scheduledReservationItemList(scheduledReservation)
+                .build();
     }
 
     public void completeReservation(DiagCompleteRequestDto request, Long doctorId, Long reservationId) throws Exception {
