@@ -17,6 +17,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static dac2dac.doctect.common.utils.DeidentificationUtils.maskName;
+
 @Service
 @RequiredArgsConstructor
 public class DoctorNoncontactDiagService {
@@ -31,7 +33,7 @@ public class DoctorNoncontactDiagService {
         List<PrescriptionItem> noncontactDiagList = noncontactDiagRepository.findByDoctorId(doctorId).stream()
             .map(n -> PrescriptionItem.builder()
                 .noncontactDiagId(n.getId())
-                .patientName(n.getUser().getUsername())
+                .patientName(maskName(n.getUser().getUsername()))
                 .reservationDate(LocalDateTime.of(n.getDiagDate(), n.getDiagTime()))
                 .build())
             .sorted(Comparator.comparing(PrescriptionItem::getReservationDate).reversed())
@@ -51,7 +53,7 @@ public class DoctorNoncontactDiagService {
         PaymentInfo paymentInfo = noncontactDiag.getPaymentInfo();
 
         return PrescriptionDto.builder()
-            .patientName(noncontactDiag.getUser().getUsername())
+            .patientName(maskName((noncontactDiag.getUser().getUsername())))
             .isAllergicSymptom(symptom.getIsAllergicSymptom())
             .isInbornDisease(symptom.getIsInbornDisease())
             .isPrescribedDrug(symptom.getIsPrescribedDrug())

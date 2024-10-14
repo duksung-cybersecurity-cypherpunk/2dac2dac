@@ -66,7 +66,7 @@ public class DoctorService {
                 .userId(r.getUser().getId())
                 .reservationId(r.getId())
                 .signupDate(r.getCreateDate())
-                .patientName(r.getUser().getUsername())
+                .patientName(maskName(r.getUser().getUsername()))
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
             .sorted(Comparator.comparing(ReservationItem::getSignupDate))
@@ -87,7 +87,7 @@ public class DoctorService {
                 .userId(r.getUser().getId())
                 .reservationId(r.getId())
                 .signupDate(r.getCreateDate())
-                .patientName(r.getUser().getUsername())
+                .patientName(maskName(r.getUser().getUsername()))
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
             .sorted(Comparator.comparing(ReservationItem::getReservationDate))
@@ -115,7 +115,7 @@ public class DoctorService {
         ReservationItem reservationItem = ReservationItem.builder()
             .reservationId(findNoncontactDiagReservation.getId())
             .signupDate(findNoncontactDiagReservation.getCreateDate())
-            .patientName(findNoncontactDiagReservation.getUser().getUsername())
+            .patientName(maskName(findNoncontactDiagReservation.getUser().getUsername()))
             .reservationDate(LocalDateTime.of(findNoncontactDiagReservation.getReservationDate(), findNoncontactDiagReservation.getReservationTime()))
             .build();
 
@@ -203,7 +203,7 @@ public class DoctorService {
         return UpcomingReservationDto.builder()
             .reservationId(reservation.getId())
             .reservationDate(LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()))
-            .patientName(reservation.getUser().getUsername())
+            .patientName(maskName(reservation.getUser().getUsername()))
             .build();
     }
 
@@ -222,7 +222,7 @@ public class DoctorService {
             .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isAfter(now))
             .map(r -> ReservationItem.builder()
                 .userId(r.getUser().getId())
-                .patientName(r.getUser().getUsername())
+                .patientName(maskName(r.getUser().getUsername()))
                 .reservationId(r.getId())
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
@@ -232,7 +232,7 @@ public class DoctorService {
             .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isBefore(now))
             .map(r -> ReservationItem.builder()
                 .userId(r.getUser().getId())
-                .patientName(r.getUser().getUsername())
+                .patientName(maskName(r.getUser().getUsername()))
                 .reservationId(r.getId())
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
