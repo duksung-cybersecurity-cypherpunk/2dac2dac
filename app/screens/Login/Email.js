@@ -50,7 +50,7 @@ const Email = ({ route, navigation }) => {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        "http://203.252.213.209:8080/api/v1/reservations/doctors/login/jwt",
+        "http://203.252.213.209:8080/api/v1/doctors/login/jwt",
         {
           username: username,
           password: password,
@@ -81,7 +81,7 @@ const Email = ({ route, navigation }) => {
   const getDataWithToken = async (token) => {
     try {
       const response = await axios.get(
-        "http://203.252.213.209:8080/api/v1/reservations/doctors/login/jwt",
+        "http://203.252.213.209:8080/api/v1/doctors/login/jwt",
         {
           headers: {
             Authorization: `Bearer ${token}`, // Authorization 헤더에 토큰을 추가

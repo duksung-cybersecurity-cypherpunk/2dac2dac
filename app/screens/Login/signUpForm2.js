@@ -67,7 +67,7 @@ export default function SignUpForm2({ navigation, route }) {
 
     try {
       const response = await axios.post(
-        "http://203.252.213.209:8080/api/v1/reservations/doctors/signup",
+        "http://203.252.213.209:8080/api/v1/doctors/signup",
         {
           name: username,
           email: email,
