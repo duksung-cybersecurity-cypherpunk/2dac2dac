@@ -10,6 +10,7 @@ import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepos
 import dac2dac.doctect.user.dto.response.UpcomingReservationDto;
 import dac2dac.doctect.user.dto.response.UserInfoDto;
 import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.user.entity.constant.Gender;
 import dac2dac.doctect.user.entity.constant.SocialType;
 import dac2dac.doctect.user.jwt.JWTUtil;
 import dac2dac.doctect.user.repository.UserRepository;
@@ -39,7 +40,7 @@ public class UserService {
 
     // 회원가입
     @Transactional
-    public User registerUser(String username, String email, String password, String phoneNumber, String code, SocialType socialType) {
+    public User registerUser(String username, String email, String password, String phoneNumber, String code, SocialType socialType, Gender gender, String birthDate) {
         // 이메일 중복 체크
         if (userRepository.findByUsername(username) != null) {
             throw new RuntimeException("Username is already registered.");
@@ -59,6 +60,8 @@ public class UserService {
         user.setCreateDate(LocalDateTime.now()); // 생성
         user.setUpdateDate(LocalDateTime.now()); // 업데이트
         user.setSocialType(socialType);
+        user.setBirthDate(birthDate);
+        user.setGender(gender);
         // 사용자 저장
         return userRepository.save(user);
     }
@@ -99,7 +102,7 @@ public class UserService {
         User user = userRepository.findByUsername(username);
         if (authenticate) {
             // DB에서 조회한 사용자 ID를 사용하여 JWT 생성
-            return jwtUtil.createJwt(username, user.getId().toString(), user.getPhoneNumber(), user.getEmail(), "user", 36000L); // 1시간 유효한 토큰 생성
+            return jwtUtil.createJwt(username, user.getId().toString(), user.getPhoneNumber(), user.getEmail(), "user",user.getBirthDate(),user.getGender() ,36000L); // 1시간 유효한 토큰 생성
         } else {
             throw new RuntimeException("Invalid username or password");
         }

@@ -3,6 +3,7 @@ package dac2dac.doctect.user.controller;
 import dac2dac.doctect.user.dto.CustomUserDetails;
 import dac2dac.doctect.user.dto.UserDTO;
 import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.user.entity.constant.Gender;
 import dac2dac.doctect.user.jwt.JWTUtil;
 import dac2dac.doctect.user.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,7 +42,9 @@ public class LoginController {
                     userDTO.getPassword(),
                     userDTO.getPhoneNumber(),
                     userDTO.getCode(),
-                    userDTO.getSocialType()
+                    userDTO.getSocialType(),
+                    userDTO.getGender(),
+                    userDTO.getBirthDate()
             );
             return ResponseEntity.ok("Registration successful!!");
         } catch (Exception e) {
@@ -77,12 +80,17 @@ public class LoginController {
             String email = customUserDetails.getEmail(); // CustomUserDetails에서 이메일 가져오기
             String PhoneNumber= customUserDetails.getPhoneNumber();
             String id = customUserDetails.getId();
+            Gender gender = customUserDetails.getGender();
+            String birthdDate = customUserDetails.getBirthDate();
+            System.out.println("들어옴"+name+email+PhoneNumber+id+gender+ birthdDate);
 
             Map<String, String> response = new HashMap<>();
             response.put("username", name);
             response.put("email", email);
             response.put("id", id);
             response.put("phonenumber", PhoneNumber);
+            response.put("gender", gender.toString());
+            response.put("birthdDate",  birthdDate);
 
             return ResponseEntity.ok(response);
 

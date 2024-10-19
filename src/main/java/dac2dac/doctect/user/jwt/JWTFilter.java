@@ -4,6 +4,7 @@ import dac2dac.doctect.doctor.dto.CustomDoctorDetails;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.user.dto.CustomUserDetails;
 import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.user.entity.constant.Gender;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -59,6 +60,8 @@ public class JWTFilter extends OncePerRequestFilter {
             String email = jwtUtil.getEmail(token);
             String userType = jwtUtil.getUserType(token); // 사용자 타입 추가
             String oneLiner = jwtUtil.getOneLiner(token);
+            Gender gender = jwtUtil.getGender(token);
+            String birthDate = jwtUtil.getBirthdDate(token);
 
             // 사용자 타입에 따라 적절한 객체 생성
             if ("doctor".equals(userType)) {
@@ -78,6 +81,8 @@ public class JWTFilter extends OncePerRequestFilter {
                 userEntity.setEmail(email);
                 userEntity.setPhoneNumber(phoneNumber);
                 userEntity.setId(id);
+                userEntity.setGender(gender);
+                userEntity.setBirthDate(birthDate);
 
                 CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
                 Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());

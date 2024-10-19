@@ -1,6 +1,7 @@
 package dac2dac.doctect.user.dto;
 
 import dac2dac.doctect.user.entity.User;
+import dac2dac.doctect.user.entity.constant.Gender;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -43,6 +44,10 @@ public class CustomUserDetails implements UserDetails {
     public String getPhoneNumber() {
         return user.getPhoneNumber();
     }
+
+    public Gender getGender(){return user.getGender();}
+
+    public String getBirthDate(){return user.getBirthDate();}
 
     @Override
     public boolean isAccountNonExpired() {

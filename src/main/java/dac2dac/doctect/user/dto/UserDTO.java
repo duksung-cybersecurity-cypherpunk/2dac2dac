@@ -1,6 +1,7 @@
 package dac2dac.doctect.user.dto;
 
 
+import dac2dac.doctect.user.entity.constant.Gender;
 import dac2dac.doctect.user.entity.constant.SocialType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,5 +19,7 @@ public class UserDTO {
     private String phoneNumber;
     private String code;
     private SocialType socialType;
+    private Gender gender;
+    private String birthDate;
 }
 
