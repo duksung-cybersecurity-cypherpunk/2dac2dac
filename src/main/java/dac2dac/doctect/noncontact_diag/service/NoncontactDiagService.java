@@ -1,5 +1,7 @@
 package dac2dac.doctect.noncontact_diag.service;
 
+import static dac2dac.doctect.common.utils.DiagTimeUtils.findCloseTime;
+import static dac2dac.doctect.common.utils.DiagTimeUtils.findOpenTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayCloseTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayOpenTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.isAgencyOpenNow;
@@ -151,7 +153,7 @@ public class NoncontactDiagService {
         LocalTime reservationTime = LocalTime.of(timeValue / 100, timeValue % 100);
 
         //* 유효한 진료 예약 날짜 및 시간인지 검증
-        isValidReservation(requestDto.getReservationDate(), reservationTime, doctor.getHospital().getDiagTime());
+        isValidReservation(requestDto.getReservationDate(), reservationTime, doctor.getHospital().getDiagTime()); //154줄
 
         //* 동의 여부 확인
         if (!requestDto.getIsConsent()) {
@@ -312,11 +314,11 @@ public class NoncontactDiagService {
         }
 
         // 진료 예약 시간 확인
-        Integer openTime = findTodayOpenTime(diagTime);
-        Integer closeTime = findTodayCloseTime(diagTime);
+        Integer openTime = findOpenTime(diagTime, reservationDate);
+        Integer closeTime = findCloseTime(diagTime, reservationDate);
 
         LocalTime reservationTimeInMinutes = LocalTime.of(reservationTime.getHour(), reservationTime.getMinute());
-        LocalTime openTimeInMinutes = LocalTime.of(openTime / 100, openTime % 100);
+        LocalTime openTimeInMinutes = LocalTime.of(openTime / 100, openTime % 100); //319줄
         LocalTime closeTimeInMinutes = LocalTime.of(closeTime / 100, closeTime % 100);
 
         if (reservationTimeInMinutes.isBefore(openTimeInMinutes) || reservationTimeInMinutes.isAfter(closeTimeInMinutes)) {
