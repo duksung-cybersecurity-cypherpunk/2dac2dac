@@ -60,8 +60,7 @@ public class JWTFilter extends OncePerRequestFilter {
             String email = jwtUtil.getEmail(token);
             String userType = jwtUtil.getUserType(token); // 사용자 타입 추가
             String oneLiner = jwtUtil.getOneLiner(token);
-            Gender gender = jwtUtil.getGender(token);
-            String birthDate = jwtUtil.getBirthdDate(token);
+
 
             // 사용자 타입에 따라 적절한 객체 생성
             if ("doctor".equals(userType)) {
@@ -74,8 +73,11 @@ public class JWTFilter extends OncePerRequestFilter {
                 CustomDoctorDetails customDoctorDetails = new CustomDoctorDetails(doctorEntity);
                 Authentication authToken = new UsernamePasswordAuthenticationToken(customDoctorDetails, null, customDoctorDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                logger.info("Doctor authenticated and set in SecurityContext.");
+                logger.info("Doctor authenticated and set in SecurityContext." + doctorEntity);
             } else if ("user".equals(userType)) {
+                Gender gender = jwtUtil.getGender(token);
+                String birthDate = jwtUtil.getBirthdDate(token);
+
                 User userEntity = new User();
                 userEntity.setUsername(username);
                 userEntity.setEmail(email);
