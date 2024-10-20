@@ -2,8 +2,53 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-export default function QRLoad() {
+export default function QRLoad({ route }) {
+    const { data } = route.params;
     const navigation = useNavigation();
+    const [item, setitem] = useState([]);
+
+    const [userId, setUserId] = useState();
+    const [name, setName] = useState("");
+    const [age, setAge] = useState("");
+    const [gender, setGender] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+
+    const fetchData = async () => {
+      try {
+        const userInfo = await AsyncStorage.getItem("userInfo");
+        const userData = JSON.parse(userInfo);
+        setDoctorInfo(userData.id);
+  
+        const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`);
+        const data = await response.json();
+        setitem(data.data.completedReservationList);
+        setCnt(data.data.totalCnt);
+        console.log(item);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    const patientData = async () => {
+      try {
+        const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/reservations/${data.doctorId}/${data.reservationId}/patientInfo`);
+        const patient = await response.json();
+        setUserId(patient.data.userId);
+        setName(patient.data.userName);
+        setAge(patient.data.age);
+        setGender(patient.data.gender);
+        setPhoneNumber(patient.data.phoneNumber);
+        console.log(item);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    useEffect(() => {
+      fetchData();
+      patientData();
+    }, []);
 
     const blocks = [
     {
@@ -28,18 +73,18 @@ export default function QRLoad() {
     },
   ];
 
-  const handleBlockPress = (id) => {
+  const handleBlockPress = (id, data) => {
     if (id === 1) {
-      navigation.navigate("PatientInfoStack", { id: 2 });
+      navigation.navigate("PatientInfoStack", { id: 2, data });
     }
     if (id === 2) {
-      navigation.navigate("PatientInfoStack", { id: 3 });
+      navigation.navigate("PatientInfoStack", { id: 3, data });
     }
     if (id === 3) {
-      navigation.navigate("PatientInfoStack", { id: 4 });
+      navigation.navigate("PatientInfoStack", { id: 4, data });
     }
     if (id === 4) {
-      navigation.navigate("PatientInfoStack", { id: 5 });
+      navigation.navigate("PatientInfoStack", { id: 5, data });
     }
   };
   
@@ -48,15 +93,15 @@ export default function QRLoad() {
         <Text style={[styles.titleText, {marginTop: 20}]}>환자 정보를 확인해 주세요.</Text>
         <View style={styles.infoBlock}>
             <View style={styles.row}>
-                <Text style={styles.infoSubText}>환자 명</Text>
+                <Text style={styles.infoSubText}>환자 명 {name}</Text>
                 <Text style={styles.text}></Text>
             </View>
             <View style={styles.row}>
-                <Text style={styles.infoSubText}>나이   </Text>
+                <Text style={styles.infoSubText}>나이    {age}</Text>
                 <Text style={styles.text}></Text>
             </View>
             <View style={styles.row}>
-                <Text style={styles.infoSubText}>성별   </Text>
+                <Text style={styles.infoSubText}>성별    {gender}</Text>
                 <Text style={styles.text}></Text>
             </View>
         </View>
@@ -66,7 +111,7 @@ export default function QRLoad() {
                 <TouchableOpacity
                     key={blocks.id}
                     style={[styles.blocks]}
-                    onPress={() => handleBlockPress(blocks.id)}
+                    onPress={() => handleBlockPress(blocks.id, userId)}
                     activeOpacity={0.7}
                 >
                     <Image source={blocks.imageUrl} />

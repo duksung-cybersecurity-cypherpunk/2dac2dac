@@ -33,11 +33,9 @@ export default function Vaccination() {
     try {
       const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/vaccination/1`);
       const data = await response.json();
-      console.log(data);
       setitem(data.data.vaccinationItemList); 
-      console.log(item);
       setCnt(data.data.totalCnt);
-      console.log(cnt);
+
     } catch (error) {
       console.error('Error fetching data:', error);
     }
