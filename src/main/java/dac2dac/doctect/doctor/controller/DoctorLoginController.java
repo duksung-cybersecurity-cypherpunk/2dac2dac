@@ -71,7 +71,7 @@ public class DoctorLoginController {
             String email = customDoctorDetails.getEmail(); // CustomUserDetails에서 이메일 가져오기
             String oneLiner = customDoctorDetails.getOneLiner();
             String id = customDoctorDetails.getId();
-
+            System.out.println("정보 가져오기" + name + email + oneLiner+id);
             Map<String, String> response = new HashMap<>();
             response.put("username", name);
             response.put("email", email);
