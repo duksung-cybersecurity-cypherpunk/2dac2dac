@@ -13,10 +13,6 @@ export default function MyPage() {
   const [userInfo, setUserInfo] = useState(null);
   const navigation = useNavigation();
 
-  const handleBlockPress = (id) => {
-    navigation.navigate("PatientInfoStack", { id });
-  };
-
   useEffect(() => {
     const loadUserData = async () => {
       const storedUserInfo = await AsyncStorage.getItem("userInfo");
@@ -54,14 +50,6 @@ export default function MyPage() {
       ) : (
         <Text>Loading user data...</Text>
       )}
-
-      <TouchableOpacity
-        style={styles.blocks}
-        onPress={() => handleBlockPress(1)}
-        activeOpacity={0.7}
-      >
-        <Text>QR 스캔</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }

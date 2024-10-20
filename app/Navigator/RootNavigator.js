@@ -5,12 +5,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BottomTabNavigator from "./TabNavigator"; // Bottom Tab Navigator
 import OnboardingStack from "./OnboardingNavigation";
 import AcceptPatientStack from "./AcceptPatientNavigator";
-
 import PatientInfoStack from "./PatientInfoNavigator";
 import TreatmentInfoStack from "./TreatmentNavigator";
 import VaccinationInfoStack from "./VaccinationNavigator";
 import PrescriptionInfoStack from "./PrescriptionNavigator";
 import ExaminationInfoStack from "./ExaminationNavigator";
+import HistoryStack from "./HistoryNavigator";
 
 // page
 import Accept from "../screens/Reservation/Accept";
@@ -39,13 +39,8 @@ export default function RootNavigator() {
         name="AcceptPatientStack"
         component={AcceptPatientStack}
       />
-      <RootStack.Screen
-        name="Accept"
-        component={Accept}
-        options={{
-          headerTitle: "예약 수락",
-        }}
-      />
+      <RootStack.Screen name="Accept" component={Accept} />
+
       <RootStack.Screen
         name="Reject"
         component={Reject}
@@ -60,7 +55,22 @@ export default function RootNavigator() {
           headerTitle: "진료 내역",
         }}
       />
-      <RootStack.Screen name="PatientInfoStack" component={PatientInfoStack} />
+      <RootStack.Screen
+        name="HistoryStack"
+        component={HistoryStack}
+        options={{
+          tabBarVisible: true, // Tab 바 표시
+        }}
+      />
+
+      <RootStack.Screen
+        name="PatientInfoStack"
+        component={PatientInfoStack}
+        options={{
+          tabBarVisible: true, // Tab 바 표시
+        }}
+      />
+
       <RootStack.Screen
         name="TreatmentInfoStack"
         component={TreatmentInfoStack}

@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-export default function QRLoad() {
-    const navigation = useNavigation();
+export default function QRLoad({ route }) {
+  const navigation = useNavigation();
+  const { doctorId, reservationId } = route.params;
+  console.log("doctorId", doctorId, reservationId);
 
-    const blocks = [
+  const blocks = [
     {
       id: 1,
       title: "진료 내역",
@@ -42,53 +44,55 @@ export default function QRLoad() {
       navigation.navigate("PatientInfoStack", { id: 5 });
     }
   };
-  
+
   return (
     <View style={styles.container}>
-        <Text style={[styles.titleText, {marginTop: 20}]}>환자 정보를 확인해 주세요.</Text>
-        <View style={styles.infoBlock}>
-            <View style={styles.row}>
-                <Text style={styles.infoSubText}>환자 명</Text>
-                <Text style={styles.text}></Text>
-            </View>
-            <View style={styles.row}>
-                <Text style={styles.infoSubText}>나이   </Text>
-                <Text style={styles.text}></Text>
-            </View>
-            <View style={styles.row}>
-                <Text style={styles.infoSubText}>성별   </Text>
-                <Text style={styles.text}></Text>
-            </View>
+      <Text style={[styles.titleText, { marginTop: 20 }]}>
+        환자 정보를 확인해 주세요.
+      </Text>
+      <View style={styles.infoBlock}>
+        <View style={styles.row}>
+          <Text style={styles.infoSubText}>환자 명</Text>
+          <Text style={styles.text}></Text>
         </View>
+        <View style={styles.row}>
+          <Text style={styles.infoSubText}>나이 </Text>
+          <Text style={styles.text}></Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.infoSubText}>성별 </Text>
+          <Text style={styles.text}></Text>
+        </View>
+      </View>
 
-        <View style={styles.listBlock}>
-            {blocks.slice(0, 4).map((blocks) => (
-                <TouchableOpacity
-                    key={blocks.id}
-                    style={[styles.blocks]}
-                    onPress={() => handleBlockPress(blocks.id)}
-                    activeOpacity={0.7}
-                >
-                    <Image source={blocks.imageUrl} />
-                    <Text style={styles.text}> {blocks.title} </Text>
-                </TouchableOpacity>
-            ))}
-
-            <Text style={[styles.text, {marginTop: 50}]}> 
-                주의사항{"\n"}
-                - 열람 종료하기를 누른 이후 해당 기기로 불러온 환자 데이{"\n"}
-                터는 소실되며, 새로 갱신된 환자 QR 촬영을 통해 다시 불{"\n"}
-                러올 수 있습니다.
-            </Text>
-
-            <TouchableOpacity
-            style={[styles.bottomBlocks]}
-            onPress={() => navigation.navigate("PatientInfoStack", {id: null})}
+      <View style={styles.listBlock}>
+        {blocks.slice(0, 4).map((blocks) => (
+          <TouchableOpacity
+            key={blocks.id}
+            style={[styles.blocks]}
+            onPress={() => handleBlockPress(blocks.id)}
             activeOpacity={0.7}
-            >
-                <Text sytle={styles.textButton}> 열람 종료하기 </Text>
-            </TouchableOpacity>
-        </View>
+          >
+            <Image source={blocks.imageUrl} />
+            <Text style={styles.text}> {blocks.title} </Text>
+          </TouchableOpacity>
+        ))}
+
+        <Text style={[styles.text, { marginTop: 50 }]}>
+          주의사항{"\n"}- 열람 종료하기를 누른 이후 해당 기기로 불러온 환자 데이
+          {"\n"}
+          터는 소실되며, 새로 갱신된 환자 QR 촬영을 통해 다시 불{"\n"}
+          러올 수 있습니다.
+        </Text>
+
+        <TouchableOpacity
+          style={[styles.bottomBlocks]}
+          onPress={() => navigation.navigate("PatientInfoStack", { id: null })}
+          activeOpacity={0.7}
+        >
+          <Text sytle={styles.textButton}> 열람 종료하기 </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -102,7 +106,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  infoBlock: { 
+  infoBlock: {
     width: "90%",
     height: "12%",
     backgroundColor: "#F5F5F5",
@@ -122,8 +126,8 @@ const styles = StyleSheet.create({
   },
   blocks: {
     flexDirection: "row",
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     width: "98%",
     height: "10%",
     backgroundColor: "#EBF2EA",
@@ -131,8 +135,8 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   bottomBlocks: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     width: "98%",
     height: "8%",
     backgroundColor: "#76B947",

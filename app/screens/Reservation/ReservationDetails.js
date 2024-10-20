@@ -17,6 +17,10 @@ const ReservationDetails = ({ route }) => {
   const navigation = useNavigation(); // 추가: 네비게이션 훅 사용
   const { doctorId, reservationId } = route.params;
 
+  const handleQRLoad = () => {
+    // QRLoad 스크린으로 doctorId와 reservationId 전달
+    navigation.navigate("QRLoad", { doctorId, reservationId });
+  };
   useEffect(() => {
     const fetchReservationDetails = async () => {
       try {
@@ -24,6 +28,7 @@ const ReservationDetails = ({ route }) => {
           `http://203.252.213.209:8080/api/v1/reservations/form/${doctorId}/${reservationId}`
         );
         setReservationData(response.data.data);
+        navigation();
       } catch (error) {
         console.error("Failed to fetch reservation details:", error);
       } finally {
@@ -91,6 +96,10 @@ const ReservationDetails = ({ route }) => {
       </View>
 
       {/* 뒤로 가기 버튼 */}
+
+      {/* QRLoad로 넘어가는 버튼 */}
+      <Button title="QR 보기" onPress={handleQRLoad} />
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.backButton}

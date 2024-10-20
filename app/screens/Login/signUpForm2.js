@@ -181,6 +181,7 @@ export default function SignUpForm2({ navigation, route }) {
           editable={isCodeVerified}
         />
       </View>
+
       <TouchableOpacity
         style={styles.button}
         onPress={handleSignUp}
