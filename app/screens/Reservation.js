@@ -35,8 +35,9 @@ export default function Reservation() {
       const userInfo = await AsyncStorage.getItem("userInfo");
 
       const userData = JSON.parse(userInfo);
-      console.log("userId", userData, ReservationDate(selectedDate));
+      //console.log("userId", userData, ReservationDate(selectedDate));
       setDoctorId(userData.id);
+
       const apiUrl = `http://203.252.213.209:8080/api/v1/reservations/${
         userData.id
       }/${ReservationDate(selectedDate)}`;
@@ -80,13 +81,11 @@ export default function Reservation() {
             <TouchableOpacity
               style={styles.acceptButton}
               onPress={() => {
-                // Set the selected reservation item and navigate
-                setSelectedReservation(item); // Update the selected reservation
+                setSelectedReservation(item);
 
-                // Navigate to the Accept screen with the selected reservation item
                 navigation.navigate("Reject", {
-                  selectedReservation: item, // Pass the selected reservation item
-                  doctorId: doctorId, // Pass the doctor's ID
+                  selectedReservation: item,
+                  doctorId: doctorId,
                 });
               }}
             >
@@ -95,13 +94,11 @@ export default function Reservation() {
             <TouchableOpacity
               style={styles.acceptButton}
               onPress={() => {
-                // Set the selected reservation item and navigate
-                setSelectedReservation(item); // Update the selected reservation
+                setSelectedReservation(item);
 
-                // Navigate to the Accept screen with the selected reservation item
                 navigation.navigate("Accept", {
-                  selectedReservation: item, // Pass the selected reservation item
-                  doctorId: doctorId, // Pass the doctor's ID
+                  selectedReservation: item,
+                  doctorId: doctorId,
                 });
               }}
             >
@@ -143,7 +140,7 @@ export default function Reservation() {
             <Text
               style={[styles.dateText, date.isToday ? styles.todayText : null]}
             >
-              {date.name}
+              {date.name} {date.date}
             </Text>
           </TouchableOpacity>
         ))}
@@ -177,7 +174,7 @@ export default function Reservation() {
             : reservations.accepted
         }
         keyExtractor={(item) => item.reservationId.toString()}
-        renderItem={renderReservation} // Make sure you are passing this function correctly
+        renderItem={renderReservation}
       />
     </View>
   );
