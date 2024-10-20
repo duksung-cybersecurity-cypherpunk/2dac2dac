@@ -8,31 +8,32 @@ import {
   Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function MedicalHistory() {
   const navigation = useNavigation();
-  const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
+  const [item, setitem] = useState([]); //done
 
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  // const handleBlockPress = (id, data) => {
-  //   navigation.navigate("HistoryStack", { id, data }); 
-  // };
+  const handleBlockPress = (id, data) => {
+    navigation.navigate("HistoryStack", { id, data }); 
+  };
 
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/vaccination/1`);
-  //     const data = await response.json();
-  //     setitem(data.data.vaccinationItemList); 
-  //     console.log(item);
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //   }
-  // };
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/1`);
+      const data = await response.json();
+      setitem(data.data.completedReservationList);
+      setCnt(data.data.totalCnt);
+      console.log(item);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+  
   return (
     <View style={{ height: "100%", backgroundColor: "white" }}>
       <View style={styles.screenContainer}>
@@ -46,39 +47,29 @@ export default function MedicalHistory() {
             </View>
           ) : (
             <ScrollView style={styles.scrollView}>
-              {item.map((item) => (
-                <View key={item.vaccId} style={{ height: "100%", backgroundColor: "white" }}>
-                  <View style={styles.screenContainer}>
-                    <View style={styles.row}>
-                      <ScrollView style={styles.scrollView}>
-                        <View style={styles.hospitalBlock}>
-                          <View style={{ flex: 1 }}>
-                            <Text style={styles.timeText}>2024.06.03 오후 13:00</Text>
-                            <View style={styles.hospitalInfoContainer}>
-                              <View>
-                                <Text style={styles.hospitalName}>김OO 환자</Text>
-                                <Text style={[styles.hospitalInfo, { width: 240 }]}>최근 방문 이력 N회</Text>
-                              </View>
+                { item.map((item) => (
+                  <View key={item.noncontactDiagId} style={{ height: "100%", backgroundColor: "white" }}>
+                    <View style={styles.screenContainer}>
+                      <View style={styles.row}>
+                        <ScrollView style={styles.scrollView}>
+                          <View style={styles.hospitalBlock}>
+                            <View style={{ flex: 1 }}>
+                              <Text style={styles.timeText}>{item.reservationDate}</Text>
+                              <Text style={styles.hospitalName}>{item.patientName} 환자</Text>
                               <TouchableOpacity
-                                onPress={() => handleBlockPress(1, item)}
-                                activeOpacity={0.7}
-                              >
-                                <Icon name="chevron-right" size={24} color="#000" />
+                                style={styles.vaccinInfo}
+                                      onPress={() => handleBlockPress(1, item.noncontactDiagId)}
+                                      activeOpacity={0.7}
+                                    >
+                                      <Text style={styles.prescriptionText}>처방전 확인하기</Text>
                               </TouchableOpacity>
                             </View>
-                            <TouchableOpacity
-                              style={styles.prescriptionBlock}
-                              activeOpacity={0.7}
-                            >
-                              <Text style={styles.prescriptionText}>처방전 작성하기</Text>
-                            </TouchableOpacity>
                           </View>
-                        </View>
-                      </ScrollView>
+                        </ScrollView>
+                      </View>
                     </View>
                   </View>
-                </View>
-              ))}
+                ))}
             </ScrollView>
           )}
         </View>
@@ -138,7 +129,7 @@ const styles = StyleSheet.create({
   },
   hospitalBlock: {
     flexDirection: "row",
-    height: 180,
+    height: 140,
     backgroundColor: "white",
     padding: 20,
     borderBottomColor: "#D6D6D6",

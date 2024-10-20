@@ -50,7 +50,7 @@ const Email = ({ route, navigation }) => {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        "http://203.252.213.209:8080/api/v1/reservations/doctors/login/jwt",
+        "http://203.252.213.209:8080/api/v1/doctors/login/jwt",
         {
           username: username,
           password: password,
@@ -62,7 +62,6 @@ const Email = ({ route, navigation }) => {
 
       await AsyncStorage.setItem("jwtToken", token); // AsyncStorage에 토큰 저장
 
-      Alert.alert("Success", "Login successful");
 
       // 로그인 후 페이지 이동
       navigation.reset({
@@ -92,7 +91,6 @@ const Email = ({ route, navigation }) => {
       console.log("GET 요청 성공:", response.data);
       const userData = response.data;
       await AsyncStorage.setItem("userInfo", JSON.stringify(userData));
-      Alert.alert("Success", "Data fetched successfully");
     } catch (error) {
       console.error("GET 요청 실패:", error);
       Alert.alert("Error", "Failed to fetch data");

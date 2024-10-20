@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BottomTabNavigator from "./TabNavigator"; // Bottom Tab Navigator
 import OnboardingStack from "./OnboardingNavigation";
 import ReservationStack from "./ReservationNavigator";
+import HistoryStack from "./HistoryNavigator";
 
 {/* Patient Infomation Navigator list. . . */}
 import PatientInfoStack from "./PatientInfoNavigator";
@@ -34,6 +35,13 @@ export default function RootNavigator() {
       <RootStack.Screen
         name="ReservationStack"
         component={ReservationStack}
+        options={{
+          tabBarVisible: true, // Tab 바 표시
+        }}
+      />
+      <RootStack.Screen
+        name="HistoryStack"
+        component={HistoryStack}
         options={{
           tabBarVisible: true, // Tab 바 표시
         }}
