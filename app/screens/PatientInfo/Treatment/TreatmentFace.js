@@ -12,15 +12,19 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Prescription() {
   const navigation = useNavigation();
+  const { userId } = route.params;
+  console.log("userId", userId);
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
   const [date, setDate] = useState();
   const [time, setTime] = useState();
 
-  const handleBlockPress = (data) => {
-    navigation.navigate("TreatmentInfoStack", { id: 2, data }); // 대면 진료 상세페이지
+  // const handleBlockPress = (data) => {
+  //   navigation.navigate("TreatmentInfoStack", { id: 2, data }); // 대면 진료 상세페이지
+  // };
+  const handleLoad = (userId, data) => {
+    navigation.navigate("FaceDetails", { userId, data });
   };
-
   const getDayOfWeek = () => {
     const daysOfWeek = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
     const today = new Date();
@@ -29,7 +33,7 @@ export default function Prescription() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/diagnosis/1`);
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/diagnosis/${userId}`);
       const data = await response.json();
       setitem(data.data.contactDiagList.contactDiagItemList);
       setCnt(data.data.contactDiagList.totalCnt);
@@ -98,7 +102,7 @@ export default function Prescription() {
                           </View>
                         </View>
                         <TouchableOpacity
-                          onPress={() => handleBlockPress(item.diagId)}
+                           onPress={() => handleLoad(userId, item.diagId)}
                           activeOpacity={0.7}
                         >
                           <Icon name="chevron-right" size={24} color="#000" />

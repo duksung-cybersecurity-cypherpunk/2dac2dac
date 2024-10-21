@@ -9,18 +9,23 @@ import {
 import { useNavigation } from "@react-navigation/native";
 
 export default function ExaminationDetails({ route }) {
-  const { data } = route.params;
+  const { userId, data } = route.params;
+  console.log("userId", userId, data);
+
   const navigation = useNavigation();
   const [examInfo, setExamInfo] = useState([]);
   const [date, setDate] = useState('');
 
-  const handleBlockPress = (id, data) => {
-    navigation.navigate("ExaminationInfoStack", { id, data }); 
+  // const handleBlockPress = (id, data) => {
+  //   navigation.navigate("ExaminationInfoStack", { id, data }); 
+  // };
+  const handleLoad = (userId, data) => {
+    navigation.navigate("MeasurementDetails", { userId, data });
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/healthScreening/1/${data.hsId}`); 
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/healthScreening/${userId}/${data.hsId}`); 
       const Examination = await response.json();
       if (Examination.data) { 
         setExamInfo(Examination.data.healthScreeningInfo);
@@ -80,7 +85,7 @@ export default function ExaminationDetails({ route }) {
       </View>
       <TouchableOpacity 
         style={styles.button} 
-        onPress={() => handleBlockPress(2, data)}
+        onPress={() => handleLoad(userId, data)}
         activeOpacity={0.7}
       >
         <Text style={styles.buttonText}>상세 검진 결과 열람하기</Text>

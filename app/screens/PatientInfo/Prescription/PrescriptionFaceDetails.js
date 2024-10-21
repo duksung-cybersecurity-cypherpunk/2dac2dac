@@ -8,12 +8,13 @@ import {
 } from "react-native";
 
 export default function PrescriptionFaceDetails({ route }) {
-  const { data } = route.params;
+  const { userId, data } = route.params;
+  console.log("userId", userId, data);
   const [item, setItem] = useState([]);
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/prescription/1/${data.prescriptionId}`); 
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/prescription/${userId}/${data.prescriptionId}`); 
       const prescription = await response.json();
       if (prescription.data) {
         setItem(prescription.data.prescriptionDrugInfo.prescriptionDrugList); 

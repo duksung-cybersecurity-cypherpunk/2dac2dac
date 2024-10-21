@@ -73,18 +73,34 @@ export default function QRLoad({ route }) {
     },
   ];
 
-  const handleBlockPress = (id, data) => {
+  // const handleBlockPress = (id, data) => {
+  //   if (id === 1) {
+  //     navigation.navigate("PatientInfoStack", { id: 2, data });
+  //   }
+  //   if (id === 2) {
+  //     navigation.navigate("PatientInfoStack", { id: 3, data });
+  //   }
+  //   if (id === 3) {
+  //     navigation.navigate("PatientInfoStack", { id: 4, data });
+  //   }
+  //   if (id === 4) {
+  //     navigation.navigate("PatientInfoStack", { id: 5, data });
+  //   }
+  // };
+  const handleLoad = ( id ) => {
     if (id === 1) {
-      navigation.navigate("PatientInfoStack", { id: 2, data });
+      navigation.navigate("Treatment", { userId });
+      navigation.navigate("TreatmentFace", { userId });
+      navigation.navigate("TreatmentNonface", { userId });
     }
     if (id === 2) {
-      navigation.navigate("PatientInfoStack", { id: 3, data });
+      navigation.navigate("Prescription", { userId });
     }
     if (id === 3) {
-      navigation.navigate("PatientInfoStack", { id: 4, data });
+      navigation.navigate("Examination", { userId });
     }
     if (id === 4) {
-      navigation.navigate("PatientInfoStack", { id: 5, data });
+      navigation.navigate("Vaccination", { userId });
     }
   };
   
@@ -111,7 +127,7 @@ export default function QRLoad({ route }) {
                 <TouchableOpacity
                     key={blocks.id}
                     style={[styles.blocks]}
-                    onPress={() => handleBlockPress(blocks.id, userId)}
+                    onPress={() => handleLoad(blocks.id)}
                     activeOpacity={0.7}
                 >
                     <Image source={blocks.imageUrl} />
