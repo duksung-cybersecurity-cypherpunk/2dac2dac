@@ -12,13 +12,12 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
-
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MedicalHistory() {
-
   const navigation = useNavigation();
+  const [doctorInfo, setDoctorInfo] = useState(null);
   const [cnt, setCnt] = useState();
   const [item, setitem] = useState([]); //done
   const [schedule, setSchedule] = useState([]); //schedule
@@ -38,7 +37,12 @@ export default function MedicalHistory() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/reservations/1/today`);
+      const userInfo = await AsyncStorage.getItem("userInfo");
+      const userData = JSON.parse(userInfo);
+      //console.log("userId", userData, ReservationDate(selectedDate));
+      setDoctorInfo(userData.id);
+
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorInfo}/today`);
       const data = await response.json();
       setitem(data.data.completedReservationItemList);
       setSchedule(data.data.scheduledReservationItemList);

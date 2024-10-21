@@ -7,7 +7,8 @@ import {
 } from "react-native";
 
 export default function VaccinationDetails({ route }) {
-  const { data } = route.params;
+  const { userId, vaccId } = route.params;
+  console.log("userId", userId, vaccId);
   const [item, setItem] = useState([]);
   const [vaccInfo, setVaccInfo] = useState([]);
   const [date, setDate] = useState('');
@@ -20,7 +21,7 @@ export default function VaccinationDetails({ route }) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/vaccination/1/${data.vaccId}`); 
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/vaccination/${userId}/${vaccId}`); 
       const vaccination = await response.json();
       if (vaccination.data) { 
         setItem(vaccination.data.agencyInfo); 

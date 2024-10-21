@@ -21,6 +21,7 @@ const ReservationDetails = ({ route }) => {
     // QRLoad 스크린으로 doctorId와 reservationId 전달
     navigation.navigate("QRLoad", { doctorId, reservationId });
   };
+  
   useEffect(() => {
     const fetchReservationDetails = async () => {
       try {

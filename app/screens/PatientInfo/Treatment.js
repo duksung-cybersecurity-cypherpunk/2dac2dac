@@ -8,7 +8,9 @@ import FaceComponent from "../PatientInfo/Treatment/TreatmentFace";
 
 const Tab = createMaterialTopTabNavigator();
 
-export default function Treatment() {
+export default function Treatment({ route }) {
+  const { userId } = route.params;
+  console.log("userId", userId);
   return (
     <View style={styles.blocks}>
 

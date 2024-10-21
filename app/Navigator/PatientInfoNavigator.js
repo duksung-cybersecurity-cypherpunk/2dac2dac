@@ -23,6 +23,7 @@ export default function PatientInfoNavigator({ route }) {
                     options={{
                         headerTitle: "환자 정보",
                     }}
+                    initialParams={{ data }}
                 />
              ) : id === 2 ? (
                 <PatientInfoStack.Screen

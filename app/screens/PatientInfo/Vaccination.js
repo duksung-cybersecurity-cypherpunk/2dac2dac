@@ -10,8 +10,11 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function Vaccination() {
+export default function Vaccination({ route }) {
   const navigation = useNavigation();
+  
+  const { userId } = route.params;
+  console.log("userId", userId);
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
 
@@ -19,8 +22,12 @@ export default function Vaccination() {
     fetchData();
   }, []);
 
-  const handleBlockPress = (id, data) => {
-    navigation.navigate("VaccinationInfoStack", { id, data }); 
+  // const handleBlockPress = (id, data) => {
+  //   navigation.navigate("VaccinationInfoStack", { id, data }); 
+  // };
+
+  const handleLoad = (userId, vaccId) => {
+    navigation.navigate("VaccinationDetails", { userId, vaccId });
   };
 
   const getDayOfWeek = () => {
@@ -31,13 +38,11 @@ export default function Vaccination() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/vaccination/1`);
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/vaccination/${userId}`);
       const data = await response.json();
-      console.log(data);
       setitem(data.data.vaccinationItemList); 
-      console.log(item);
       setCnt(data.data.totalCnt);
-      console.log(cnt);
+
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -78,7 +83,7 @@ export default function Vaccination() {
                             </View>
                           </View>
                           <TouchableOpacity
-                            onPress={() => handleBlockPress(1, item)}
+                            onPress={() => handleLoad(userId, item)}
                             activeOpacity={0.7}
                           >
                             <Icon name="chevron-right" size={24} color="#000" />

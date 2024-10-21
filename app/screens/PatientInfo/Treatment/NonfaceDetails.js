@@ -12,7 +12,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function NonfaceDetails({ route }) {
   const navigation = useNavigation();
-  const { data } = route.params;
+  const { userId, data } = route.params;
+  console.log("userId", userId, data);
+
   const [item, setitem] = useState([]);
   const [diag, setDiag] = useState([]);
 
@@ -24,7 +26,7 @@ export default function NonfaceDetails({ route }) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/diagnosis/noncontact/1/${data}`);
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/diagnosis/noncontact/${userId}/${data}`);
       const diagdata = await response.json();
       setitem(diagdata.data.noncontactDoctorInfo);
       setDiag(diagdata.data.noncontactDiagDetailInfo);
