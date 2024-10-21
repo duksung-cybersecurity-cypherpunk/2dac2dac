@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,106 +6,126 @@ import {
   ScrollView,
   FlatList,
   StyleSheet,
+  Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import {
+  getCurrentWeekDays,
+  formatDate,
+  ReservationDate,
+} from "../Components/weeks";
 
-// Function to get the current week's weekday names
-const getCurrentWeekDays = () => {
-  const currentDate = new Date();
-  const currentDayIndex = currentDate.getDay(); // Get the current day index (0 for Sunday, 6 for Saturday)
-  const week = [];
-  const daysOfWeek = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-
-  for (let i = 0; i < 7; i++) {
-    const dayIndex = (currentDayIndex + i) % 7; // Ensure index stays within the 0-6 range
-    week.push({
-      name: daysOfWeek[dayIndex],
-      isToday: i === 0, // Mark today as true for the first day
-    });
-  }
-
-  return week;
-};
-
-const Reservation = () => {
-  const navigation = useNavigation(); // Access navigation
-
-  // Current Week Dates
+export default function Reservation() {
+  const navigation = useNavigation();
   const dates = getCurrentWeekDays();
   const [selectedDate, setSelectedDate] = useState(dates[0].name);
-
-  // Tabs: "요청된 예약" and "수락된 예약"
   const [selectedTab, setSelectedTab] = useState("요청된 예약");
+  const [reservations, setReservations] = useState({
+    pending: [],
+    accepted: [],
+  });
+  const [modalVisible, setModalVisible] = useState(false);
+  const [doctorId, setDoctorId] = useState(null);
+  const [selectedReservation, setSelectedReservation] = useState(null); // New state
 
-  // Sample reservations data
-  const pendingReservations = [
-    {
-      id: 1,
-      patientName: "김OO",
-      desiredTime: "20XX. 0X. XX 오전 00:00",
-      request: "예약한 시간보다 빠르게 진료 받고 싶어요.",
-    },
-    {
-      id: 2,
-      patientName: "OOO",
-      desiredTime: "20XX. 0X. XX 오전 00:00",
-      request: "예약한 시간보다 빠르게 진료 받고 싶어요.",
-    },
-  ];
+  const fetchReservations = async () => {
+    try {
+      const userInfo = await AsyncStorage.getItem("userInfo");
 
-  const acceptedReservations = [
-    {
-      id: 3,
-      patientName: "박OO",
-      desiredTime: "20XX. 0X. XX 오후 02:00",
-      request: "정해진 시간에 예약을 받고 싶어요.",
-    },
-  ];
+      const userData = JSON.parse(userInfo);
+      //console.log("userId", userData, ReservationDate(selectedDate));
+      setDoctorId(userData.id);
 
-  // Render reservation item
-  const renderReservation = ({ item }) => (
-    <View style={styles.reservationCard}>
-      <Text style={styles.timeText}>{item.desiredTime}</Text>
-      <Text style={styles.patientName}>환자 {item.patientName}</Text>
-      <Text style={styles.desiredTime}>희망 진료 시간: {item.desiredTime}</Text>
-      <View style={styles.requestRow}>
-        <Text>✔ {item.request}</Text>
+      const apiUrl = `http://203.252.213.209:8080/api/v1/reservations/${
+        userData.id
+      }/${ReservationDate(selectedDate)}`;
+      const response = await axios.get(apiUrl);
+
+      if (response.data.status === 200) {
+        const { requestReservationList, acceptedReservationList } =
+          response.data.data;
+        setReservations({
+          pending: requestReservationList.requestReservationItemList,
+          accepted: acceptedReservationList.acceptedReservationItemList,
+        });
+      } else {
+        console.error("Failed to fetch reservations:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching reservations:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchReservations();
+  }, [selectedDate]);
+
+  const renderReservation = ({ item }) => {
+    //console.log("Rendered Item:", item); // Check if item is passed correctly
+    const id = item.reservationId;
+    console.log("id", item, doctorId);
+    return (
+      <View style={styles.reservationCard}>
+        <Text style={styles.timeText}>{formatDate(item.reservationDate)}</Text>
+        <Text style={styles.patientName}>환자: {item.patientName}</Text>
+        <Text style={styles.desiredTime}>
+          희망 진료 시간: {formatDate(item.reservationDate)}
+        </Text>
+        <View style={styles.requestRow}>
+          <Text>✔ 예약 요청: {item.request}</Text>
+        </View>
+        {selectedTab === "요청된 예약" && (
+          <View style={styles.buttonsRow}>
+            <TouchableOpacity
+              style={styles.acceptButton}
+              onPress={() => {
+                setSelectedReservation(item);
+
+                navigation.navigate("Reject", {
+                  selectedReservation: item,
+                  doctorId: doctorId,
+                });
+              }}
+            >
+              <Text style={styles.acceptButtonText}>예약 거절하기</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.acceptButton}
+              onPress={() => {
+                setSelectedReservation(item);
+
+                navigation.navigate("Accept", {
+                  selectedReservation: item,
+                  doctorId: doctorId,
+                });
+              }}
+            >
+              <Text style={styles.acceptButtonText}>예약 수락하기</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        {selectedTab === "수락된 예약" && (
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedReservation(item); // Set the selected reservation
+              navigation.navigate("ReservationDetails", {
+                doctorId: doctorId,
+                reservationId: item.reservationId, // Pass the reservation ID
+              });
+            }}
+          >
+            <Text style={styles.viewDetailsText}>상세보기</Text>
+          </TouchableOpacity>
+        )}
       </View>
-      <View style={styles.buttonsRow}>
-        <TouchableOpacity style={styles.rejectButton}>
-          <Text style={styles.buttonText}>예약 거절</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.acceptButton}
-          onPress={() =>
-            navigation.navigate("ReservationStack", {
-              screen: "PatientInfo",
-              params: { patient: item },
-            })
-          }
-        >
-          <Text style={styles.buttonText2}>예약 수락</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
-      {/* Date Navigation */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.dateScroll}
-      >
+      <ScrollView horizontal style={styles.dateScroll}>
         {dates.map((date) => (
           <TouchableOpacity
             key={date.name}
@@ -118,18 +138,14 @@ const Reservation = () => {
             onPress={() => setSelectedDate(date.name)}
           >
             <Text
-              style={[
-                styles.dateText,
-                date.isToday ? styles.todayText : null, // Highlight today's date
-              ]}
+              style={[styles.dateText, date.isToday ? styles.todayText : null]}
             >
-              {date.name}
+              {date.name} {date.date}
             </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      {/* Tabs for "요청된 예약" and "수락된 예약" */}
       <View style={styles.tabHeader}>
         <TouchableOpacity
           style={[
@@ -151,121 +167,99 @@ const Reservation = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Reservation List */}
       <FlatList
         data={
           selectedTab === "요청된 예약"
-            ? pendingReservations
-            : acceptedReservations
+            ? reservations.pending
+            : reservations.accepted
         }
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.reservationId.toString()}
         renderItem={renderReservation}
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  dateScroll: {
-    marginBottom: 16,
   },
   dateBox: {
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 5,
     borderRadius: 8,
     marginRight: 8,
+    height: 100,
+    marginBottom: 15,
   },
   selectedDate: {
-    backgroundColor: "#4CAF50", // Green background
+    backgroundColor: "#5cb85c",
   },
   unselectedDate: {
-    backgroundColor: "#F0F0F0",
+    backgroundColor: "#f8f9fa",
   },
   dateText: {
-    fontSize: 16,
     color: "#000",
   },
   todayText: {
-    fontWeight: "bold", // Highlight today's date
-    color: "#FF0000", // Red color for today
+    fontWeight: "bold",
   },
   tabHeader: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
+    marginVertical: 10,
   },
   tab: {
-    paddingVertical: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    backgrounColor: "#fff",
   },
   selectedTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: "#4CAF50", // Green underline for selected tab
+    backgroundColor: "#5cb85c",
   },
-  tabText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-  },
+
   reservationCard: {
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
+    marginBottom: 10,
+    padding: 15,
     borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: "#fff",
+    borderWidth: 1, // Border width
+    borderColor: "black", // Border color
+    margin: 2,
   },
   timeText: {
-    fontSize: 14,
-    color: "#888",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   patientName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginVertical: 8,
+    fontSize: 14,
+    marginVertical: 5,
   },
   desiredTime: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 8,
+    fontSize: 14,
   },
   requestRow: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
+    justifyContent: "space-between",
+    marginVertical: 10,
   },
   buttonsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
   rejectButton: {
-    backgroundColor: "#fff",
-    borderColor: "#4CAF50",
-    borderWidth: 1,
-    padding: 12,
-    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    backgroundColor: "#dc3545",
+    borderRadius: 5,
   },
   acceptButton: {
-    backgroundColor: "#4CAF50",
-    padding: 12,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: "#4CAF50",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  buttonText2: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    backgroundColor: "#28a745",
+    borderRadius: 5,
   },
 });
 
-export default Reservation;
+// Styles unchanged...

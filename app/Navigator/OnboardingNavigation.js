@@ -19,7 +19,11 @@ export default function SearchNavigation() {
         component={OnboardingScreen}
         options={{ headerShown: false }}
       />
-      <OnboardingStack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+      <OnboardingStack.Screena
+        name="Login"
+        component={Login}
+        options={{ headerShown: false }}
+      />
       <OnboardingStack.Screen name="signUpForm1" component={signUpForm1} />
       <OnboardingStack.Screen name="signUpForm2" component={signUpForm2} />
       <OnboardingStack.Screen name="Email" component={Email} />

@@ -2,13 +2,13 @@ import React from "react";
 import { Image } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-{/* Screen list. . . */}
+{
+  /* Screen list. . . */
+}
 import Home from "../screens/Home";
 import Reservation from "../screens/Reservation";
 import MedicalHistory from "../screens/MedicalHistory";
 import MyPage from "../screens/MyPage";
-
-
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {

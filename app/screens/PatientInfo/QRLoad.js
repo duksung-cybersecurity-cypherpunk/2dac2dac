@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 export default function QRLoad({ route }) {
-    const { data } = route.params;
-    const navigation = useNavigation();
+  const navigation = useNavigation();
+  const { doctorId, reservationId } = route.params;
+  console.log("doctorId", doctorId, reservationId);
     const [item, setitem] = useState([]);
 
     const [userId, setUserId] = useState();
@@ -50,7 +51,7 @@ export default function QRLoad({ route }) {
       patientData();
     }, []);
 
-    const blocks = [
+  const blocks = [
     {
       id: 1,
       title: "진료 내역",
@@ -103,7 +104,7 @@ export default function QRLoad({ route }) {
       navigation.navigate("Vaccination", { userId });
     }
   };
-  
+
   return (
     <View style={styles.container}>
         <Text style={[styles.titleText, {marginTop: 20}]}>환자 정보를 확인해 주세요.</Text>
@@ -135,21 +136,21 @@ export default function QRLoad({ route }) {
                 </TouchableOpacity>
             ))}
 
-            <Text style={[styles.text, {marginTop: 50}]}> 
-                주의사항{"\n"}
-                - 열람 종료하기를 누른 이후 해당 기기로 불러온 환자 데이{"\n"}
-                터는 소실되며, 새로 갱신된 환자 QR 촬영을 통해 다시 불{"\n"}
-                러올 수 있습니다.
-            </Text>
+        <Text style={[styles.text, { marginTop: 50 }]}>
+          주의사항{"\n"}- 열람 종료하기를 누른 이후 해당 기기로 불러온 환자 데이
+          {"\n"}
+          터는 소실되며, 새로 갱신된 환자 QR 촬영을 통해 다시 불{"\n"}
+          러올 수 있습니다.
+        </Text>
 
-            <TouchableOpacity
-            style={[styles.bottomBlocks]}
-            onPress={() => navigation.navigate("PatientInfoStack", {id: null})}
-            activeOpacity={0.7}
-            >
-                <Text sytle={styles.textButton}> 열람 종료하기 </Text>
-            </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={[styles.bottomBlocks]}
+          onPress={() => navigation.navigate("PatientInfoStack", { id: null })}
+          activeOpacity={0.7}
+        >
+          <Text sytle={styles.textButton}> 열람 종료하기 </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  infoBlock: { 
+  infoBlock: {
     width: "90%",
     height: "12%",
     backgroundColor: "#F5F5F5",
@@ -183,8 +184,8 @@ const styles = StyleSheet.create({
   },
   blocks: {
     flexDirection: "row",
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     width: "98%",
     height: "10%",
     backgroundColor: "#EBF2EA",
@@ -192,8 +193,8 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   bottomBlocks: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     width: "98%",
     height: "8%",
     backgroundColor: "#76B947",

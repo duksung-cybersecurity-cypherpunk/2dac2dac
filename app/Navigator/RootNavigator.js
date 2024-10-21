@@ -4,15 +4,18 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // stack
 import BottomTabNavigator from "./TabNavigator"; // Bottom Tab Navigator
 import OnboardingStack from "./OnboardingNavigation";
-import ReservationStack from "./ReservationNavigator";
-import HistoryStack from "./HistoryNavigator";
-
-{/* Patient Infomation Navigator list. . . */}
+import AcceptPatientStack from "./AcceptPatientNavigator";
 import PatientInfoStack from "./PatientInfoNavigator";
 import TreatmentInfoStack from "./TreatmentNavigator";
 import VaccinationInfoStack from "./VaccinationNavigator";
 import PrescriptionInfoStack from "./PrescriptionNavigator";
 import ExaminationInfoStack from "./ExaminationNavigator";
+import HistoryStack from "./HistoryNavigator";
+
+// page
+import Accept from "../screens/Reservation/Accept";
+import Reject from "../screens/Reservation/Reject";
+import ReservationDetails from "../screens/Reservation/ReservationDetails";
 
 const RootStack = createNativeStackNavigator();
 
@@ -33,10 +36,23 @@ export default function RootNavigator() {
         component={BottomTabNavigator}
       />
       <RootStack.Screen
-        name="ReservationStack"
-        component={ReservationStack}
+        name="AcceptPatientStack"
+        component={AcceptPatientStack}
+      />
+      <RootStack.Screen name="Accept" component={Accept} />
+
+      <RootStack.Screen
+        name="Reject"
+        component={Reject}
         options={{
-          tabBarVisible: true, // Tab 바 표시
+          headerTitle: "예약 거절",
+        }}
+      />
+      <RootStack.Screen
+        name="ReservationDetails"
+        component={ReservationDetails}
+        options={{
+          headerTitle: "진료 내역",
         }}
       />
       <RootStack.Screen
@@ -46,6 +62,7 @@ export default function RootNavigator() {
           tabBarVisible: true, // Tab 바 표시
         }}
       />
+
       <RootStack.Screen
         name="PatientInfoStack"
         component={PatientInfoStack}
@@ -53,6 +70,7 @@ export default function RootNavigator() {
           tabBarVisible: true, // Tab 바 표시
         }}
       />
+
       <RootStack.Screen
         name="TreatmentInfoStack"
         component={TreatmentInfoStack}
@@ -80,7 +98,7 @@ export default function RootNavigator() {
         options={{
           tabBarVisible: true, // Tab 바 표시
         }}
-      />                  
+      />
     </RootStack.Navigator>
   );
 }

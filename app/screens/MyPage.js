@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,16 +10,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 
 export default function MyPage() {
-  const navigation = useNavigation();
-  const handleBlockPress = (id) => {
-      navigation.navigate("PatientInfoStack", { id });
-  };
-
   const [userInfo, setUserInfo] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const loadUserData = async () => {
       const storedUserInfo = await AsyncStorage.getItem("userInfo");
+      console.log("storedUserInfo", storedUserInfo);
       if (storedUserInfo) {
         setUserInfo(JSON.parse(storedUserInfo));
       }
@@ -55,15 +51,6 @@ export default function MyPage() {
       ) : (
         <Text>Loading user data...</Text>
       )}
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.blocks}
-          onPress={() => handleBlockPress(1)}
-          activeOpacity={0.7}
-        >
-          <Text>QR 스캔</Text>
-        </TouchableOpacity>
-      </View>
     </ScrollView>
   );
 }

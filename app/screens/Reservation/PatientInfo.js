@@ -10,7 +10,13 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-export function PatientInfo() {
+import {
+  getCurrentWeekDays,
+  formatDate,
+  ReservationDate,
+} from "../../Components/weeks";
+
+export function PatientInformation() {
   const [medicationChecked, setMedicationChecked] = useState(false);
   const [allergyChecked, setAllergyChecked] = useState(false);
   const [congenitalChecked, setCongenitalChecked] = useState(false);
