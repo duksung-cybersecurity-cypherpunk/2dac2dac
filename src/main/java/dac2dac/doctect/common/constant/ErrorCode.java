@@ -18,6 +18,7 @@ public enum ErrorCode {
     CANCELED_FORM_BAD_REQUEST(HttpStatus.BAD_REQUEST, "예약취소 상태의 비대면 진료 예약 신청서입니다."),
     INVALID_RESERVATION_STATUS(HttpStatus.BAD_REQUEST, "예약신청완료(SIGN_UP) 상태에서만 상태 변경이 가능합니다."),
     RESERVATION_NOT_STARTED(HttpStatus.BAD_REQUEST, "진료가 시작되지 않아 진료완료 처리할 수 없습니다."),
+    MYDATA_NOT_SYNCED(HttpStatus.BAD_REQUEST, "이전에 마이데이터를 연동한 기록이 없습니다."),
 
     /**
      * 401 Unauthorized
