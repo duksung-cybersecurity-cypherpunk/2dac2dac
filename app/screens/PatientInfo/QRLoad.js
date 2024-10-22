@@ -31,7 +31,6 @@ export default function QRLoad({ route }) {
     };
 
     useEffect(() => {
-      fetchData();
       patientData();
     }, []);
 
