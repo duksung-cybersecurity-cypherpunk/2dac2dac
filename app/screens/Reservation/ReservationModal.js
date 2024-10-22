@@ -4,7 +4,7 @@ import axios from "axios";
 import dayjs from 'dayjs';
 import { formatDate } from "../../Components/weeks";
 
-const ReservationModal = ({ selectedReservation, modalType, modalVisible, setModalVisible, doctorId }) => {
+const ReservationModal = ({ selectedReservation, modalType, modalVisible, setModalVisible, doctorId, fetchReservations }) => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [additionalReason, setAdditionalReason] = useState("");
 
@@ -16,6 +16,7 @@ const ReservationModal = ({ selectedReservation, modalType, modalVisible, setMod
       if (response.status === 200) {
         console.log("Reservation accepted successfully!");
         setModalVisible(false);
+        fetchReservations();
       } else {
         console.error("Failed to accept the reservation.");
       }
@@ -35,6 +36,7 @@ const ReservationModal = ({ selectedReservation, modalType, modalVisible, setMod
       if (response.status === 200) {
         console.log("Reservation rejected successfully!");
         setModalVisible(false);
+        fetchReservations();
       } else {
         console.error("Failed to reject the reservation.");
       }

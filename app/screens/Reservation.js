@@ -67,9 +67,10 @@ export default function Reservation() {
     const id = item.reservationId;
 
     return (
+    <ScrollView style={styles.scrollView}>
       <View key={id.toString()} style={styles.reservationCard}>
-        <Text style={styles.timeText}>{formatDate(item.reservationDate)}</Text>
-        <Text style={styles.patientName}>환자: {item.patientName}</Text>
+        <Text style={styles.timeText}>{dayjs(item.signupDate).format('YYYY.MM.DD HH:mm')}</Text>
+        <Text style={styles.patientName}>환자 {item.patientName}</Text>
         <Text style={styles.desiredTime}>
           희망 진료 시간: {dayjs(item.reservationDate).format('YYYY.MM.DD HH:mm')}
         </Text>
@@ -86,6 +87,7 @@ export default function Reservation() {
             >
               <Text style={styles.acceptButtonText}>예약 거절하기</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.acceptButton}
               onPress={() => {
@@ -113,6 +115,7 @@ export default function Reservation() {
           </TouchableOpacity>
         )}
       </View>
+    </ScrollView>
     );
   };
 
@@ -182,6 +185,7 @@ export default function Reservation() {
         modalType={modalType}
         selectedReservation={selectedReservation}
         doctorId={doctorId}
+        fetchReservations={fetchReservations}
       />
     </View>
   );
@@ -240,7 +244,6 @@ const styles = StyleSheet.create({
   },
 
   reservationCard: {
-    marginBottom: 10,
     padding: 15,
     borderRadius: 8,
     backgroundColor: "#fff",
@@ -248,6 +251,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc", // Border color
     margin: 2,
   },
+
   timeText: {
     fontSize: 11,
   },
@@ -304,22 +308,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 10,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    width: 300,
-    padding: 20,
-    backgroundColor: "white",
-    borderRadius: 10,
-  },
-  modalTitle: {
-    marginBottom: 15
-  },
-  modalButtonsRow: {},
-  modalButton: {},
-  modalButtonText: {}
 });
