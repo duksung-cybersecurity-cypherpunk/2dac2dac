@@ -218,15 +218,18 @@ public class HealthListService {
             .stream()
             .map(nc -> {
                 LocalDateTime diagDateTime = LocalDateTime.of(nc.getDiagDate(), nc.getDiagTime());
+                Doctor doctor = nc.getDoctor();
+                Hospital doctorHospital = doctor.getHospital();
+                
                 return NoncontactDiagItem.builder()
                     .diagId(nc.getId())
                     .diagDate(diagDateTime)
-                    .doctorName(nc.getDoctor().getName())
-                    .doctorHostpital(nc.getDoctor().getHospital().getName())
-                    .doctorThumnail(nc.getDoctor().getProfileImagePath())
-                    .doctorIsOpenNow(isAgencyOpenNow(nc.getDoctor().getDiagTime()))
-                    .doctorTodayOpenTime(findTodayOpenTime(nc.getDoctor().getDiagTime()))
-                    .doctorTodayCloseTime(findTodayCloseTime(nc.getDoctor().getDiagTime()))
+                    .doctorName(doctor.getName())
+                    .doctorHostpital(doctorHospital.getName())
+                    .doctorThumnail(doctor.getProfileImagePath())
+                    .doctorIsOpenNow(isAgencyOpenNow(doctorHospital.getDiagTime()))
+                    .doctorTodayOpenTime(findTodayOpenTime(doctorHospital.getDiagTime()))
+                    .doctorTodayCloseTime(findTodayCloseTime(doctorHospital.getDiagTime()))
                     .build();
             })
             .sorted(Comparator.comparing(NoncontactDiagItem::getDiagDate).reversed())
