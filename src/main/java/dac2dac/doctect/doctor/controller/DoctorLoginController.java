@@ -1,12 +1,12 @@
 package dac2dac.doctect.doctor.controller;
 
 import dac2dac.doctect.doctor.dto.CustomDoctorDetails;
-import dac2dac.doctect.doctor.dto.DoctorDTO;
+import dac2dac.doctect.doctor.dto.request.DoctorLoginRequestDto;
+import dac2dac.doctect.doctor.dto.request.DoctorRegisterRequestDto;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
 import dac2dac.doctect.doctor.service.DoctorLoginService;
 import dac2dac.doctect.user.controller.LoginController;
-import dac2dac.doctect.user.dto.UserDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public class DoctorLoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @PostMapping("/signup")
-    public ResponseEntity<String> registerDoctor(@RequestBody DoctorDTO doctorDTO) {
+    public ResponseEntity<String> registerDoctor(@RequestBody DoctorRegisterRequestDto doctorDTO) {
 
         // 이메일 중복 체크
         if (doctorRepository.findByEmail(doctorDTO.getEmail()) != null) {
@@ -48,7 +48,7 @@ public class DoctorLoginController {
 
 
     @PostMapping("/login/jwt")
-    public ResponseEntity<String> loginUser(@RequestBody UserDTO userDTO, HttpServletResponse response) {
+    public ResponseEntity<String> loginUser(@RequestBody DoctorLoginRequestDto userDTO, HttpServletResponse response) {
         try {
             String token = doctorService.authenticateAndGenerateToken(userDTO.getUsername(), userDTO.getPassword());
             response.addHeader("Authorization", "Bearer " + token);
@@ -68,10 +68,10 @@ public class DoctorLoginController {
             CustomDoctorDetails customDoctorDetails = (CustomDoctorDetails) authentication.getPrincipal();
 
             String name = customDoctorDetails.getUsername();
-            String email = customDoctorDetails.getEmail(); // CustomUserDetails에서 이메일 가져오기
+            String email = customDoctorDetails.getEmail();
             String oneLiner = customDoctorDetails.getOneLiner();
             String id = customDoctorDetails.getId();
-            System.out.println("정보 가져오기" + name + email + oneLiner+id);
+
             Map<String, String> response = new HashMap<>();
             response.put("username", name);
             response.put("email", email);
@@ -79,7 +79,6 @@ public class DoctorLoginController {
             response.put("oneLiner", oneLiner);
 
             return ResponseEntity.ok(response);
-
 
         } else {
             // 인증되지 않은 경우 오류 응답
