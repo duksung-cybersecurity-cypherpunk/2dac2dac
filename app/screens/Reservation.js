@@ -6,16 +6,17 @@ import {
   ScrollView,
   FlatList,
   StyleSheet,
-  Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import dayjs from 'dayjs';
 import {
   getCurrentWeekDays,
   formatDate,
   ReservationDate,
 } from "../Components/weeks";
+import ReservationModal from "./Reservation/ReservationModal";
 
 export default function Reservation() {
   const navigation = useNavigation();
@@ -27,16 +28,19 @@ export default function Reservation() {
     pending: [],
     accepted: [],
   });
-  const [modalVisible, setModalVisible] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState(""); // 모달 종류 (수락/거절)
   const [doctorId, setDoctorId] = useState(null);
-  const [selectedReservation, setSelectedReservation] = useState(null); // New state
+  const [selectedReservation, setSelectedReservation] = useState(null); // 선택된 예약 정보
+
+  useEffect(() => {
+    fetchReservations();
+  }, [selectedDate]);
 
   const fetchReservations = async () => {
     try {
       const userInfo = await AsyncStorage.getItem("userInfo");
-
       const userData = JSON.parse(userInfo);
-
       setDoctorId(userData.id);
 
       const apiUrl = `http://203.252.213.209:8080/api/v1/doctors/reservations/${
@@ -59,20 +63,15 @@ export default function Reservation() {
     }
   };
 
-  useEffect(() => {
-    fetchReservations();
-  }, [selectedDate]);
-
   const renderReservation = ({ item }) => {
-    //console.log("Rendered Item:", item); // Check if item is passed correctly
     const id = item.reservationId;
 
     return (
-      <View style={styles.reservationCard}>
+      <View key={id.toString()} style={styles.reservationCard}>
         <Text style={styles.timeText}>{formatDate(item.reservationDate)}</Text>
         <Text style={styles.patientName}>환자: {item.patientName}</Text>
         <Text style={styles.desiredTime}>
-          희망 진료 시간: {formatDate(item.reservationDate)}
+          희망 진료 시간: {dayjs(item.reservationDate).format('YYYY.MM.DD HH:mm')}
         </Text>
 
         {selectedTab === "요청된 예약" && (
@@ -81,11 +80,8 @@ export default function Reservation() {
               style={styles.rejectButton}
               onPress={() => {
                 setSelectedReservation(item);
-
-                navigation.navigate("Reject", {
-                  selectedReservation: item,
-                  doctorId: doctorId,
-                });
+                setModalType("reject"); // 거절 모달 설정
+                setModalVisible(true); // 모달 열기
               }}
             >
               <Text style={styles.acceptButtonText}>예약 거절하기</Text>
@@ -94,11 +90,8 @@ export default function Reservation() {
               style={styles.acceptButton}
               onPress={() => {
                 setSelectedReservation(item);
-
-                navigation.navigate("Accept", {
-                  selectedReservation: item,
-                  doctorId: doctorId,
-                });
+                setModalType("accept"); // 수락 모달 설정
+                setModalVisible(true); // 모달 열기
               }}
             >
               <Text style={styles.acceptButtonText}>예약 수락하기</Text>
@@ -181,6 +174,15 @@ export default function Reservation() {
         keyExtractor={(item) => item.reservationId.toString()}
         renderItem={renderReservation}
       />
+
+      {/* ReservationModal 호출 */}
+      <ReservationModal
+        modalVisible={isModalVisible}
+        setModalVisible={setModalVisible}
+        modalType={modalType}
+        selectedReservation={selectedReservation}
+        doctorId={doctorId}
+      />
     </View>
   );
 }
@@ -197,7 +199,6 @@ const styles = StyleSheet.create({
     height: 70,
     width: 70,
     marginBottom: 15,
-
     alignItems: "center",
   },
   selectedDate: {
@@ -216,7 +217,6 @@ const styles = StyleSheet.create({
   },
   dateText: {
     color: "#000",
-
     textAlign: "center",
   },
   todayText: {
@@ -304,6 +304,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 10,
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+  },
+  modalTitle: {
+    marginBottom: 15
+  },
+  modalButtonsRow: {},
+  modalButton: {},
+  modalButtonText: {}
 });
-
-// Styles unchanged...

@@ -4,7 +4,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // stack
 import BottomTabNavigator from "./TabNavigator"; // Bottom Tab Navigator
 import OnboardingStack from "./OnboardingNavigation";
-import AcceptPatientStack from "./AcceptPatientNavigator";
 import PatientInfoStack from "./PatientInfoNavigator";
 import TreatmentInfoStack from "./TreatmentNavigator";
 import VaccinationInfoStack from "./VaccinationNavigator";
@@ -13,8 +12,6 @@ import ExaminationInfoStack from "./ExaminationNavigator";
 import HistoryStack from "./HistoryNavigator";
 
 // page
-import Accept from "../screens/Reservation/Accept";
-import Reject from "../screens/Reservation/Reject";
 import ReservationDetails from "../screens/Reservation/ReservationDetails";
 
 const RootStack = createNativeStackNavigator();
@@ -35,19 +32,7 @@ export default function RootNavigator() {
         name="BottomTabNavigator"
         component={BottomTabNavigator}
       />
-      <RootStack.Screen
-        name="AcceptPatientStack"
-        component={AcceptPatientStack}
-      />
-      <RootStack.Screen name="Accept" component={Accept} />
 
-      <RootStack.Screen
-        name="Reject"
-        component={Reject}
-        options={{
-          headerTitle: "예약 거절",
-        }}
-      />
       <RootStack.Screen
         name="ReservationDetails"
         component={ReservationDetails}
@@ -55,6 +40,7 @@ export default function RootNavigator() {
           headerTitle: "진료 내역",
         }}
       />
+
       <RootStack.Screen
         name="HistoryStack"
         component={HistoryStack}
