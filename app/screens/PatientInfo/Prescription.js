@@ -10,18 +10,23 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function Prescription() {
+export default function Prescription({route}) {
   const navigation = useNavigation();
+  const { userId } = route.params;
+  console.log("userId", userId);
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
 
-  const handleBlockPress = (id, data) => {
-    navigation.navigate("PrescriptionInfoStack", { id, data }); // 투약 대면 상세페이지
+  // const handleBlockPress = (id, data) => {
+  //   navigation.navigate("PrescriptionInfoStack", { id, data }); // 투약 대면 상세페이지
+  // };
+  const handleLoad = (userId, data) => {
+    navigation.navigate("PrescriptionFaceDetails", { userId, data });
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/prescription/1`); 
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/prescription/${userId}`); 
       const data = await response.json();
       console.log(data);
       setitem(data.data.prescriptionItemList); 
@@ -70,7 +75,7 @@ export default function Prescription() {
                         </View>
                         <TouchableOpacity
                           style={{ paddingLeft: 110 }}
-                          onPress={() => handleBlockPress(1, item)}
+                          onPress={() => handleLoad(userId, item)}
                           activeOpacity={0.7}
                         > 
                           <Icon name="chevron-right" size={24} color="#000" />

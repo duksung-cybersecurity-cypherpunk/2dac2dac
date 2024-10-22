@@ -10,18 +10,24 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function Examination() {
+export default function Examination({route}) {
   const navigation = useNavigation();
+  const { userId } = route.params;
+  console.log("userId", userId);
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
 
-  const handleBlockPress = ( data ) => {
-    navigation.navigate("ExaminationInfoStack", { id: 1, data }); // 건강 검진 상세
+  // const handleBlockPress = ( data ) => {
+  //   navigation.navigate("ExaminationInfoStack", { id: 1, data }); // 건강 검진 상세
+  // };
+  const handleLoad = (userId, data) => {
+    navigation.navigate("ExaminationDetails", { userId, data });
   };
+
 
   const fetchData = async () => { 
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/healthScreening/1`);
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/healthScreening/${userId}`);
       const data = await response.json();
       console.log(data);
       setitem(data.data.healthScreeningItemList);
@@ -60,7 +66,7 @@ export default function Examination() {
                             </View>      
                             <TouchableOpacity
                               style={{ paddingLeft: 110 }}
-                              onPress={() => handleBlockPress(item)}
+                              onPress={() => handleLoad(userId, item)}
                               activeOpacity={0.7}
                             >
                               <Icon name="chevron-right" size={24} color="#000" />

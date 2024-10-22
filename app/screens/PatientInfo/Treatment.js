@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
 // page
@@ -8,10 +8,11 @@ import FaceComponent from "../PatientInfo/Treatment/TreatmentFace";
 
 const Tab = createMaterialTopTabNavigator();
 
-export default function Treatment() {
+export default function Treatment({ route }) {
+  const { userId } = route.params;
+  console.log("userId", userId);
   return (
     <View style={styles.blocks}>
-
       <Tab.Navigator
         initialRouteName="TreatmentDashboard"
         screenOptions={{
@@ -72,4 +73,3 @@ const styles = StyleSheet.create({
     fontFamily: "Arial",
   },
 });
-

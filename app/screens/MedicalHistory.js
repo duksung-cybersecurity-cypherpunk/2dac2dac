@@ -8,9 +8,11 @@ import {
   Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MedicalHistory() {
   const navigation = useNavigation();
+  const [doctorInfo, setDoctorInfo] = useState(null);
   const [cnt, setCnt] = useState();
   const [item, setitem] = useState([]); //done
 
@@ -24,7 +26,12 @@ export default function MedicalHistory() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/1`);
+      const userInfo = await AsyncStorage.getItem("userInfo");
+      const userData = JSON.parse(userInfo);
+      //console.log("userId", userData, ReservationDate(selectedDate));
+      setDoctorInfo(userData.id);
+
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`);
       const data = await response.json();
       setitem(data.data.completedReservationList);
       setCnt(data.data.totalCnt);

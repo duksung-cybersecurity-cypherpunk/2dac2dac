@@ -9,40 +9,46 @@ import {
 import { useNavigation } from "@react-navigation/native";
 
 export default function ExaminationDetails({ route }) {
-  const { data } = route.params;
+  const { userId, data } = route.params;
+  console.log("userId Exam", userId, data);
+
   const navigation = useNavigation();
   const [examInfo, setExamInfo] = useState([]);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState("");
 
-  const handleBlockPress = (id, data) => {
-    navigation.navigate("ExaminationInfoStack", { id, data }); 
+  // const handleBlockPress = (id, data) => {
+  //   navigation.navigate("ExaminationInfoStack", { id, data });
+  // };
+  const handleLoad = (userId, data) => {
+    navigation.navigate("MeasurementDetails", { userId, data });
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/healthScreening/1/${data.hsId}`); 
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/healthList/healthScreening/${userId}/${data.hsId}`
+      );
       const Examination = await response.json();
-      if (Examination.data) { 
+      if (Examination.data) {
         setExamInfo(Examination.data.healthScreeningInfo);
         if (data.diagDate) {
-          const datePart = data.diagDate.split('T')[0];
-          const modifiedDatePart = datePart.replace(/-/g, '. ');
+          const datePart = data.diagDate.split("T")[0];
+          const modifiedDatePart = datePart.replace(/-/g, ". ");
           setDate(modifiedDatePart);
         } else {
-          console.error('ExamDate is undefined');
+          console.error("ExamDate is undefined");
         }
       } else {
-        console.error('Examination data is undefined');
+        console.error("Examination data is undefined");
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
-  
+
   useEffect(() => {
     fetchData();
-  }, []); 
-
+  }, []);
 
   return (
     <View style={styles.screenContainer}>
@@ -78,9 +84,9 @@ export default function ExaminationDetails({ route }) {
           <Text>{examInfo.opinion}</Text>
         </ScrollView>
       </View>
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => handleBlockPress(2, data)}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => handleLoad(userId, data)}
         activeOpacity={0.7}
       >
         <Text style={styles.buttonText}>상세 검진 결과 열람하기</Text>
@@ -140,10 +146,10 @@ const styles = StyleSheet.create({
   },
   button: {
     height: "6%",
-    backgroundColor: '#9BD394',
+    backgroundColor: "#9BD394",
     borderRadius: 8,
     paddingTop: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
     marginLeft: 90,
     marginRight: 90,

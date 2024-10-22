@@ -7,7 +7,9 @@ import {
 } from "react-native";
 
 export default function FaceDetails({ route }) {
-  const { data } = route.params;
+  const { userId, data } = route.params;
+  console.log("userId", userId, data);
+
   const [agencyInfo, setAgencyInfo] = useState([]);
   const [diagInfo, setDiagInfo] = useState([]);
   
@@ -19,7 +21,7 @@ export default function FaceDetails({ route }) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/diagnosis/contact/1/${data}`); 
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/diagnosis/contact/${userId}/${data}`); 
       const treatment = await response.json();
       if (treatment.data) {
         setAgencyInfo(treatment.data.agencyInfo);

@@ -9,18 +9,26 @@ import {
 import { useNavigation } from "@react-navigation/native";
 
 export default function MeasurementDetails({ route }) {
-  const { data } = route.params;
+  const { userId, data } = route.params;
+  console.log("userId", userId, data);
   const navigation = useNavigation();
   const [item, setItem] = useState([]);
   const [date, setDate] = useState('');
 
-  const handleBlockPress = (id, data) => {
-    navigation.navigate("ExaminationInfoStack", { id, data }); 
+  // const handleBlockPress = (id, data) => {
+  //   navigation.navigate("ExaminationInfoStack", { id, data }); 
+  // };
+  const handleBlockPress = (userId, data) => {
+    navigation.navigate("ExaminationDetails", { userId, data }); 
+  };
+
+  const handleLoad = (userId, data) => {
+    navigation.navigate("BloodDetails", { userId, data });
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/healthScreening/1/${data.hsId}`); 
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/healthScreening/${userId}/${data.hsId}`); 
       const Measurement = await response.json();
       if (Measurement.data) { 
         setItem(Measurement.data.measurementTestInfo);
@@ -183,14 +191,14 @@ export default function MeasurementDetails({ route }) {
         <View style={styles.row}>
             <TouchableOpacity 
                 style={styles.buttonBack}
-                onPress={() => handleBlockPress(1, data)}
+                onPress={() => handleBlockPress(userId, data)}
                 activeOpacity={0.7}
             >
                 <Text style={styles.buttonText}>뒤로 가기</Text>
             </TouchableOpacity>
             <TouchableOpacity 
                 style={styles.button} 
-                onPress={() => handleBlockPress(3, data)}
+                onPress={() => handleLoad(userId, data)}
                 activeOpacity={0.7}
             >
                 <Text style={styles.buttonText}>혈액 검사 결과 보기</Text>

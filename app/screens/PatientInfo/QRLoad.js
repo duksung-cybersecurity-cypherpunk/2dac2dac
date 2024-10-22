@@ -6,8 +6,62 @@ import axios from "axios";
 export default function QRLoad({ route }) {
   const navigation = useNavigation();
   const { doctorId, reservationId } = route.params;
+
   const [reservationData, setReservationData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [item, setitem] = useState([]);
+
+  const [userId, setUserId] = useState();
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+  const fetchData = async () => {
+    try {
+      const userInfo = await AsyncStorage.getItem("userInfo");
+      const userData = JSON.parse(userInfo);
+      setDoctorInfo(userData.id);
+
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`
+      );
+      const data = await response.json();
+      setitem(data.data.completedReservationList);
+      setCnt(data.data.totalCnt);
+      console.log(item);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const patientData = async () => {
+    try {
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorId}/${reservationId}/patientInfo`
+      );
+      const patient = await response.json();
+      setUserId(patient.data.userId);
+      setName(patient.data.userName);
+      setAge(patient.data.age);
+      setGender(patient.data.gender);
+      setPhoneNumber(patient.data.phoneNumber);
+      console.log(userId);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    patientData();
+  }, []);
+  useEffect(() => {
+    setUserId(userId);
+  }, [userId]);
 
   const blocks = [
     {
@@ -32,23 +86,6 @@ export default function QRLoad({ route }) {
     },
   ];
 
-  useEffect(() => {
-    const fetchReservationDetails = async () => {
-      try {
-        const response = await axios.get(
-          `http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorId}/${reservationId}/patientInfo`
-        );
-        setReservationData(response.data.data);
-      } catch (error) {
-        console.error("Failed to fetch reservation details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReservationDetails();
-  }, [doctorId]);
-
   if (loading) {
     return (
       <View style={styles.container}>
@@ -57,18 +94,40 @@ export default function QRLoad({ route }) {
     );
   }
 
-  const handleBlockPress = (id) => {
+  const handleLoad = (id) => {
     if (id === 1) {
-      navigation.navigate("PatientInfoStack", { id: 2 });
+      navigation.navigate("TreatmentInfoStack", {
+        screen: "Treatment",
+        params: { userId: userId },
+      });
+      navigation.navigate("TreatmentInfoStack", {
+        screen: "TreatmentFace",
+        params: { userId: userId },
+      });
+      navigation.navigate("TreatmentInfoStack", {
+        screen: "TreatmentNonFace",
+        params: { userId: userId },
+      });
     }
     if (id === 2) {
-      navigation.navigate("PatientInfoStack", { id: 3 });
+      navigation.navigate("PrescriptionInfoStac", {
+        screen: "처방",
+        params: { userId: userId },
+      });
     }
     if (id === 3) {
-      navigation.navigate("PatientInfoStack", { id: 4 });
+      //ExaminationInfoStack
+      navigation.navigate("ExaminationInfoStack", {
+        screen: "건강검진",
+        params: { userId: userId },
+      });
     }
+    //PatientInfoStack Vaccination
     if (id === 4) {
-      navigation.navigate("PatientInfoStack", { id: 5 });
+      navigation.navigate("PatientInfoStack", {
+        screen: "예방 접종 내역",
+        params: { userId: userId },
+      });
     }
   };
 
@@ -79,29 +138,24 @@ export default function QRLoad({ route }) {
       </Text>
       <View style={styles.infoBlock}>
         <View style={styles.row}>
-          <Text style={styles.infoSubText}>
-            환자 명 : {reservationData.userName}
-          </Text>
+          <Text style={styles.infoSubText}>환자 명 {name}</Text>
           <Text style={styles.text}></Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.infoSubText}>나이 : {reservationData.age}</Text>
+          <Text style={styles.infoSubText}>나이 {age}</Text>
           <Text style={styles.text}></Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.infoSubText}>
-            성별 : {reservationData.gender}
-          </Text>
+          <Text style={styles.infoSubText}>성별 {gender}</Text>
           <Text style={styles.text}></Text>
         </View>
       </View>
-
       <View style={styles.listBlock}>
         {blocks.slice(0, 4).map((blocks) => (
           <TouchableOpacity
             key={blocks.id}
             style={[styles.blocks]}
-            onPress={() => handleBlockPress(blocks.id)}
+            onPress={() => handleLoad(blocks.id)}
             activeOpacity={0.7}
           >
             <Image source={blocks.imageUrl} />

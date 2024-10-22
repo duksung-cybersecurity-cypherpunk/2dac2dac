@@ -8,33 +8,47 @@ import {
   Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-export default function Prescription() {
+export default function Prescription({ route }) {
   const navigation = useNavigation();
+  const { userId } = route.params;
+  console.log("userId", userId, route.params);
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
   const [date, setDate] = useState();
   const [time, setTime] = useState();
 
-  const handleBlockPress = (data) => {
-    navigation.navigate("TreatmentInfoStack", { id: 2, data }); // 대면 진료 상세페이지
+  // const handleBlockPress = (data) => {
+  //   navigation.navigate("TreatmentInfoStack", { id: 2, data }); // 대면 진료 상세페이지
+  // };
+  const handleLoad = (userId, data) => {
+    navigation.navigate("FaceDetails", { userId, data });
   };
-
   const getDayOfWeek = () => {
-    const daysOfWeek = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    const daysOfWeek = [
+      "일요일",
+      "월요일",
+      "화요일",
+      "수요일",
+      "목요일",
+      "금요일",
+      "토요일",
+    ];
     const today = new Date();
     return daysOfWeek[today.getDay()];
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/diagnosis/1`);
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/healthList/diagnosis/${userId}`
+      );
       const data = await response.json();
       setitem(data.data.contactDiagList.contactDiagItemList);
       setCnt(data.data.contactDiagList.totalCnt);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -46,8 +60,8 @@ export default function Prescription() {
     if (item.length > 0) {
       item.forEach((item) => {
         if (item.diagDate) {
-          const [datePart, timePart] = item.diagDate.split('T');
-          const modifiedDatePart = datePart.replace(/-/g, '.');
+          const [datePart, timePart] = item.diagDate.split("T");
+          const modifiedDatePart = datePart.replace(/-/g, ".");
           setDate(modifiedDatePart);
 
           const [hour, minute, second] = timePart.split(":");
@@ -61,55 +75,84 @@ export default function Prescription() {
     <View style={[{ height: "100%" }, { backgroundColor: "white" }]}>
       <View style={styles.screenContainer}>
         <View style={styles.row}>
-          {
-            cnt === 0 ? (
-              <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}>
-                <Image source={require("../../../../assets/images/PatientInfo/ListNonExist.png")} />
-                <Text style={[styles.hospitalName, { paddingTop: 20 }, { paddingBottom: 10 }]}> 확인된 진료 내역이 없어요. </Text>
-                <Text> Doc'tech을 통해 대면 진료 내역도 관리해보세요. </Text>
-              </View>
-            ) : <ScrollView style={styles.scrollView}>
-              {
-                item.map((item) => (
-                  <View key={item.diagId} style={styles.hospitalBlock}>
-                    <View>
-                      <Text style={styles.timeText}>{date}{" "} {time}</Text>
-                      <View style={styles.hospitalInfoContainer}>
-                        <Image source={require("../../../../assets/images/hospital/hospital_all.png")} style={styles.hospitalImage} />
-                        <View style={styles.row}>
-                          <View style={[{ padding: 5 }]}>
-                            <Text style={styles.hospitalName}> {item.agencyName} </Text>
-                            <Text
-                              style={[styles.hospitalInfo, {width: 260}]}
-                              numberOfLines={1}
-                              ellipsizeMode="tail"
-                            >
-                              {item.agencyAddress}
+          {cnt === 0 ? (
+            <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}>
+              <Image
+                source={require("../../../../assets/images/PatientInfo/ListNonExist.png")}
+              />
+              <Text
+                style={[
+                  styles.hospitalName,
+                  { paddingTop: 20 },
+                  { paddingBottom: 10 },
+                ]}
+              >
+                {" "}
+                확인된 진료 내역이 없어요.{" "}
+              </Text>
+              <Text> Doc'tech을 통해 대면 진료 내역도 관리해보세요. </Text>
+            </View>
+          ) : (
+            <ScrollView style={styles.scrollView}>
+              {item.map((item) => (
+                <View key={item.diagId} style={styles.hospitalBlock}>
+                  <View>
+                    <Text style={styles.timeText}>
+                      {date} {time}
+                    </Text>
+                    <View style={styles.hospitalInfoContainer}>
+                      <Image
+                        source={require("../../../../assets/images/hospital/hospital_all.png")}
+                        style={styles.hospitalImage}
+                      />
+                      <View style={styles.row}>
+                        <View style={[{ padding: 5 }]}>
+                          <Text style={styles.hospitalName}>
+                            {" "}
+                            {item.agencyName}{" "}
+                          </Text>
+                          <Text
+                            style={[styles.hospitalInfo, { width: 260 }]}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {item.agencyAddress}
+                          </Text>
+                          <View
+                            style={[{ flexDirection: "row" }, { padding: 3 }]}
+                          >
+                            {item.agencyIsOpenNow === true ? (
+                              <Text style={[styles.text, { color: "#94C973" }]}>
+                                {" "}
+                                ㆍ영업 중 |{" "}
+                              </Text>
+                            ) : (
+                              <Text style={[styles.text, { color: "#D6D6D6" }]}>
+                                {" "}
+                                ㆍ영업 종료 |{" "}
+                              </Text>
+                            )}
+                            <Text style={[styles.text, { color: "#D6D6D6" }]}>
+                              {" "}
+                              {getDayOfWeek()} ({item.agencyTodayOpenTime}
+                              {" ~ "}
+                              {item.agencyTodayCloseTime}){" "}
                             </Text>
-                            <View style={[{ flexDirection: "row" }, { padding: 3 }]}>
-                              {
-                                item.agencyIsOpenNow === true ? (
-                                  <Text style={[styles.text, { color: "#94C973" }]}> ㆍ영업 중 | </Text>
-                                ) :
-                                  <Text style={[styles.text, { color: "#D6D6D6" }]}> ㆍ영업 종료 | </Text>
-                              }
-                              <Text style={[styles.text, { color: "#D6D6D6" }]}> {getDayOfWeek()} ({item.agencyTodayOpenTime}{" ~ "}{item.agencyTodayCloseTime}) </Text>
-                            </View>
                           </View>
                         </View>
-                        <TouchableOpacity
-                          onPress={() => handleBlockPress(item.diagId)}
-                          activeOpacity={0.7}
-                        >
-                          <Icon name="chevron-right" size={24} color="#000" />
-                        </TouchableOpacity>
                       </View>
+                      <TouchableOpacity
+                        onPress={() => handleLoad(userId, item.diagId)}
+                        activeOpacity={0.7}
+                      >
+                        <Icon name="chevron-right" size={24} color="#000" />
+                      </TouchableOpacity>
                     </View>
                   </View>
-                ))
-              }
+                </View>
+              ))}
             </ScrollView>
-          }
+          )}
         </View>
       </View>
     </View>
