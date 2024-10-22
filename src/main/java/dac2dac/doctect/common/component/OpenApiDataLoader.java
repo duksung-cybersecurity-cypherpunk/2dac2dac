@@ -34,20 +34,20 @@ public class OpenApiDataLoader implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        //saveAllPharmacyInfo();
-        //saveAllHospitalInfo();
+        saveAllPharmacyInfo();
+        saveAllHospitalInfo();
     }
 
     public void saveAllPharmacyInfo() throws ParseException {
         String pharmacyInfo = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(PHARMACY_ENDPOINT)
-                        .queryParam("serviceKey", PHARMACY_API_KEY)
-                        .queryParam("_type", "json")
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder
+                .path(PHARMACY_ENDPOINT)
+                .queryParam("serviceKey", PHARMACY_API_KEY)
+                .queryParam("_type", "json")
+                .build())
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
 
         JSONParser parser = new JSONParser();
         JSONObject jsonObject = (JSONObject) parser.parse(pharmacyInfo);
@@ -65,14 +65,14 @@ public class OpenApiDataLoader implements ApplicationRunner {
 
     public void saveAllHospitalInfo() throws ParseException {
         String hospitalInfo = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(HOSPITAL_ENDPOINT)
-                        .queryParam("serviceKey", HOSPITAL_API_KEY)
-                        .queryParam("_type", "json")
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder
+                .path(HOSPITAL_ENDPOINT)
+                .queryParam("serviceKey", HOSPITAL_API_KEY)
+                .queryParam("_type", "json")
+                .build())
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
 
         JSONParser parser = new JSONParser();
         JSONObject jsonObject = (JSONObject) parser.parse(hospitalInfo);

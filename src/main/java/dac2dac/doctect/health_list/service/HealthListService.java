@@ -20,6 +20,7 @@ import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
 import dac2dac.doctect.health_list.dto.request.VaccinationDto;
 import dac2dac.doctect.health_list.dto.response.HostpitalInfo;
 import dac2dac.doctect.health_list.dto.response.PharmacyInfo;
+import dac2dac.doctect.health_list.dto.response.UpdateMydataDto;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagDetailDto;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagItem;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagItemList;
@@ -96,7 +97,7 @@ public class HealthListService {
     private final PrescriptionDrugRepository prescriptionDrugRepository;
 
     @Transactional
-    public void syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
+    public UpdateMydataDto syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
@@ -107,6 +108,8 @@ public class HealthListService {
 
         // 유저 정보(이름, 주민등록번호)를 통해 마이데이터 DB의 유저 아이디 가져오기 (본인 인증)
         Long mydataUserId = authenticateUser(userAuthenticationDto.getName(), pin);
+
+        LocalDateTime updateTime = LocalDateTime.now();
 
         // 유저의 생년월일과 성별 저장
         user.setBirthDate(pinFront);
@@ -161,6 +164,10 @@ public class HealthListService {
         List<VaccinationDto> vaccinationData = mydataJdbcRepository.findVaccinationByUserId(mydataUserId);
         vaccinationData.forEach(vaccinationDto ->
             vaccinationRepository.save(vaccinationDto.toEntity(user)));
+
+        return UpdateMydataDto.builder()
+            .updateTime(updateTime)
+            .build();
     }
 
     public DiagnosisListDto getDiagnosisList(Long userId) {
@@ -628,5 +635,72 @@ public class HealthListService {
             default:
                 throw new IllegalArgumentException("유효하지 않은 성별 코드입니다: " + genderCode);
         }
+    }
+
+    @Transactional
+    public UpdateMydataDto updateMydata(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        // 유저 정보(이름, 주민등록번호)를 통해 마이데이터 DB의 유저 아이디 가져오기 (본인 인증)
+        Map<String, Object> mydataUser = mydataJdbcRepository
+            .findByName(user.getUsername())
+            .orElseThrow(() -> new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED));
+        Long mydataUserId = (Long) mydataUser.get("id");
+
+        LocalDateTime updateTime = LocalDateTime.now();
+
+        // 마이데이터 유저의 아이디를 이용하여 마이데이터 조회 후 Doc'tech 서버 DB에 저장한다.
+        //* 진료 내역
+        contactDiagRepository.deleteByUserId(userId);
+
+        List<DiagnosisDto> diagnosisData = mydataJdbcRepository.findDiagnosisByUserId(mydataUserId);
+        diagnosisData.forEach(diagnosisDto ->
+            contactDiagRepository.save(diagnosisDto.toEntity(user)));
+
+        //* 투악 내역
+        prescriptionRepository.deleteByUserId(userId);
+
+        List<PrescriptionDto> prescriptionData = mydataJdbcRepository.findPrescriptionByUserId(mydataUserId);
+        prescriptionData.forEach(prescriptionDto -> {
+            Prescription prescription = prescriptionDto.toEntity(user);
+
+            prescriptionDto.getDrugDtoList().forEach(drugDto -> {
+                PrescriptionDrug prescriptionDrug = drugDto.toEntity();
+                prescription.addPrescriptionDrug(prescriptionDrug);
+            });
+
+            prescriptionRepository.save(prescription);
+        });
+
+        //* 건강검진 내역
+        healthScreeningRepository.deleteByUserId(userId);
+
+        List<HealthScreeningDto> healthScreeningData = mydataJdbcRepository.findHealthScreeningByUserId(mydataUserId);
+        healthScreeningData.forEach(healthScreeningDto -> {
+            HealthScreening healthScreening = healthScreeningDto.toEntity(user);
+
+            MeasurementTest measurementTest = healthScreeningDto.getMeasurementTest().toEntity();
+            healthScreening.setMeasurementTest(measurementTest);
+
+            BloodTest bloodTest = healthScreeningDto.getBloodTest().toEntity();
+            healthScreening.setBloodTest(bloodTest);
+
+            OtherTest otherTest = healthScreeningDto.getOtherTest().toEntity();
+            healthScreening.setOtherTest(otherTest);
+
+            healthScreeningRepository.save(healthScreening);
+        });
+
+        //* 예방접종 내역
+        vaccinationRepository.deleteByUserId(userId);
+
+        List<VaccinationDto> vaccinationData = mydataJdbcRepository.findVaccinationByUserId(mydataUserId);
+        vaccinationData.forEach(vaccinationDto ->
+            vaccinationRepository.save(vaccinationDto.toEntity(user)));
+
+        return UpdateMydataDto.builder()
+            .updateTime(updateTime)
+            .build();
     }
 }

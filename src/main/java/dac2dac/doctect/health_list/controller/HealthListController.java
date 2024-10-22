@@ -26,8 +26,13 @@ public class HealthListController {
     @Operation(summary = "마이데이터 연동 API", description = "마이데이터 서버로부터 유저의 마이데이터를 연동한다.")
     @PostMapping("/sync/{userId}")
     public ApiResult syncMydata(@Valid @RequestBody UserAuthenticationDto userAuthenticationDto, @PathVariable Long userId) {
-        healthListService.syncMydata(userAuthenticationDto, userId);
-        return ApiResult.success(SuccessCode.SYNC_SUCCESS);
+        return ApiResult.success(SuccessCode.SYNC_SUCCESS, healthListService.syncMydata(userAuthenticationDto, userId));
+    }
+
+    @Operation(summary = "마이데이터 연동 업데이트 API", description = "마이데이터 서버로부터 유저의 마이데이터를 업데이트한다.")
+    @GetMapping("/update/{userId}")
+    public ApiResult syncMydata(@PathVariable Long userId) {
+        return ApiResult.success(SuccessCode.SYNC_SUCCESS, healthListService.updateMydata(userId));
     }
 
     @Operation(summary = "진료 내역(대면, 비대면) 조회 API", description = "유저의 진료 내역(대면, 비대면)을 조회한다.")
