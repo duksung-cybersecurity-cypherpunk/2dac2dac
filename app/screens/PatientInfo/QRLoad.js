@@ -14,18 +14,6 @@ export default function QRLoad({ route }) {
     const [gender, setGender] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
 
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorId}`);
-        const data = await response.json();
-        setitem(data.data.completedReservationList);
-        setCnt(data.data.totalCnt);
-        console.log(item);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
     const patientData = async () => {
       try {
         const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorId}/${reservationId}/patientInfo`);
@@ -70,21 +58,7 @@ export default function QRLoad({ route }) {
     },
   ];
 
-  // const handleBlockPress = (id, data) => {
-  //   if (id === 1) {
-  //     navigation.navigate("PatientInfoStack", { id: 2, data });
-  //   }
-  //   if (id === 2) {
-  //     navigation.navigate("PatientInfoStack", { id: 3, data });
-  //   }
-  //   if (id === 3) {
-  //     navigation.navigate("PatientInfoStack", { id: 4, data });
-  //   }
-  //   if (id === 4) {
-  //     navigation.navigate("PatientInfoStack", { id: 5, data });
-  //   }
-  // };
-  const handleLoad = ( id ) => {
+  const handleLoad = ( id, userId ) => {
     if (id === 1) {
       navigation.navigate("Treatment", { userId });
       navigation.navigate("TreatmentFace", { userId });
@@ -124,7 +98,7 @@ export default function QRLoad({ route }) {
                 <TouchableOpacity
                     key={blocks.id}
                     style={[styles.blocks]}
-                    onPress={() => handleLoad(blocks.id)}
+                    onPress={() => handleLoad(blocks.id, userId)}
                     activeOpacity={0.7}
                 >
                     <Image source={blocks.imageUrl} />
