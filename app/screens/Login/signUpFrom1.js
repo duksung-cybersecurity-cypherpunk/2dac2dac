@@ -98,7 +98,7 @@ const SignUpForm1 = () => {
       hospitalId,
       experience,
     };
-    console.log("Form data:", formData);
+
     navigation.navigate("signUpForm2", { formData });
   };
 

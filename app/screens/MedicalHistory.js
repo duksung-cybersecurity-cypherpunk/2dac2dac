@@ -21,7 +21,7 @@ export default function MedicalHistory() {
   }, []);
 
   const handleBlockPress = (id, data) => {
-    navigation.navigate("HistoryStack", { id, data }); 
+    navigation.navigate("HistoryStack", { id, data });
   };
 
   const fetchData = async () => {
@@ -31,52 +31,71 @@ export default function MedicalHistory() {
       //console.log("userId", userData, ReservationDate(selectedDate));
       setDoctorInfo(userData.id);
 
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`);
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`
+      );
       const data = await response.json();
       setitem(data.data.completedReservationList);
       setCnt(data.data.totalCnt);
-      console.log(item);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
-  
+
   return (
     <View style={{ height: "100%", backgroundColor: "white" }}>
       <View style={styles.screenContainer}>
         <View style={styles.row}>
           {cnt === 0 ? (
             <View style={{ alignItems: "center", paddingTop: 250 }}>
-              <Image source={require("../../assets/images/PatientInfo/ListNonExist.png")} />
-              <Text style={[styles.hospitalName, { paddingTop: 20, paddingBottom: 10 }]}>
+              <Image
+                source={require("../../assets/images/PatientInfo/ListNonExist.png")}
+              />
+              <Text
+                style={[
+                  styles.hospitalName,
+                  { paddingTop: 20, paddingBottom: 10 },
+                ]}
+              >
                 완료된 진료 내역이 없어요.
               </Text>
             </View>
           ) : (
             <ScrollView style={styles.scrollView}>
-                { item.map((item) => (
-                  <View key={item.noncontactDiagId} style={{ height: "100%", backgroundColor: "white" }}>
-                    <View style={styles.screenContainer}>
-                      <View style={styles.row}>
-                        <ScrollView style={styles.scrollView}>
-                          <View style={styles.hospitalBlock}>
-                            <View style={{ flex: 1 }}>
-                              <Text style={styles.timeText}>{item.reservationDate}</Text>
-                              <Text style={styles.hospitalName}>{item.patientName} 환자</Text>
-                              <TouchableOpacity
-                                style={styles.vaccinInfo}
-                                      onPress={() => handleBlockPress(1, item.noncontactDiagId)}
-                                      activeOpacity={0.7}
-                                    >
-                                      <Text style={styles.prescriptionText}>처방전 확인하기</Text>
-                              </TouchableOpacity>
-                            </View>
+              {item.map((item) => (
+                <View
+                  key={item.noncontactDiagId}
+                  style={{ height: "100%", backgroundColor: "white" }}
+                >
+                  <View style={styles.screenContainer}>
+                    <View style={styles.row}>
+                      <ScrollView style={styles.scrollView}>
+                        <View style={styles.hospitalBlock}>
+                          <View style={{ flex: 1 }}>
+                            <Text style={styles.timeText}>
+                              {item.reservationDate}
+                            </Text>
+                            <Text style={styles.hospitalName}>
+                              {item.patientName} 환자
+                            </Text>
+                            <TouchableOpacity
+                              style={styles.vaccinInfo}
+                              onPress={() =>
+                                handleBlockPress(1, item.noncontactDiagId)
+                              }
+                              activeOpacity={0.7}
+                            >
+                              <Text style={styles.prescriptionText}>
+                                처방전 확인하기
+                              </Text>
+                            </TouchableOpacity>
                           </View>
-                        </ScrollView>
-                      </View>
+                        </View>
+                      </ScrollView>
                     </View>
                   </View>
-                ))}
+                </View>
+              ))}
             </ScrollView>
           )}
         </View>

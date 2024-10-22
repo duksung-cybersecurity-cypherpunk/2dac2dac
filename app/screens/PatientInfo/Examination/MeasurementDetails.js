@@ -10,16 +10,16 @@ import { useNavigation } from "@react-navigation/native";
 
 export default function MeasurementDetails({ route }) {
   const { userId, data } = route.params;
-  console.log("userId", userId, data);
+
   const navigation = useNavigation();
   const [item, setItem] = useState([]);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState("");
 
   // const handleBlockPress = (id, data) => {
-  //   navigation.navigate("ExaminationInfoStack", { id, data }); 
+  //   navigation.navigate("ExaminationInfoStack", { id, data });
   // };
   const handleBlockPress = (userId, data) => {
-    navigation.navigate("ExaminationDetails", { userId, data }); 
+    navigation.navigate("ExaminationDetails", { userId, data });
   };
 
   const handleLoad = (userId, data) => {
@@ -28,29 +28,31 @@ export default function MeasurementDetails({ route }) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/healthScreening/${userId}/${data.hsId}`); 
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/healthList/healthScreening/${userId}/${data.hsId}`
+      );
       const Measurement = await response.json();
-      if (Measurement.data) { 
+      if (Measurement.data) {
         setItem(Measurement.data.measurementTestInfo);
-        console.log(item);
+
         if (data.diagDate) {
-          const datePart = data.diagDate.split('T')[0];
-          const modifiedDatePart = datePart.replace(/-/g, '. ');
+          const datePart = data.diagDate.split("T")[0];
+          const modifiedDatePart = datePart.replace(/-/g, ". ");
           setDate(modifiedDatePart);
         } else {
-          console.error('ExamDate is undefined');
+          console.error("ExamDate is undefined");
         }
       } else {
-        console.error('Measurement data is undefined');
+        console.error("Measurement data is undefined");
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
-  
+
   useEffect(() => {
     fetchData();
-  }, []); 
+  }, []);
 
   const calculatePosition = (waist) => {
     if (waist <= 50) {
@@ -91,120 +93,169 @@ export default function MeasurementDetails({ route }) {
       return 100; // 160 이상일 경우 고혈압 전 단계 바의 끝
     }
   };
-  
 
   return (
     <View style={styles.screenContainer}>
-        <View style={styles.hospitalBlock}>
-            <View style={{ flex: 1 }}>
-                <Text>{date}</Text>
-                <Text style={styles.hospitalName}>{data.doctorName} 의사</Text>
-                <Text style={styles.hospitalInfo}>{data.doctorHospital}</Text>
-            </View>
+      <View style={styles.hospitalBlock}>
+        <View style={{ flex: 1 }}>
+          <Text>{date}</Text>
+          <Text style={styles.hospitalName}>{data.doctorName} 의사</Text>
+          <Text style={styles.hospitalInfo}>{data.doctorHospital}</Text>
         </View>
-        <Text style={styles.titleText}>건강 검진 결과</Text>
-        <Text style={styles.subTitleText}>계측 검사</Text>
-          <ScrollView style={[{paddingLeft: 20, paddingRight: 20}]}>
-            <View style={styles.row}>
-                <Text>신장 (cm)</Text>
-                <Text>{item.height}</Text>
-            </View>
-            <View style={styles.row}>
-                <Text>체중 (kg)</Text>
-                <Text>{item.weight}</Text>
-            </View>
-            <View style={styles.scrollView}>
-              <Text>허리 둘레 (cm)</Text>
-              <Text style={[styles.valueBox, {width: "10%"}, {left: `${calculatePosition(item.waist)-4}%`}]}>{item.waist}</Text>
-              <Text style={[{left: `${calculatePosition(item.waist)}%`}]}>|</Text>
-              <View style={[{flexDirection: "row"}]}>
-                {/* 정상 구간 */}
-                <View style={styles.waistLeftBar}>
-                  <Text>정상</Text>
-                </View>
-                {/* 복부 비만 구간 */}
-                <View style={styles.waistRightBar}>
-                  <Text>복부 비만</Text>
-                </View>
-              </View>
-              <Text style={styles.waistmidValueText}>85</Text>
-            </View>
-            <View style={styles.scrollView}>
-              <Text>체질량 지수</Text>
-              <Text style={[styles.valueBox, {width: "13%"}, {left: `${calculateBmiPosition(item.bmi)-6}%`}]}>{item.bmi}</Text>
-              <Text style={{ left: `${calculateBmiPosition(item.bmi)}%` }}>|</Text>
-              <View style={[{flexDirection: "row"}]}>
-                {/* 저체중 구간 */}
-                <View style={styles.bmiBar1}>
-                  <Text>저체중</Text>
-                </View>
-                {/* 정상 구간 */}
-                <View style={[styles.bmiBar2, {backgroundColor: 'rgba(118, 185, 71, 0.5)'}]}>
-                  <Text>정상</Text>
-                </View>
-                {/* 과체중 구간 */}
-                <View style={[styles.bmiBar2, {backgroundColor: 'rgba(71, 116, 58, 0.5)'}]}>
-                  <Text>과체중</Text>
-                </View>
-                {/* 비만 구간 */}
-                <View style={styles.bmiBar3}>
-                  <Text>비만</Text>
-                </View>
-              </View>
-              <View style={[{flexDirection: "row"}]}>
-                <Text style={styles.bmiFirstValueText}>18.5</Text>
-                <Text style={styles.bmiMidValueText}>25.0</Text>
-                <Text style={styles.bmiFinValueText}>30.0</Text>
-              </View>
-            </View>
-            <View style={styles.row}>
-                <Text>시력</Text>
-                <Text>좌 {item.sightLeft} / 우 {item.sightRight}</Text>
-            </View>
-            <View style={styles.row}>
-                <Text>청력</Text>
-                <Text>좌 {item.hearingLeft} / 우 {item.hearingRight}</Text>
-            </View>
-            <View style={styles.scrollView}>
-              <Text>혈압 (mmHg)</Text>
-              <Text style={[styles.valueBox, {width: "18%"}, {left: `${calculateBloodPressurePosition(item.bloodPressureHigh)-8}%`}]}>{item.bloodPressureHigh}/{item.bloodPressureLow}</Text>
-              <Text style={{ left: `${calculateBloodPressurePosition(item.bloodPressureHigh)}%` }}>|</Text>
-              <View style={[{flexDirection: "row"}]}>
-                {/* 정상 구간 */}
-                <View style={styles.bloodbar1}>
-                  <Text>정상</Text>
-                </View>
-                {/* 고혈압 전 단계 구간 */}
-                <View style={styles.bloodbar2}>
-                  <Text>고혈압 전 단계</Text>
-                </View>
-                {/* 고혈압 의심 구간 */}
-                <View style={styles.bloodbar3}>
-                  <Text>고혈압 의심</Text>
-                </View>
-              </View>
-              <View style={[{flexDirection: "row"}]}>
-                <Text style={styles.bloodFirstValueText}> 120/80 </Text>
-                <Text style={styles.bloodFinValueText}> 140/90 </Text>
-              </View>
-            </View>
+      </View>
+      <Text style={styles.titleText}>건강 검진 결과</Text>
+      <Text style={styles.subTitleText}>계측 검사</Text>
+      <ScrollView style={[{ paddingLeft: 20, paddingRight: 20 }]}>
         <View style={styles.row}>
-            <TouchableOpacity 
-                style={styles.buttonBack}
-                onPress={() => handleBlockPress(userId, data)}
-                activeOpacity={0.7}
-            >
-                <Text style={styles.buttonText}>뒤로 가기</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-                style={styles.button} 
-                onPress={() => handleLoad(userId, data)}
-                activeOpacity={0.7}
-            >
-                <Text style={styles.buttonText}>혈액 검사 결과 보기</Text>
-            </TouchableOpacity>
+          <Text>신장 (cm)</Text>
+          <Text>{item.height}</Text>
         </View>
-        </ScrollView>
+        <View style={styles.row}>
+          <Text>체중 (kg)</Text>
+          <Text>{item.weight}</Text>
+        </View>
+        <View style={styles.scrollView}>
+          <Text>허리 둘레 (cm)</Text>
+          <Text
+            style={[
+              styles.valueBox,
+              { width: "10%" },
+              { left: `${calculatePosition(item.waist) - 4}%` },
+            ]}
+          >
+            {item.waist}
+          </Text>
+          <Text style={[{ left: `${calculatePosition(item.waist)}%` }]}>|</Text>
+          <View style={[{ flexDirection: "row" }]}>
+            {/* 정상 구간 */}
+            <View style={styles.waistLeftBar}>
+              <Text>정상</Text>
+            </View>
+            {/* 복부 비만 구간 */}
+            <View style={styles.waistRightBar}>
+              <Text>복부 비만</Text>
+            </View>
+          </View>
+          <Text style={styles.waistmidValueText}>85</Text>
+        </View>
+        <View style={styles.scrollView}>
+          <Text>체질량 지수</Text>
+          <Text
+            style={[
+              styles.valueBox,
+              { width: "13%" },
+              { left: `${calculateBmiPosition(item.bmi) - 6}%` },
+            ]}
+          >
+            {item.bmi}
+          </Text>
+          <Text style={{ left: `${calculateBmiPosition(item.bmi)}%` }}>|</Text>
+          <View style={[{ flexDirection: "row" }]}>
+            {/* 저체중 구간 */}
+            <View style={styles.bmiBar1}>
+              <Text>저체중</Text>
+            </View>
+            {/* 정상 구간 */}
+            <View
+              style={[
+                styles.bmiBar2,
+                { backgroundColor: "rgba(118, 185, 71, 0.5)" },
+              ]}
+            >
+              <Text>정상</Text>
+            </View>
+            {/* 과체중 구간 */}
+            <View
+              style={[
+                styles.bmiBar2,
+                { backgroundColor: "rgba(71, 116, 58, 0.5)" },
+              ]}
+            >
+              <Text>과체중</Text>
+            </View>
+            {/* 비만 구간 */}
+            <View style={styles.bmiBar3}>
+              <Text>비만</Text>
+            </View>
+          </View>
+          <View style={[{ flexDirection: "row" }]}>
+            <Text style={styles.bmiFirstValueText}>18.5</Text>
+            <Text style={styles.bmiMidValueText}>25.0</Text>
+            <Text style={styles.bmiFinValueText}>30.0</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <Text>시력</Text>
+          <Text>
+            좌 {item.sightLeft} / 우 {item.sightRight}
+          </Text>
+        </View>
+        <View style={styles.row}>
+          <Text>청력</Text>
+          <Text>
+            좌 {item.hearingLeft} / 우 {item.hearingRight}
+          </Text>
+        </View>
+        <View style={styles.scrollView}>
+          <Text>혈압 (mmHg)</Text>
+          <Text
+            style={[
+              styles.valueBox,
+              { width: "18%" },
+              {
+                left: `${
+                  calculateBloodPressurePosition(item.bloodPressureHigh) - 8
+                }%`,
+              },
+            ]}
+          >
+            {item.bloodPressureHigh}/{item.bloodPressureLow}
+          </Text>
+          <Text
+            style={{
+              left: `${calculateBloodPressurePosition(
+                item.bloodPressureHigh
+              )}%`,
+            }}
+          >
+            |
+          </Text>
+          <View style={[{ flexDirection: "row" }]}>
+            {/* 정상 구간 */}
+            <View style={styles.bloodbar1}>
+              <Text>정상</Text>
+            </View>
+            {/* 고혈압 전 단계 구간 */}
+            <View style={styles.bloodbar2}>
+              <Text>고혈압 전 단계</Text>
+            </View>
+            {/* 고혈압 의심 구간 */}
+            <View style={styles.bloodbar3}>
+              <Text>고혈압 의심</Text>
+            </View>
+          </View>
+          <View style={[{ flexDirection: "row" }]}>
+            <Text style={styles.bloodFirstValueText}> 120/80 </Text>
+            <Text style={styles.bloodFinValueText}> 140/90 </Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <TouchableOpacity
+            style={styles.buttonBack}
+            onPress={() => handleBlockPress(userId, data)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.buttonText}>뒤로 가기</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleLoad(userId, data)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.buttonText}>혈액 검사 결과 보기</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -266,104 +317,104 @@ const styles = StyleSheet.create({
   },
 
   waistLeftBar: {
-    alignItems: 'center',
+    alignItems: "center",
     justifyContent: "center",
-    width: '50%',
+    width: "50%",
     height: 30,
-    backgroundColor: 'rgba(118, 185, 71, 0.5)',
+    backgroundColor: "rgba(118, 185, 71, 0.5)",
     borderTopLeftRadius: 6,
     borderBottomLeftRadius: 6,
   },
   waistRightBar: {
-    alignItems: 'center',
+    alignItems: "center",
     justifyContent: "center",
-    width: '50%',
+    width: "50%",
     height: 30,
-    backgroundColor: 'rgba(82, 82, 82, 0.5)',
+    backgroundColor: "rgba(82, 82, 82, 0.5)",
     borderTopRightRadius: 6,
     borderBottomRightRadius: 6,
   },
   waistmidValueText: {
-    left: '48%',
+    left: "48%",
     marginTop: 5,
     marginBottom: 20,
   },
   bmiBar1: {
-    alignItems: 'center',
-    justifyContent: "center", 
-    width: '25%',
+    alignItems: "center",
+    justifyContent: "center",
+    width: "25%",
     height: 30,
-    backgroundColor: 'rgba(155, 211, 148, 0.5)',
+    backgroundColor: "rgba(155, 211, 148, 0.5)",
     borderTopLeftRadius: 6,
     borderBottomLeftRadius: 6,
   },
   bmiBar2: {
-    alignItems: 'center',
+    alignItems: "center",
     justifyContent: "center",
-    width: '25%',
+    width: "25%",
     height: 30,
   },
   bmiBar3: {
-    alignItems: 'center',
+    alignItems: "center",
     justifyContent: "center",
-    width: '25%',
+    width: "25%",
     height: 30,
-    backgroundColor: 'rgba(82, 82, 82, 0.5)',
+    backgroundColor: "rgba(82, 82, 82, 0.5)",
     borderTopRightRadius: 6,
     borderBottomRightRadius: 6,
   },
   bmiFirstValueText: {
-    left: '180%',
+    left: "180%",
     marginTop: 5,
     marginBottom: 20,
   },
   bmiMidValueText: {
-    left: '320%',
+    left: "320%",
     marginTop: 5,
     marginBottom: 20,
   },
   bmiFinValueText: {
-    left: '480%',
+    left: "480%",
     marginTop: 5,
     marginBottom: 20,
   },
   bloodbar1: {
-    alignItems: 'center',
-    justifyContent: "center", 
-    width: '33.3%',
+    alignItems: "center",
+    justifyContent: "center",
+    width: "33.3%",
     height: 30,
-    backgroundColor: 'rgba(155, 211, 148, 0.5)',
+    backgroundColor: "rgba(155, 211, 148, 0.5)",
     borderTopLeftRadius: 6,
     borderBottomLeftRadius: 6,
   },
   bloodbar2: {
-    alignItems: 'center',
+    alignItems: "center",
     justifyContent: "center",
-    width: '33.3%',
+    width: "33.3%",
     height: 30,
-    backgroundColor: 'rgba(71, 116, 58, 0.5)',
+    backgroundColor: "rgba(71, 116, 58, 0.5)",
   },
   bloodbar3: {
-    alignItems: 'center',
+    alignItems: "center",
     justifyContent: "center",
-    width: '33.3%',
+    width: "33.3%",
     height: 30,
-    backgroundColor: 'rgba(82, 82, 82, 0.5)',
+    backgroundColor: "rgba(82, 82, 82, 0.5)",
     borderTopRightRadius: 6,
     borderBottomRightRadius: 6,
   },
   bloodFirstValueText: {
-    left: '220%',
+    left: "220%",
     marginTop: 5,
     marginBottom: 20,
   },
   bloodFinValueText: {
-    left: '380%',
+    left: "380%",
     marginTop: 5,
     marginBottom: 20,
   },
   valueBox: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     borderRadius: 8,
     paddingLeft: 10,
     marginTop: 10,
@@ -371,21 +422,21 @@ const styles = StyleSheet.create({
   buttonBack: {
     width: "30%",
     height: "60%",
-    borderColor: '#9BD394',
+    borderColor: "#9BD394",
     borderWidth: 2,
     borderRadius: 8,
     paddingTop: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
     marginLeft: 20,
   },
   button: {
     width: "55%",
     height: "60%",
-    backgroundColor: '#9BD394',
+    backgroundColor: "#9BD394",
     borderRadius: 8,
     paddingTop: 10,
-    alignItems: 'center',
+    alignItems: "center",
     margin: 20,
   },
   buttonText: {

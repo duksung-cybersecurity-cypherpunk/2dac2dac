@@ -87,11 +87,9 @@ const Email = ({ route, navigation }) => {
         }
       );
 
-      console.log("GET 요청 성공:", response.data);
       const userData = response.data;
 
       await AsyncStorage.setItem("userInfo", JSON.stringify(userData));
-      console.log("userData", userData);
     } catch (error) {
       console.error("GET 요청 실패:", error);
       Alert.alert("Error", "Failed to fetch data");

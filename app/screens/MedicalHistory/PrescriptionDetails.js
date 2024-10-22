@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function PrescriptionDetails({ route }) {
@@ -20,9 +15,11 @@ export default function PrescriptionDetails({ route }) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/prescription/${data}`);
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/prescription/${data}`
+      );
       const itemdata = await response.json();
-      console.log(itemdata);
+
       setName(itemdata.data.patientName);
       setDrug(itemdata.data.isPrescribedDrug);
       setSymptom(itemdata.data.isAllergicSymptom);
@@ -31,7 +28,7 @@ export default function PrescriptionDetails({ route }) {
       setType(itemdata.data.paymentType);
       setDate(itemdata.data.paymentAcceptedDate);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -41,73 +38,98 @@ export default function PrescriptionDetails({ route }) {
 
   return (
     <View style={styles.screenContainer}>
-      <ScrollView style={styles.scrollView}> 
-        <View style={[{padding: 20}]}>
-          <View style={[styles.doctorInfoContainer, {paddingBottom: 15}]}>
-            <View style={[{padding: 10}]}>
+      <ScrollView style={styles.scrollView}>
+        <View style={[{ padding: 20 }]}>
+          <View style={[styles.doctorInfoContainer, { paddingBottom: 15 }]}>
+            <View style={[{ padding: 10 }]}>
               <Text style={styles.doctorName}> {name} 환자 </Text>
-              <View style={[{padding: 3}]}></View>
-            </View>    
+              <View style={[{ padding: 3 }]}></View>
+            </View>
           </View>
           <Text style={styles.titleText}>진료 세부 정보</Text>
-          <View style={[styles.row, {paddingTop: 20}]}>
-            <Text>진료 형태</Text>          
+          <View style={[styles.row, { paddingTop: 20 }]}>
+            <Text>진료 형태</Text>
             <Text>일반 외래</Text>
           </View>
           <Text style={styles.titleText}>증상</Text>
-          <View style={[styles.row, {paddingTop: 20}]}>
+          <View style={[styles.row, { paddingTop: 20 }]}>
             <Text style={styles.text}> 복용 중인 약 유무 </Text>
-            {
-              drug === true ? (
-                <Icon name="check" size={24} color="#76B947" style={[{marginLeft: 100}]} />
-              ) :
-                <Icon name="check" size={24} color="#D6D6D6" style={[{marginLeft: 100}]} />
-            }
+            {drug === true ? (
+              <Icon
+                name="check"
+                size={24}
+                color="#76B947"
+                style={[{ marginLeft: 100 }]}
+              />
+            ) : (
+              <Icon
+                name="check"
+                size={24}
+                color="#D6D6D6"
+                style={[{ marginLeft: 100 }]}
+              />
+            )}
           </View>
-          <View style={[styles.row, {paddingTop: 5}]}>
+          <View style={[styles.row, { paddingTop: 5 }]}>
             <Text style={styles.text}> 알레르기 유무 </Text>
-            {
-              symptom === true ? (
-                <Icon name="check" size={24} color="#76B947" style={[{marginLeft: 100}]} />
-              ) :
-                <Icon name="check" size={24} color="#D6D6D6" style={[{marginLeft: 100}]} />
-            }
+            {symptom === true ? (
+              <Icon
+                name="check"
+                size={24}
+                color="#76B947"
+                style={[{ marginLeft: 100 }]}
+              />
+            ) : (
+              <Icon
+                name="check"
+                size={24}
+                color="#D6D6D6"
+                style={[{ marginLeft: 100 }]}
+              />
+            )}
           </View>
-          <View style={[styles.row, {paddingTop: 5}]}>
+          <View style={[styles.row, { paddingTop: 5 }]}>
             <Text style={styles.text}> 선천적인 질환 유무 </Text>
-            {
-              disease === true ? (
-                <Icon name="check" size={24} color="#76B947" style={[{marginLeft: 100}]} />
-              ) :
-                <Icon name="check" size={24} color="#D6D6D6" style={[{marginLeft: 100}]} />
-            }
+            {disease === true ? (
+              <Icon
+                name="check"
+                size={24}
+                color="#76B947"
+                style={[{ marginLeft: 100 }]}
+              />
+            ) : (
+              <Icon
+                name="check"
+                size={24}
+                color="#D6D6D6"
+                style={[{ marginLeft: 100 }]}
+              />
+            )}
           </View>
           <Text style={styles.titleText}>결제 정보</Text>
-          <View style={[styles.row, {paddingTop: 20}]}>
-            <Text> 진찰료 </Text>                 
+          <View style={[styles.row, { paddingTop: 20 }]}>
+            <Text> 진찰료 </Text>
             <Text> {price}원 </Text>
           </View>
-          <View style={[styles.row, {paddingTop: 5}]}>
-            <Text> 결제 방법 </Text>          
+          <View style={[styles.row, { paddingTop: 5 }]}>
+            <Text> 결제 방법 </Text>
             <Text> {paymentType} </Text>
           </View>
-          <View style={[styles.row, {paddingTop: 5}]}>
-            <Text> 승인 일시 </Text>          
+          <View style={[styles.row, { paddingTop: 5 }]}>
+            <Text> 승인 일시 </Text>
             <Text> {date} </Text>
           </View>
-
         </View>
       </ScrollView>
     </View>
-    
   );
 }
 
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "white",
   },
   row: {
@@ -120,8 +142,8 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   countBlock: {
-    flexDirection: "row", 
-    justifyContent: "space-between", 
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingTop: 30,
     paddingLeft: 50,
     paddingRight: 50,
@@ -130,13 +152,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "98%",
     height: "20%",
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#EBF2EA",
   },
   blockTop: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     width: "32%",
     height: 35,
     borderTopLeftRadius: 5,
@@ -144,8 +166,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#9BD394",
   },
   blockBottom: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     width: "32%",
     height: 35,
     borderBottomLeftRadius: 5,
@@ -153,13 +175,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#EBF2EA",
   },
   symptomBlock: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     height: 32,
     borderRadius: 5,
     backgroundColor: "#CFECD9",
   },
-  button: { 
+  button: {
     width: "60%",
     justifyContent: "center",
     alignItems: "center",

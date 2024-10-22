@@ -6,17 +6,13 @@ import axios from "axios";
 export default function QRLoad({ route }) {
   const navigation = useNavigation();
   const { doctorId, reservationId } = route.params;
-
-  const [reservationData, setReservationData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const [item, setitem] = useState([]);
-
   const [userId, setUserId] = useState();
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
 
   const fetchData = async () => {
     try {
@@ -30,7 +26,6 @@ export default function QRLoad({ route }) {
       const data = await response.json();
       setitem(data.data.completedReservationList);
       setCnt(data.data.totalCnt);
-      console.log(item);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -47,7 +42,6 @@ export default function QRLoad({ route }) {
       setAge(patient.data.age);
       setGender(patient.data.gender);
       setPhoneNumber(patient.data.phoneNumber);
-      console.log(userId);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -94,23 +88,16 @@ export default function QRLoad({ route }) {
     );
   }
 
-  const handleLoad = (id) => {
+  const handleLoad = (id, userId) => {
     if (id === 1) {
       navigation.navigate("TreatmentInfoStack", {
         screen: "Treatment",
-        params: { userId: userId },
-      });
-      navigation.navigate("TreatmentInfoStack", {
-        screen: "TreatmentFace",
-        params: { userId: userId },
-      });
-      navigation.navigate("TreatmentInfoStack", {
-        screen: "TreatmentNonFace",
+        id: 5,
         params: { userId: userId },
       });
     }
     if (id === 2) {
-      navigation.navigate("PrescriptionInfoStac", {
+      navigation.navigate("PrescriptionInfoStack", {
         screen: "처방",
         params: { userId: userId },
       });
@@ -119,6 +106,7 @@ export default function QRLoad({ route }) {
       //ExaminationInfoStack
       navigation.navigate("ExaminationInfoStack", {
         screen: "건강검진",
+        id: 5,
         params: { userId: userId },
       });
     }
@@ -126,6 +114,7 @@ export default function QRLoad({ route }) {
     if (id === 4) {
       navigation.navigate("PatientInfoStack", {
         screen: "예방 접종 내역",
+        id: 5,
         params: { userId: userId },
       });
     }
@@ -155,7 +144,7 @@ export default function QRLoad({ route }) {
           <TouchableOpacity
             key={blocks.id}
             style={[styles.blocks]}
-            onPress={() => handleLoad(blocks.id)}
+            onPress={() => handleLoad(blocks.id, userId)}
             activeOpacity={0.7}
           >
             <Image source={blocks.imageUrl} />

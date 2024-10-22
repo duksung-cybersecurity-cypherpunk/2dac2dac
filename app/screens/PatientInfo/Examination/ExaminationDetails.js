@@ -10,7 +10,6 @@ import { useNavigation } from "@react-navigation/native";
 
 export default function ExaminationDetails({ route }) {
   const { userId, data } = route.params;
-  console.log("userId Exam", userId, data);
 
   const navigation = useNavigation();
   const [examInfo, setExamInfo] = useState([]);

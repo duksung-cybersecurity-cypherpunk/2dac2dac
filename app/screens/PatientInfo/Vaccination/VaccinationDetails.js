@@ -1,49 +1,55 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 
 export default function VaccinationDetails({ route }) {
   const { userId, vaccId } = route.params;
-  console.log("userId", userId, vaccId);
+
   const [item, setItem] = useState([]);
   const [vaccInfo, setVaccInfo] = useState([]);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState("");
 
   const getDayOfWeek = () => {
-    const daysOfWeek = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    const daysOfWeek = [
+      "일요일",
+      "월요일",
+      "화요일",
+      "수요일",
+      "목요일",
+      "금요일",
+      "토요일",
+    ];
     const today = new Date();
     return daysOfWeek[today.getDay()];
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/vaccination/${userId}/${vaccId}`); 
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/healthList/vaccination/${userId}/${vaccId}`
+      );
       const vaccination = await response.json();
-      if (vaccination.data) { 
-        setItem(vaccination.data.agencyInfo); 
+      if (vaccination.data) {
+        setItem(vaccination.data.agencyInfo);
         setVaccInfo(vaccination.data.vaccinationDetailInfo);
         if (vaccination.data.vaccinationDetailInfo.vaccDate) {
-          const datePart = vaccination.data.vaccinationDetailInfo.vaccDate.split('T')[0];
-          const modifiedDatePart = datePart.replace(/-/g, '. ');
+          const datePart =
+            vaccination.data.vaccinationDetailInfo.vaccDate.split("T")[0];
+          const modifiedDatePart = datePart.replace(/-/g, ". ");
           setDate(modifiedDatePart);
         } else {
-          console.error('vaccDate is undefined');
+          console.error("vaccDate is undefined");
         }
       } else {
-        console.error('Vaccination data is undefined');
+        console.error("Vaccination data is undefined");
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
-  
+
   useEffect(() => {
     fetchData();
-  }, []); 
+  }, []);
 
   return (
     <View style={styles.screenContainer}>
@@ -54,21 +60,31 @@ export default function VaccinationDetails({ route }) {
             source={require("../../../../assets/images/hospital/Hospital.png")}
             style={styles.hospitalImage}
           />
-          <View style={[{padding: 10}]}>
+          <View style={[{ padding: 10 }]}>
             <Text style={styles.hospitalName}> {item.agencyName} </Text>
             <Text
-              style={[styles.hospitalInfo, {width: 280}]}
+              style={[styles.hospitalInfo, { width: 280 }]}
               numberOfLines={1}
               ellipsizeMode="tail"
-            > {item.agencyAddress}</Text>
-            <View style={[styles.hospitalInfoContainer, {paddingTop: 3}]}>
-              <Text style={[styles.timeText, {color: "#94C973"}]}> ㆍ오늘 예약  | </Text>
-              <Text style={[styles.timeText, {color: "#D6D6D6"}]}> {getDayOfWeek()} ({item.agencyTodayOpenTime}~{item.agencyTodayCloseTime})</Text>
+            >
+              {" "}
+              {item.agencyAddress}
+            </Text>
+            <View style={[styles.hospitalInfoContainer, { paddingTop: 3 }]}>
+              <Text style={[styles.timeText, { color: "#94C973" }]}>
+                {" "}
+                ㆍ오늘 예약 |{" "}
+              </Text>
+              <Text style={[styles.timeText, { color: "#D6D6D6" }]}>
+                {" "}
+                {getDayOfWeek()} ({item.agencyTodayOpenTime}~
+                {item.agencyTodayCloseTime})
+              </Text>
             </View>
           </View>
         </View>
       </View>
-      <Text style={[styles.titleText, {padding: 20}]}>접종 정보</Text>
+      <Text style={[styles.titleText, { padding: 20 }]}>접종 정보</Text>
       <View style={styles.row}>
         <Text>백신</Text>
         <Text>{vaccInfo.vaccName}</Text>
@@ -80,13 +96,17 @@ export default function VaccinationDetails({ route }) {
       <View style={styles.row}>
         <Text>접종 일자</Text>
         <Text>{date}</Text>
-      </View> 
-      <View style={styles.vaccinInfo}> 
-        <Image 
+      </View>
+      <View style={styles.vaccinInfo}>
+        <Image
           source={require("../../../../assets/images/PatientInfo/VaccDone.png")}
         />
-        <Text style={[styles.titleText, {color: "#5E9740"}, {padding: 15}]}>접종 완료!</Text>
-        <Text style={styles.vaccText}>{vaccInfo.postVaccinationDays}일 경과</Text>
+        <Text style={[styles.titleText, { color: "#5E9740" }, { padding: 15 }]}>
+          접종 완료!
+        </Text>
+        <Text style={styles.vaccText}>
+          {vaccInfo.postVaccinationDays}일 경과
+        </Text>
       </View>
     </View>
   );
@@ -127,7 +147,7 @@ const styles = StyleSheet.create({
   },
   vaccText: {
     fontSize: 16,
-    color: "#A3A3A3"
+    color: "#A3A3A3",
   },
   hospitalBlock: {
     padding: 20,

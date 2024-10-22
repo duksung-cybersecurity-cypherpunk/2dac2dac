@@ -10,13 +10,13 @@ import { useNavigation } from "@react-navigation/native";
 
 export default function OtherDetails({ route }) {
   const { userId, data } = route.params;
-  console.log("userId", userId, data);
+
   const navigation = useNavigation();
   const [item, setItem] = useState([]);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState("");
 
   // const handleBlockPress = (id, data) => {
-  //   navigation.navigate("ExaminationInfoStack", { id, data }); 
+  //   navigation.navigate("ExaminationInfoStack", { id, data });
   // };
   const handleBlockPress = () => {
     navigation.navigate("Examination", { userId });
@@ -28,32 +28,34 @@ export default function OtherDetails({ route }) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/healthScreening/${userId}/${data.hsId}`); 
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/healthList/healthScreening/${userId}/${data.hsId}`
+      );
       const Measurement = await response.json();
-      if (Measurement.data) { 
+      if (Measurement.data) {
         setItem(Measurement.data.otherTestInfo);
         if (data.diagDate) {
-          const datePart = data.diagDate.split('T')[0];
-          const modifiedDatePart = datePart.replace(/-/g, '. ');
+          const datePart = data.diagDate.split("T")[0];
+          const modifiedDatePart = datePart.replace(/-/g, ". ");
           setDate(modifiedDatePart);
         } else {
-          console.error('ExamDate is undefined');
+          console.error("ExamDate is undefined");
         }
       } else {
-        console.error('Measurement data is undefined');
+        console.error("Measurement data is undefined");
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
-  
+
   useEffect(() => {
     fetchData();
-  }, []); 
+  }, []);
 
   const calculateDepressionPosition = (depression) => {
     if (depression <= 0) {
-      return 0; 
+      return 0;
     } else if (depression > 0 && depression <= 5) {
       return ((depression - 0) / (5 - 0)) * 25; // 10~5 범위를 0%~25%로 매핑
     } else if (depression > 5 && depression <= 10) {
@@ -70,11 +72,11 @@ export default function OtherDetails({ route }) {
     if (cognitiveDysfunction <= 0) {
       return 0;
     } else if (cognitiveDysfunction > 0 && cognitiveDysfunction <= 6) {
-      return ((cognitiveDysfunction - 0) / (6 - 0)) * 50; 
+      return ((cognitiveDysfunction - 0) / (6 - 0)) * 50;
     } else if (cognitiveDysfunction > 6 && cognitiveDysfunction <= 12) {
-      return 50 + ((cognitiveDysfunction - 6) / (12 - 6)) * 50; 
+      return 50 + ((cognitiveDysfunction - 6) / (12 - 6)) * 50;
     } else {
-      return 100; 
+      return 100;
     }
   };
 
@@ -88,123 +90,157 @@ export default function OtherDetails({ route }) {
         </View>
       </View>
       <Text style={styles.titleText}>건강 검진 결과</Text>
-        <ScrollView style={[{paddingLeft: 20, paddingRight: 20}]}>
-          <Text style={styles.subTitleText}>요 검사</Text>
-          <Text>{item.urinaryProtein}</Text>
-          
-          <Text style={styles.subTitleText}>영상 검사</Text>
-          <Text>{item.tbchestDisease}</Text>
+      <ScrollView style={[{ paddingLeft: 20, paddingRight: 20 }]}>
+        <Text style={styles.subTitleText}>요 검사</Text>
+        <Text>{item.urinaryProtein}</Text>
 
-          <Text style={styles.subTitleText}>문진</Text>
-          {item.smoke && (
-            <Text>금연 필요</Text>
-          )}
-          {item.drink && (
-            <Text>절주 필요</Text>
-          )}
-          {!item.physicalActivity && (
-            <Text>신체 활동 필요</Text>
-          )}
-          {!item.exercise && (
-            <Text>근력 운동 필요</Text>
-          )}
+        <Text style={styles.subTitleText}>영상 검사</Text>
+        <Text>{item.tbchestDisease}</Text>
 
-          <Text style={styles.subTitleText}>B형 간염</Text>
-          {!item.isHepB ? (
-            <Text>검사 미해당</Text>
-          ) : (
-            <>
-              <View style={styles.row}>
-                <Text>표면 항원</Text>
-                <Text>{item.hepBSurfaceAntibody}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text>표면 항체</Text>
-                <Text>{item.hepBSurfaceAntigen}</Text>
-              </View>
-              <View style={{ alignItems: 'flex-end' }}>
-                <Text>{item.hepB}</Text>
-              </View>
-            </>
-          )}
+        <Text style={styles.subTitleText}>문진</Text>
+        {item.smoke && <Text>금연 필요</Text>}
+        {item.drink && <Text>절주 필요</Text>}
+        {!item.physicalActivity && <Text>신체 활동 필요</Text>}
+        {!item.exercise && <Text>근력 운동 필요</Text>}
 
-          <Text style={styles.subTitleText}>골밀도</Text>
-          {!item.isBoneDensityTest ? (
-            <Text>검사 미해당</Text>
-          ) : (
-            <>
-              <Text>{item.boneDensityTest}</Text>
-            </>
-          )}
-          
-          <Text style={styles.subTitleText}>우울증</Text>
-          {!item.isDepression ? (
-            <Text>검사 미해당</Text>
-          ) : (
-            <>
-              <View style={styles.scrollView}>
-              <Text style={[styles.valueBox, {width: "25%"}, {left: 50}]}>{item.depression}</Text>
-              <Text style={{ left: `${calculateDepressionPosition(item.depression)}%` }}>|</Text>
-                <View style={[{flexDirection: "row"}]}>
-                  <View style={styles.bar1}>
-                    <Text>우울 증상 없음</Text>
-                  </View>
-                  <View style={[styles.bar2, {backgroundColor: 'rgba(118, 185, 71, 0.5)'}]}>
-                    <Text>가벼운 우울</Text>
-                  </View>
-                  <View style={[styles.bar2, {backgroundColor: 'rgba(71, 116, 58, 0.5)'}]}>
-                    <Text>중간 우울</Text>
-                  </View>
-                  <View style={styles.bar3}>
-                    <Text>심한 우울 </Text>
-                  </View>
+        <Text style={styles.subTitleText}>B형 간염</Text>
+        {!item.isHepB ? (
+          <Text>검사 미해당</Text>
+        ) : (
+          <>
+            <View style={styles.row}>
+              <Text>표면 항원</Text>
+              <Text>{item.hepBSurfaceAntibody}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text>표면 항체</Text>
+              <Text>{item.hepBSurfaceAntigen}</Text>
+            </View>
+            <View style={{ alignItems: "flex-end" }}>
+              <Text>{item.hepB}</Text>
+            </View>
+          </>
+        )}
+
+        <Text style={styles.subTitleText}>골밀도</Text>
+        {!item.isBoneDensityTest ? (
+          <Text>검사 미해당</Text>
+        ) : (
+          <>
+            <Text>{item.boneDensityTest}</Text>
+          </>
+        )}
+
+        <Text style={styles.subTitleText}>우울증</Text>
+        {!item.isDepression ? (
+          <Text>검사 미해당</Text>
+        ) : (
+          <>
+            <View style={styles.scrollView}>
+              <Text style={[styles.valueBox, { width: "25%" }, { left: 50 }]}>
+                {item.depression}
+              </Text>
+              <Text
+                style={{
+                  left: `${calculateDepressionPosition(item.depression)}%`,
+                }}
+              >
+                |
+              </Text>
+              <View style={[{ flexDirection: "row" }]}>
+                <View style={styles.bar1}>
+                  <Text>우울 증상 없음</Text>
                 </View>
-                <View style={[{flexDirection: "row"}]}>
-                  <Text style={styles.zeroValueText}>0</Text>
-                  <Text style={styles.firstValueText}>5</Text>
-                  <Text style={styles.midValueText}>10</Text>
-                  <Text style={styles.finValueText}>20</Text>
-                  <Text style={styles.endValueText}>27</Text>
+                <View
+                  style={[
+                    styles.bar2,
+                    { backgroundColor: "rgba(118, 185, 71, 0.5)" },
+                  ]}
+                >
+                  <Text>가벼운 우울</Text>
+                </View>
+                <View
+                  style={[
+                    styles.bar2,
+                    { backgroundColor: "rgba(71, 116, 58, 0.5)" },
+                  ]}
+                >
+                  <Text>중간 우울</Text>
+                </View>
+                <View style={styles.bar3}>
+                  <Text>심한 우울 </Text>
                 </View>
               </View>
-            </>
-          )}
-
-          <Text style={styles.subTitleText}>인지 기능 장애</Text>
-          {!item.isCognitiveDysfunction ? (
-            <Text>검사 미해당</Text>
-          ) : (
-            <>
-              <View style={styles.scrollView}>
-              <Text style={[styles.valueBox, {width: "30%"}, {left: `${calculateCognitiveDysfunctionPosition(item.cognitiveDysfunction)-40}%`}]}>{item.cognitiveDysfunction}</Text>
-              <Text style={{ left: `${calculateCognitiveDysfunctionPosition(item.cognitiveDysfunction)-25}%` }}>|</Text>
-                <View style={[{flexDirection: "row"}]}>
-                  {/* 정상 구간 */}
-                  <View style={styles.leftBar}>
-                    <Text>특이 소견 없음</Text>
-                  </View>
-                  {/* 인지 기능 저하 의심 구간 */}
-                  <View style={styles.rightBar}>
-                    <Text>인지 기능 저하 의심</Text>
-                  </View>
-                </View>
-                <Text style={styles.midValueText}>6</Text>
+              <View style={[{ flexDirection: "row" }]}>
+                <Text style={styles.zeroValueText}>0</Text>
+                <Text style={styles.firstValueText}>5</Text>
+                <Text style={styles.midValueText}>10</Text>
+                <Text style={styles.finValueText}>20</Text>
+                <Text style={styles.endValueText}>27</Text>
               </View>
-            </>
-          )}
+            </View>
+          </>
+        )}
 
-          <Text style={styles.subTitleText}>노인 신체 기능 검사</Text>
-          {!item.isElderlyPhysicalFunctionTest ? (
-            <Text>검사 미해당</Text>
-          ) : (
-            <Text>{item.elderlyPhysicalFunctionTest}</Text>
-          )}
-          
-          <Text style={styles.subTitleText}>노인 기능 평가</Text>
-          {!item.isElderlyFunctionalAssessment ? (
-            <Text>검사 미해당</Text>
-          ) : (
-            <>
+        <Text style={styles.subTitleText}>인지 기능 장애</Text>
+        {!item.isCognitiveDysfunction ? (
+          <Text>검사 미해당</Text>
+        ) : (
+          <>
+            <View style={styles.scrollView}>
+              <Text
+                style={[
+                  styles.valueBox,
+                  { width: "30%" },
+                  {
+                    left: `${
+                      calculateCognitiveDysfunctionPosition(
+                        item.cognitiveDysfunction
+                      ) - 40
+                    }%`,
+                  },
+                ]}
+              >
+                {item.cognitiveDysfunction}
+              </Text>
+              <Text
+                style={{
+                  left: `${
+                    calculateCognitiveDysfunctionPosition(
+                      item.cognitiveDysfunction
+                    ) - 25
+                  }%`,
+                }}
+              >
+                |
+              </Text>
+              <View style={[{ flexDirection: "row" }]}>
+                {/* 정상 구간 */}
+                <View style={styles.leftBar}>
+                  <Text>특이 소견 없음</Text>
+                </View>
+                {/* 인지 기능 저하 의심 구간 */}
+                <View style={styles.rightBar}>
+                  <Text>인지 기능 저하 의심</Text>
+                </View>
+              </View>
+              <Text style={styles.midValueText}>6</Text>
+            </View>
+          </>
+        )}
+
+        <Text style={styles.subTitleText}>노인 신체 기능 검사</Text>
+        {!item.isElderlyPhysicalFunctionTest ? (
+          <Text>검사 미해당</Text>
+        ) : (
+          <Text>{item.elderlyPhysicalFunctionTest}</Text>
+        )}
+
+        <Text style={styles.subTitleText}>노인 기능 평가</Text>
+        {!item.isElderlyFunctionalAssessment ? (
+          <Text>검사 미해당</Text>
+        ) : (
+          <>
             <View style={styles.row}>
               <Text>낙상</Text>
               <Text>{item.elderlyFunctionalAssessmentFalls}</Text>
@@ -222,25 +258,25 @@ export default function OtherDetails({ route }) {
               <Text>{item.elderlyFunctionalAssessmentVaccination}</Text>
             </View>
           </>
-          )}
+        )}
 
         <View style={styles.row}>
-            <TouchableOpacity 
-                style={styles.buttonBack}
-                onPress={() => handleLoad(userId, data)}
-                activeOpacity={0.7}
-            >
-                <Text style={styles.buttonText}>뒤로 가기</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-                style={styles.button} 
-                onPress={() => handleBlockPress(userId)}
-                activeOpacity={0.7}
-            >
-                <Text style={styles.buttonText}>처음으로 돌아가기</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonBack}
+            onPress={() => handleLoad(userId, data)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.buttonText}>뒤로 가기</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleBlockPress(userId)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.buttonText}>처음으로 돌아가기</Text>
+          </TouchableOpacity>
         </View>
-        </ScrollView>
+      </ScrollView>
     </View>
   );
 }
@@ -302,74 +338,74 @@ const styles = StyleSheet.create({
     color: "#737373",
   },
   leftBar: {
-    alignItems: 'center',
+    alignItems: "center",
     justifyContent: "center",
-    width: '50%',
+    width: "50%",
     height: 30,
-    backgroundColor: 'rgba(118, 185, 71, 0.5)',
+    backgroundColor: "rgba(118, 185, 71, 0.5)",
     borderTopLeftRadius: 6,
     borderBottomLeftRadius: 6,
   },
   rightBar: {
-    alignItems: 'center',
+    alignItems: "center",
     justifyContent: "center",
-    width: '50%',
+    width: "50%",
     height: 30,
-    backgroundColor: 'rgba(82, 82, 82, 0.5)',
+    backgroundColor: "rgba(82, 82, 82, 0.5)",
     borderTopRightRadius: 6,
     borderBottomRightRadius: 6,
   },
   midValueText: {
-    left: '47%',
+    left: "47%",
     marginTop: 5,
     marginBottom: 20,
   },
   bar1: {
-    alignItems: 'center',
-    justifyContent: "center", 
-    width: '25%',
+    alignItems: "center",
+    justifyContent: "center",
+    width: "25%",
     height: 30,
-    backgroundColor: 'rgba(155, 211, 148, 0.5)',
+    backgroundColor: "rgba(155, 211, 148, 0.5)",
     borderTopLeftRadius: 6,
-    borderBottomLeftRadius: 6, 
+    borderBottomLeftRadius: 6,
   },
   bar2: {
-    alignItems: 'center',
+    alignItems: "center",
     justifyContent: "center",
-    width: '25%',
+    width: "25%",
     height: 30,
   },
   bar3: {
-    alignItems: 'center',
+    alignItems: "center",
     justifyContent: "center",
-    width: '25%',
+    width: "25%",
     height: 30,
-    backgroundColor: 'rgba(82, 82, 82, 0.5)',
+    backgroundColor: "rgba(82, 82, 82, 0.5)",
     borderTopRightRadius: 6,
     borderBottomRightRadius: 6,
   },
   zeroValueText: {
-    left: '0%',
+    left: "0%",
     marginTop: 5,
     marginBottom: 20,
   },
   firstValueText: {
-    left: '180%',
+    left: "180%",
     marginTop: 5,
     marginBottom: 20,
   },
   midValueText: {
-    left: '360%',
+    left: "360%",
     marginTop: 5,
     marginBottom: 20,
   },
   finValueText: {
-    left: '530%',
+    left: "530%",
     marginTop: 5,
     marginBottom: 20,
   },
   endValueText: {
-    left: '690%',
+    left: "690%",
     marginTop: 5,
     marginBottom: 20,
   },
@@ -377,21 +413,21 @@ const styles = StyleSheet.create({
   buttonBack: {
     width: "30%",
     height: "60%",
-    borderColor: '#9BD394',
+    borderColor: "#9BD394",
     borderWidth: 2,
     borderRadius: 8,
     paddingTop: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
     marginLeft: 20,
   },
   button: {
     width: "55%",
     height: "60%",
-    backgroundColor: '#9BD394',
+    backgroundColor: "#9BD394",
     borderRadius: 8,
     paddingTop: 10,
-    alignItems: 'center',
+    alignItems: "center",
     margin: 20,
   },
   buttonText: {

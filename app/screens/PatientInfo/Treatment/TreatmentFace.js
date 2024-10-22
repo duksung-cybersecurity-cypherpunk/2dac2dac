@@ -13,7 +13,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 export default function Prescription({ route }) {
   const navigation = useNavigation();
   const { userId } = route.params;
-  console.log("userId", userId, route.params);
+  console.log("userId22", route.params);
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
   const [date, setDate] = useState();

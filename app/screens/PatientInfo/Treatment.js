@@ -10,7 +10,7 @@ const Tab = createMaterialTopTabNavigator();
 
 export default function Treatment({ route }) {
   const { userId } = route.params;
-  console.log("userId", userId);
+  console.log("userId22", route.params);
   return (
     <View style={styles.blocks}>
       <Tab.Navigator
@@ -48,12 +48,14 @@ export default function Treatment({ route }) {
           name="NonfaceComponent"
           component={NonfaceComponent}
           options={{ tabBarLabel: "비대면" }}
+          initialParams={{ userId: userId }} // userId 전달
         />
 
         <Tab.Screen
           name="FaceComponent"
           component={FaceComponent}
           options={{ tabBarLabel: "대면" }}
+          initialParams={{ userId: userId }} // userId 전달
         />
       </Tab.Navigator>
     </View>

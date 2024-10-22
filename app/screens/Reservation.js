@@ -20,7 +20,7 @@ import {
 export default function Reservation() {
   const navigation = useNavigation();
   const dates = getCurrentWeekDays();
-  console.log("dates", dates);
+
   const [selectedDate, setSelectedDate] = useState(dates[0].name);
   const [selectedTab, setSelectedTab] = useState("요청된 예약");
   const [reservations, setReservations] = useState({
@@ -36,7 +36,7 @@ export default function Reservation() {
       const userInfo = await AsyncStorage.getItem("userInfo");
 
       const userData = JSON.parse(userInfo);
-      console.log("userId", userData, ReservationDate(selectedDate));
+
       setDoctorId(userData.id);
 
       const apiUrl = `http://203.252.213.209:8080/api/v1/doctors/reservations/${
@@ -66,7 +66,7 @@ export default function Reservation() {
   const renderReservation = ({ item }) => {
     //console.log("Rendered Item:", item); // Check if item is passed correctly
     const id = item.reservationId;
-    console.log("id", item, doctorId);
+
     return (
       <View style={styles.reservationCard}>
         <Text style={styles.timeText}>{formatDate(item.reservationDate)}</Text>

@@ -13,7 +13,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 export default function TreatmentNonface({ route }) {
   const navigation = useNavigation();
   const { userId } = route.params;
-  console.log("userId", userId);
+  console.log("userId", route.params);
 
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
