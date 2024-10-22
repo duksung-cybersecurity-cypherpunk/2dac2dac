@@ -15,14 +15,14 @@ import axios from "axios";
 import Svg, { Circle, Text as SvgText } from "react-native-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function MedicalHistory() {
+export default function Home() {
   const navigation = useNavigation();
   const [doctorInfo, setDoctorInfo] = useState(null);
   const [cnt, setCnt] = useState();
-  const [item, setitem] = useState([]); //done
+  const [completed, setCompleted] = useState([]); //done
   const [schedule, setSchedule] = useState([]); //schedule
-
   const [pay, setPay] = useState([]); //need pay
+
   const [modalVisible, setModalVisible] = useState(false);
   const [price, setPrice] = useState("");
 
@@ -58,7 +58,7 @@ export default function MedicalHistory() {
       );
       const data = await response.json();
       console.log(data);
-      setitem(data.data.completedReservationItemList);
+      setCompleted(data.data.completedReservationItemList);
       setSchedule(data.data.scheduledReservationItemList[0]);
       setPay(data.data.toBeCompleteReservationItemList);
       setCnt(data.data.totalCnt);
@@ -84,73 +84,6 @@ export default function MedicalHistory() {
       console.error("Error:", error);
     }
   };
-
-  // const CircularProgress = ({ percent }) => {
-  //   const radius = 150;
-  //   const circumference = 2 * Math.PI * radius;
-  //   const strokeDashoffset = circumference - (percent / 100) * circumference;
-
-  //   return (
-  //     <View style={styles.progressContainer}>
-  //       <Svg height={radius * 2} width={radius * 2}>
-  //         <Circle
-  //           stroke="#CFECD9" // 배경 원
-  //           fill="none"
-  //           strokeWidth={8}
-  //           r={radius}
-  //           cx={radius}
-  //           cy={radius}
-  //         />
-  //         <Circle
-  //           stroke="#47743A" // 진행 원
-  //           fill="none"
-  //           strokeWidth={8}
-  //           r={radius}
-  //           cx={radius}
-  //           cy={radius}
-  //           strokeDasharray={circumference}
-  //           strokeDashoffset={strokeDashoffset}
-  //           rotation="-90"
-  //           origin={`${radius}, ${radius}`}
-  //         />
-  //         <SvgText
-  //           x="50%"
-  //           y="50%"
-  //           textAnchor="middle"
-  //           fontSize="14"
-  //           fill="#555"
-  //           alignmentBaseline="middle"
-  //           dy=".3em"
-  //         >
-  //           다음 진료까지 앞으로
-  //         </SvgText>
-  //         <SvgText
-  //           x="50%"
-  //           y="50%"
-  //           textAnchor="middle"
-  //           fontSize="40"
-  //           fontWeight="bold"
-  //           fill="#000"
-  //           alignmentBaseline="middle"
-  //           dy="1.2em"
-  //         >
-  //           01 : 01 : 01
-  //         </SvgText>
-  //         <SvgText
-  //           x="50%"
-  //           y="50%"
-  //           textAnchor="middle"
-  //           fontSize="12"
-  //           fill="#000"
-  //           alignmentBaseline="middle"
-  //           dy="2em"
-  //         >
-  //           2024년 3월 17일 일요일 오후 16:00
-  //         </SvgText>
-  //       </Svg>
-  //     </View>
-  //   );
-  // };
 
   return (
     <View style={{ height: "100%", backgroundColor: "white" }}>
@@ -185,7 +118,7 @@ export default function MedicalHistory() {
                 {pay && pay.length > 0 ? (
                   pay.map((item) => (
                     <View
-                      key={item.noncontactDiagId}
+                      key={item.reservationId}
                       style={{ height: "100%", backgroundColor: "white" }}
                     >
                       <View style={styles.screenContainer}>
@@ -224,7 +157,7 @@ export default function MedicalHistory() {
                 {schedule && schedule.length > 0 ? (
                   schedule.map((item) => (
                     <View
-                      key={item.noncontactDiagId}
+                      key={item.reservationId}
                       style={{ height: "100%", backgroundColor: "white" }}
                     >
                       <View style={styles.screenContainer}>
@@ -233,11 +166,11 @@ export default function MedicalHistory() {
                             <View style={styles.hospitalBlock}>
                               <View style={{ flex: 1 }}>
                                 <Text style={styles.timeText}>
-                                  {schedule.reservationDate}
+                                  {item.reservationDate}
                                 </Text>
                                 <View style={styles.hospitalInfoContainer}>
                                   <Text style={styles.hospitalName}>
-                                    {schedule.patientName} 환자
+                                    {item.patientName} 환자
                                   </Text>
                                 </View>
                                 {/* <TouchableOpacity
@@ -258,10 +191,10 @@ export default function MedicalHistory() {
                   <Text></Text>
                 )}
                 {/* 완료된 예약 항목 리스트 랜더링 */}
-                {item && item.length > 0 ? (
-                  item.map((item) => (
+                {completed && completed.length > 0 ? (
+                  completed.map((item) => (
                     <View
-                      key={item.noncontactDiagId}
+                      key={item.reservationId}
                       style={{ height: "100%", backgroundColor: "white" }}
                     >
                       <View style={styles.screenContainer}>
