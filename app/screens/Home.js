@@ -26,29 +26,40 @@ export default function MedicalHistory() {
   const [modalVisible, setModalVisible] = useState(false);
   const [price, setPrice] = useState("");
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+    useEffect(() => {
+      const fetchUserInfo = async () => {
+        try {
+          const userInfo = await AsyncStorage.getItem("userInfo");
+          const userData = JSON.parse(userInfo);
+          setDoctorInfo(userData.id);
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        }
+      };
 
-  const ModalPress = (item) => {
-    setSelectedItem(item);
-    setModalVisible(true);
-  };
+      fetchUserInfo();
+    }, []); // doctorInfo를 설정하는 부분은 useEffect에서 한 번만 호출
+
+    useEffect(() => {
+      if (doctorInfo) {
+        fetchData(); // doctorInfo가 설정된 후에만 fetchData 호출
+      }
+    }, [doctorInfo]); // doctorInfo가 변경될 때만 이 useEffect 실행
+
+      const ModalPress = (item) => {
+        setSelectedItem(item);
+        setModalVisible(true);
+      };
 
   const fetchData = async () => {
     try {
-      const userInfo = await AsyncStorage.getItem("userInfo");
-      const userData = JSON.parse(userInfo);
-      //console.log("userId", userData, ReservationDate(selectedDate));
-      setDoctorInfo(userData.id);
-
       const response = await fetch(
         `http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorInfo}/today`
       );
       const data = await response.json();
+      console.log(data);
       setitem(data.data.completedReservationItemList);
       setSchedule(data.data.scheduledReservationItemList[0]);
-      console.log("schedule", schedule);
       setPay(data.data.toBeCompleteReservationItemList);
       setCnt(data.data.totalCnt);
     } catch (error) {
