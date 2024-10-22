@@ -1,6 +1,5 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { PatientInformation } from ".././screens/Reservation/PatientInfo";
 import { Accept } from "../screens/Reservation/Accept";
 
 const AcceptPatientStack = createBottomTabNavigator();
@@ -15,8 +14,6 @@ export default function AcceptPatientNavigator() {
           headerTitle: "환자 예약 내역",
         }}
       />
-
-     
     </AcceptPatientStack.Navigator>
   );
 }

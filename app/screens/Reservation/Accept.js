@@ -10,7 +10,7 @@ const Accept = ({ route }) => {
 
   const handleAcceptReservation = async () => {
     try {
-      const apiUrl = `http://203.252.213.209:8080/api/v1/reservations/accept/${doctorId}/${selectedReservation.reservationId}`;
+      const apiUrl = `http://203.252.213.209:8080/api/v1/doctors/reservations/accept/${doctorId}/${selectedReservation.reservationId}`;
       const response = await axios.post(apiUrl);
 
       if (response.status === 200) {
@@ -34,7 +34,9 @@ const Accept = ({ route }) => {
       {selectedReservation && (
         <View style={styles.detailsBox}>
           <Text>신청자 명: {selectedReservation.patientName}</Text>
-          <Text>신청 일시: {formatDate(selectedReservation.signUpDate)}</Text>
+          <Text>
+            신청 일시: {formatDate(selectedReservation.reservationDate)}
+          </Text>
           <Text>
             희망 일시: {formatDate(selectedReservation.reservationDate)}
           </Text>
@@ -54,31 +56,50 @@ const Accept = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center", // Centers the content vertically
+    justifyContent: "center",
+    alignItems: "center", // Centers content horizontally
     padding: 20,
     backgroundColor: "#fff",
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
+    color: "#333", // Darker text
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 14,
-    marginBottom: 20,
     color: "#666",
+    marginBottom: 20,
+    textAlign: "center", // Centered subtitle
   },
   detailsBox: {
-    marginBottom: 20,
+    backgroundColor: "#F0F8F5", // Light greenish background
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 30,
+    width: "100%", // Full width
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  label: {
+    fontWeight: "bold",
+    color: "#333",
+  },
+  value: {
+    color: "#333",
   },
   confirmButton: {
-    backgroundColor: "#4CAF50", // Green background
-    paddingVertical: 10,
-    borderRadius: 5,
-    alignItems: "center",
+    backgroundColor: "#9BD394",
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 10,
   },
   confirmButtonText: {
-    color: "white",
+    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 export default function QRLoad({ route }) {
   const navigation = useNavigation();
   const { doctorId, reservationId } = route.params;
-  console.log("doctorId", doctorId, reservationId);
+  const [reservationData, setReservationData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const blocks = [
     {
@@ -30,6 +32,31 @@ export default function QRLoad({ route }) {
     },
   ];
 
+  useEffect(() => {
+    const fetchReservationDetails = async () => {
+      try {
+        const response = await axios.get(
+          `http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorId}/${reservationId}/patientInfo`
+        );
+        setReservationData(response.data.data);
+      } catch (error) {
+        console.error("Failed to fetch reservation details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReservationDetails();
+  }, [doctorId]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   const handleBlockPress = (id) => {
     if (id === 1) {
       navigation.navigate("PatientInfoStack", { id: 2 });
@@ -52,15 +79,19 @@ export default function QRLoad({ route }) {
       </Text>
       <View style={styles.infoBlock}>
         <View style={styles.row}>
-          <Text style={styles.infoSubText}>환자 명</Text>
+          <Text style={styles.infoSubText}>
+            환자 명 : {reservationData.userName}
+          </Text>
           <Text style={styles.text}></Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.infoSubText}>나이 </Text>
+          <Text style={styles.infoSubText}>나이 : {reservationData.age}</Text>
           <Text style={styles.text}></Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.infoSubText}>성별 </Text>
+          <Text style={styles.infoSubText}>
+            성별 : {reservationData.gender}
+          </Text>
           <Text style={styles.text}></Text>
         </View>
       </View>

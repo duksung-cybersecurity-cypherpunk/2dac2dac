@@ -8,27 +8,31 @@ import {
   TouchableOpacity,
 } from "react-native";
 import axios from "axios";
-import { useNavigation } from "@react-navigation/native"; // 추가: useNavigation 가져오기
+import { useNavigation } from "@react-navigation/native";
+import CheckBox from "@react-native-community/checkbox";
 
 const ReservationDetails = ({ route }) => {
   const [reservationData, setReservationData] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const navigation = useNavigation(); // 추가: 네비게이션 훅 사용
+  const navigation = useNavigation();
   const { doctorId, reservationId } = route.params;
 
   const handleQRLoad = () => {
-    // QRLoad 스크린으로 doctorId와 reservationId 전달
-    navigation.navigate("QRLoad", { doctorId, reservationId });
+    // 상위 네비게이터에서 PatientInfoStack으로 이동하고 QRLoad로 바로 이동
+    navigation.navigate("PatientInfoStack", {
+      id: 1,
+      screen: "QRLoad",
+      params: { doctorId, reservationId },
+    });
   };
+
   useEffect(() => {
     const fetchReservationDetails = async () => {
       try {
         const response = await axios.get(
-          `http://203.252.213.209:8080/api/v1/reservations/form/${doctorId}/${reservationId}`
+          `http://203.252.213.209:8080/api/v1/doctors/reservations/form/${doctorId}/${reservationId}`
         );
         setReservationData(response.data.data);
-        navigation();
       } catch (error) {
         console.error("Failed to fetch reservation details:", error);
       } finally {
@@ -51,62 +55,98 @@ const ReservationDetails = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      {/* 상단 예약 정보 섹션 */}
       <View style={styles.headerContainer}>
         <Text style={styles.reservationDate}>
-          {new Date(
-            reservationData.reservationItem.reservationDate
-          ).toLocaleString()}
+          {
+            new Date(reservationData.reservationItem.reservationDate)
+              .toLocaleString()
+              .split(",")[0]
+          }
         </Text>
         <Text style={styles.patientName}>
           환자: {reservationData.reservationItem.patientName}
         </Text>
-        <Text style={styles.requestTime}>
-          희망 진료 시간: {reservationData.noncontactDiagFormInfo.desiredTime}
+        <Text style={styles.patientName}>
+          희망 진료 시간:{" "}
+          {
+            new Date(reservationData.reservationItem.reservationDate)
+              .toLocaleString()
+              .split(",")[1]
+          }
         </Text>
       </View>
-
-      {/* 예약 세부 정보 섹션 */}
+      <Text style={styles.sectionTitle}>예약 신청자 세부 정보</Text>
+      <View style={styles.detailsBox}>
+        <Text>신청자 명: {reservationData.reservationItem.patientName}</Text>
+        <Text>과목: {reservationData.noncontactDiagFormInfo.department}</Text>
+        <Text>
+          진료 종류: {reservationData.noncontactDiagFormInfo.diagType}
+        </Text>
+      </View>
       <View style={styles.detailsContainer}>
-        <Text style={styles.sectionTitle}>예약 신청자 세부 정보</Text>
+        <Text style={styles.label}>현재 복용 중인 약이 있습니다.</Text>
+
         <View style={styles.detailItem}>
-          <Text style={styles.label}>희망 과목</Text>
           <Text style={styles.value}>
-            {reservationData.noncontactDiagFormInfo.department}
+            {reservationData.noncontactDiagFormInfo.isPrescribedDrug
+              ? reservationData.noncontactDiagFormInfo.prescribedDrug
+              : "없음"}
           </Text>
         </View>
-        <View style={styles.detailItem}>
-          <Text style={styles.label}>선호 방식</Text>
-          <Text style={styles.value}>
-            {reservationData.noncontactDiagFormInfo.preferredMethod}
-          </Text>
-        </View>
-        {/* 더 많은 세부 정보를 여기에 추가 */}
-      </View>
 
-      {/* 각 섹션 구분선 */}
-      <View style={styles.separator}></View>
-
-      {/* 기타 정보 섹션 */}
-      <View style={styles.additionalInfoContainer}>
-        <Text style={styles.sectionTitle}>기타 정보</Text>
-        <Text style={styles.additionalInfoText}>
-          {reservationData.noncontactDiagFormInfo.additionalInformation}
+        {/* Display allergy information */}
+        <Text style={styles.label}>알레르기 증상이 있습니다.</Text>
+        <Text style={styles.checkboxLabel}>
+          약이나 음식물로 인한 알레르기 혹은 그와 유사한 증상을 보인 적이
+          있습니다.
         </Text>
+        <View style={styles.detailItem}>
+          <Text style={styles.value}>
+            {reservationData.noncontactDiagFormInfo.isAllergicSymptom
+              ? reservationData.noncontactDiagFormInfo.allergicSymptom
+              : "없음"}
+          </Text>
+        </View>
+
+        {/* Display congenital disease information */}
+        <Text style={styles.label}>선천적 질환이 있습니다.</Text>
+        <Text style={styles.checkboxLabel}>
+          앓고 있는 선천적 질환이 있습니다.
+        </Text>
+        <View style={styles.detailItem}>
+          <Text style={styles.value}>
+            {reservationData.noncontactDiagFormInfo.isInbornDisease
+              ? reservationData.noncontactDiagFormInfo.inbornDisease
+              : "없음"}
+          </Text>
+        </View>
+
+        {/* Display additional information */}
+        <Text style={styles.label}>기타 정보가 있습니다.</Text>
+        <View style={styles.detailItem}>
+          <Text style={styles.value}>
+            {reservationData.noncontactDiagFormInfo.additionalInformation ||
+              "없음"}
+          </Text>
+        </View>
       </View>
-
-      {/* 뒤로 가기 버튼 */}
-
-      {/* QRLoad로 넘어가는 버튼 */}
-      <Button title="QR 보기" onPress={handleQRLoad} />
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()} // 뒤로 가기 버튼 클릭 시 이전 화면으로 이동
-        >
-          <Text style={styles.buttonText}>뒤로 가기</Text>
-        </TouchableOpacity>
+      <View style={styles.buttonsRow}>
+        <View style={styles.rejectButton}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => handleQRLoad()}
+          >
+            <Text style={styles.buttonText}>QR 보기</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.acceptButton}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.buttonText}>뒤로 가기</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -114,112 +154,97 @@ const ReservationDetails = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    justifyContent: "flex-start",
     backgroundColor: "#fff",
+    padding: 16,
   },
   headerContainer: {
-    backgroundColor: "#fff",
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
-    elevation: 2,
-    marginHorizontal: 16,
-    marginTop: "30%",
+    backgroundColor: "white",
+    width: "100%",
+
+    paddingBottom: 20,
   },
   reservationDate: {
-    fontSize: 16,
-    color: "#444",
-    marginBottom: 8,
+    fontSize: 19,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
   patientName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  requestTime: {
     fontSize: 16,
-    color: "#333",
+    marginBottom: 5,
   },
   detailsContainer: {
-    backgroundColor: "#fff",
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
-    elevation: 2,
-    marginHorizontal: 16,
+    marginTop: 20,
+  },
+  detailsBox: {
+    backgroundColor: "#F0F8F5", // Light greenish background
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 30,
+    justifyContent: "center",
+    width: "100%", // Full width
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 10,
   },
   detailItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
+    marginBottom: 10,
+    paddingBottom: 23,
+    borderWidth: 1,
+    borderColor: "#d1d1d1",
+    borderRadius: 5,
   },
   label: {
     fontSize: 16,
-    color: "#555",
+    marginBottom: 5,
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    margin: 8,
+    colot: "gray",
   },
   value: {
     fontSize: 16,
-    color: "#333",
-    fontWeight: "500",
-  },
-  additionalInfoContainer: {
-    backgroundColor: "#fff",
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
-    elevation: 2,
-    marginHorizontal: 16,
+    color: "gray",
   },
   additionalInfoText: {
     fontSize: 16,
-    color: "#333",
+    marginTop: 10,
   },
-  separator: {
-    height: 1,
-    backgroundColor: "#ddd",
-    marginVertical: 16,
-    marginHorizontal: 16,
+  rejectButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderWidth: 1, // 테두리 두께
+    borderColor: "#9BD394", // 테두리 색상
+    borderRadius: 5,
+    width: "45%",
+    height: "50px",
+    alignItems: "center", // Centers the content horizontally
+    justifyContent: "center",
+    marginLeft: 10,
+    marginTop: 10,
   },
-  noDataText: {
-    fontSize: 16,
-    color: "red",
-    textAlign: "center",
-    marginTop: 20,
+  acceptButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    backgroundColor: "#9BD394",
+    borderRadius: 5,
+    width: "45%",
+    height: "50px",
+    alignItems: "center", // Centers the content horizontally
+    justifyContent: "center",
+    marginRight: 10,
+    marginTop: 10,
   },
-  buttonContainer: {
-    alignItems: "center", // 가운데 정렬
-    marginTop: 16,
-    marginBottom: 16,
+  buttonsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
-  backButton: {
-    backgroundColor: "#28a745", // 초록색 버튼
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    width: "80%", // 너비를 넓게 설정
-    alignItems: "center", // 텍스트 가운데 정렬
-  },
+
   buttonText: {
     fontSize: 16,
-    color: "#fff",
-    fontWeight: "bold",
   },
 });
 
