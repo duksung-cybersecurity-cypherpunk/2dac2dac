@@ -122,7 +122,7 @@ const SignUpForm1 = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.heading}>의사 소개 정보를 입력해 주세요.</Text>
+    <Text style={styles.title}>의사 소개 정보를 입력해 주세요.</Text>
 
       <Text style={styles.label}>대표 제목을 작성해 주세요.</Text>
       <TextInput
@@ -162,7 +162,7 @@ const SignUpForm1 = () => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>입력 완료</Text>
+        <Text style={styles.submitButtonText}>다음</Text>
       </TouchableOpacity>
 
       {/* Selection Modal */}
@@ -224,6 +224,12 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#fff",
   },
+    title: {
+      fontSize: 24,
+      fontWeight: "bold",
+      marginBottom: 20,
+      marginTop: 20,
+    },
   heading: {
     fontSize: 18,
     fontWeight: "bold",
@@ -251,6 +257,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
+    marginTop: 8,
   },
   submitButtonText: {
     color: "#fff",

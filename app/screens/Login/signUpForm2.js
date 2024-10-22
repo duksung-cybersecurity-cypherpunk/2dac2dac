@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
   Alert,
 } from "react-native";
 import axios from "axios";
@@ -61,7 +62,7 @@ export default function SignUpForm2({ navigation, route }) {
     }
 
     if (!isCodeVerified) {
-      Alert.alert("Error", "이메일 인증을 완료해주세요.");
+      Alert.alert("Error", "이메일 인증을 완료해 주세요.");
       return;
     }
 
@@ -83,7 +84,7 @@ export default function SignUpForm2({ navigation, route }) {
 
       if (response.status === 200) {
         Alert.alert(
-          "회원가입이 완료됐습니다.",
+          "회원가입이 완료되었습니다.",
           response.data.message || "회원가입 성공"
         );
         navigation.navigate("Login");
@@ -103,13 +104,14 @@ export default function SignUpForm2({ navigation, route }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      {/* Email verification code send input and button */}
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>기본 정보를 입력해주세요.</Text>
+
+      <Text style={styles.label}>이메일</Text>
       <View style={styles.emailContainer}>
         <TextInput
           style={styles.emailInput}
-          placeholder="Email"
+          placeholder="email@example.com"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -128,10 +130,11 @@ export default function SignUpForm2({ navigation, route }) {
         </TouchableOpacity>
       </View>
 
+      <Text style={styles.label}>이메일 인증 코드</Text>
       <View style={styles.emailContainer}>
         <TextInput
           style={styles.emailInput}
-          placeholder="Email 인증 코드"
+          placeholder="이메일 인증 코드"
           value={verificationCode}
           onChangeText={setVerificationCode}
         />
@@ -143,39 +146,47 @@ export default function SignUpForm2({ navigation, route }) {
           <Text style={styles.buttonText}>코드 확인</Text>
         </TouchableOpacity>
       </View>
+
+      <Text style={styles.label}>이름</Text>
       <View style={styles.emailContainer}>
         <TextInput
-          style={styles.emailInput}
-          placeholder="Username"
+          style={styles.Input}
+          placeholder="이름"
           value={username}
           onChangeText={setUsername}
           editable={isCodeVerified}
         />
       </View>
+
+      <Text style={styles.label}>비밀번호</Text>
       <View style={styles.emailContainer}>
         <TextInput
-          style={styles.emailInput}
-          placeholder="Password"
+          style={styles.Input}
+          placeholder="비밀번호"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           editable={isCodeVerified}
         />
       </View>
+
+      <Text style={styles.label}>비밀번호 확인</Text>
       <View style={styles.emailContainer}>
         <TextInput
-          style={styles.emailInput}
-          placeholder="Confirm Password"
+          style={styles.Input}
+          placeholder="비밀번호 확인"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry
           editable={isCodeVerified}
         />
       </View>
+
+      <Text style={styles.label}>휴대폰 번호</Text>
       <View style={styles.emailContainer}>
         <TextInput
-          style={styles.emailInput}
-          placeholder="PhoneNumber"
+          style={styles.Input}
+          placeholder="휴대폰 번호를 - 없이 입력해주세요."
           value={phonenumber}
           onChangeText={setPhoneNumber}
           editable={isCodeVerified}
@@ -187,41 +198,58 @@ export default function SignUpForm2({ navigation, route }) {
         onPress={handleSignUp}
         disabled={!isCodeVerified}
       >
-        <Text style={styles.buttonText}>Sign Up</Text>
+        <Text style={styles.buttonText}>가입 완료</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
+    padding: 16,
     justifyContent: "center",
     backgroundColor: "#fff",
   },
-  title: {
-    fontSize: 24,
+    title: {
+      fontSize: 24,
+      fontWeight: "bold",
+      marginBottom: 20,
+      marginTop: 20,
+    },
+  label: {
+    marginBottom: 8,
+    fontSize: 14,
     fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
   },
   emailContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 15,
+    marginBottom: 16,
   },
   emailInput: {
     flex: 1,
     height: 40,
+    borderWidth: 1,
     borderColor: "#ccc",
     borderBottomWidth: 1,
     paddingHorizontal: 10,
+      borderRadius: 8,
+      padding: 8,
     marginRight: 10,
   },
+   Input: {
+      flex: 1,
+      height: 40,
+      borderWidth: 1,
+      borderColor: "#ccc",
+      borderBottomWidth: 1,
+      paddingHorizontal: 10,
+        borderRadius: 8,
+        padding: 8,
+    },
   codeButton: {
-    backgroundColor: "#FFC107",
+    backgroundColor: "#4CAF50",
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 5,
@@ -233,8 +261,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   button: {
-    backgroundColor: "#007BFF",
-    paddingVertical: 15,
+    backgroundColor: "#4CAF50",
+      padding: 10,
+      borderRadius: 8,
+      alignItems: "center",
     borderRadius: 5,
   },
 });

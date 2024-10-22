@@ -19,10 +19,10 @@ export default function SearchNavigation() {
         component={OnboardingScreen}
         options={{ headerShown: false }}
       />
-      <OnboardingStack.Screen name="Login" component={Login} />
-      <OnboardingStack.Screen name="signUpForm1" component={signUpForm1} />
-      <OnboardingStack.Screen name="signUpForm2" component={signUpForm2} />
-      <OnboardingStack.Screen name="Email" component={Email} />
+      <OnboardingStack.Screen name="Login" options={{headerTitle: '로그인'}} component={Login} />
+      <OnboardingStack.Screen name="signUpForm1" options={{headerTitle: '회원가입'}} component={signUpForm1} />
+      <OnboardingStack.Screen name="signUpForm2" options={{headerTitle: '회원가입'}} component={signUpForm2} />
+      <OnboardingStack.Screen name="Email" options={{headerTitle: '이메일 2차 인증'}} component={Email} />
     </OnboardingStack.Navigator>
   );
 }
