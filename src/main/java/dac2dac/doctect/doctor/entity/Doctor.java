@@ -1,9 +1,7 @@
 package dac2dac.doctect.doctor.entity;
 
 import dac2dac.doctect.agency.entity.Hospital;
-import dac2dac.doctect.common.entity.DiagTime;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -44,9 +42,6 @@ public class Doctor {
     @Lob
     @Column(columnDefinition = "TEXT")
     private String experience;
-
-    @Embedded
-    private DiagTime diagTime;
 
     public static Doctor registerDoctor(
         Hospital hospital,

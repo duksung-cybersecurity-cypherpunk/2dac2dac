@@ -7,10 +7,10 @@ import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
+import dac2dac.doctect.user.dto.request.UserDTO;
 import dac2dac.doctect.user.dto.response.UpcomingReservationDto;
 import dac2dac.doctect.user.dto.response.UserInfoDto;
 import dac2dac.doctect.user.entity.User;
-import dac2dac.doctect.user.entity.constant.Gender;
 import dac2dac.doctect.user.jwt.JWTUtil;
 import dac2dac.doctect.user.repository.UserRepository;
 import java.time.LocalDateTime;
@@ -30,21 +30,27 @@ public class UserService {
     private final JWTUtil jwtUtil;
 
     @Transactional
-    public User registerUser(String username, String email, String password, String phoneNumber, Gender gender, String birthDate) {
+    public User registerUser(UserDTO userDTO) {
         // 유저 이름 중복 체크
-        if (userRepository.findByUsername(username) != null) {
+        if (userRepository.findByUsername(userDTO.getUsername()) != null) {
             throw new RuntimeException("Username is already registered.");
         }
 
         // 이메일 중복 체크
-        if (userRepository.findByEmail(email) != null) {
+        if (userRepository.findByEmail(userDTO.getEmail()) != null) {
             throw new RuntimeException("Email is already registered.");
         }
 
         // 사용자 등록 로직
-        User user = new User();
-        user.registerUser(username, email, passwordEncoder.encode(password), phoneNumber, birthDate, gender);
-        return userRepository.save(user);
+        User newUser = User.registerUser(
+            userDTO.getUsername(),
+            userDTO.getEmail(),
+            passwordEncoder.encode(userDTO.getPassword()),
+            userDTO.getPhoneNumber(),
+            userDTO.getBirthDate(),
+            userDTO.getGender()
+        );
+        return userRepository.save(newUser);
     }
 
     public User findByUsername(String username) {

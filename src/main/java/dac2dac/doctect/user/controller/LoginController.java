@@ -33,20 +33,8 @@ public class LoginController {
 
     @PostMapping("/api/v1/register")
     public ResponseEntity<String> registerUser(@RequestBody UserDTO userDTO) {
-        try {
-            userService.registerUser(
-                userDTO.getUsername(),
-                userDTO.getEmail(),
-                userDTO.getPassword(),
-                userDTO.getPhoneNumber(),
-                userDTO.getGender(),
-                userDTO.getBirthDate()
-            );
-            return ResponseEntity.ok("Registration successful!!");
-        } catch (Exception e) {
-            logger.error("Error during registration: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
-        }
+        userService.registerUser(userDTO);
+        return ResponseEntity.ok("Registration successful!!");
     }
 
 
@@ -92,5 +80,5 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
-    
+
 }

@@ -42,13 +42,15 @@ public class User extends BaseEntity {
         this.latitude = latitude;
     }
 
-    public void registerUser(String username, String email, String password, String phoneNumber, String birthDate, Gender gender) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.birthDate = birthDate;
-        this.gender = gender;
+    public static User registerUser(String username, String email, String password, String phoneNumber, String birthDate, Gender gender) {
+        User user = new User();
+        user.username = username;
+        user.email = email;
+        user.password = password;
+        user.phoneNumber = phoneNumber;
+        user.birthDate = birthDate;
+        user.gender = gender;
+        return user;
     }
 
     public void checkJWT(String id, String username, String email, String phoneNumber, String birthDate, Gender gender) {

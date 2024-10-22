@@ -36,12 +36,6 @@ public class DoctorLoginController {
 
     @PostMapping("/signup")
     public ResponseEntity<String> registerDoctor(@RequestBody DoctorRegisterRequestDto doctorDTO) {
-
-        // 이메일 중복 체크
-        if (doctorRepository.findByEmail(doctorDTO.getEmail()) != null) {
-            return ResponseEntity.badRequest().body("Email is already registered.");
-        }
-
         Doctor registeredDoctor = doctorService.registerDoctor(doctorDTO);
         return ResponseEntity.ok("Doctor registered successfully with ID: " + registeredDoctor.getId());
     }

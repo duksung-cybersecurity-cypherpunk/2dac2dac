@@ -29,6 +29,11 @@ public class DoctorLoginService {
         Department department = departmentRepository.findById(doctorDTO.getDepartmentId())
             .orElseThrow(() -> new IllegalArgumentException("Invalid department ID"));
 
+        // 이메일 중복 체크
+        if (doctorRepository.findByEmail(doctorDTO.getEmail()) != null) {
+            throw new RuntimeException("Email is already registered.");
+        }
+
         Doctor newDoctor = Doctor.registerDoctor(
             hospital,
             department,
