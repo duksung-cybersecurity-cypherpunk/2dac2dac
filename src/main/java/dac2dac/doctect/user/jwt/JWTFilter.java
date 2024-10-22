@@ -9,15 +9,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jdk.jshell.spi.ExecutionControl;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 // JWT 검증 필터
 public class JWTFilter extends OncePerRequestFilter {
@@ -59,16 +57,13 @@ public class JWTFilter extends OncePerRequestFilter {
             String phoneNumber = jwtUtil.getPhoneNumber(token);
             String email = jwtUtil.getEmail(token);
             String userType = jwtUtil.getUserType(token); // 사용자 타입 추가
-            String oneLiner = jwtUtil.getOneLiner(token);
-
 
             // 사용자 타입에 따라 적절한 객체 생성
             if ("doctor".equals(userType)) {
+                String oneLiner = jwtUtil.getOneLiner(token);
+
                 Doctor doctorEntity = new Doctor();
-                doctorEntity.setName(username);
-                doctorEntity.setEmail(email);
-                doctorEntity.setOneLiner(oneLiner);
-                doctorEntity.setId(id);
+                doctorEntity.checkJWT(id, username, email, oneLiner);
 
                 CustomDoctorDetails customDoctorDetails = new CustomDoctorDetails(doctorEntity);
                 Authentication authToken = new UsernamePasswordAuthenticationToken(customDoctorDetails, null, customDoctorDetails.getAuthorities());
@@ -79,12 +74,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 String birthDate = jwtUtil.getBirthdDate(token);
 
                 User userEntity = new User();
-                userEntity.setUsername(username);
-                userEntity.setEmail(email);
-                userEntity.setPhoneNumber(phoneNumber);
-                userEntity.setId(id);
-                userEntity.setGender(gender);
-                userEntity.setBirthDate(birthDate);
+                userEntity.checkJWT(id, username, email, phoneNumber, birthDate, gender);
 
                 CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
                 Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());

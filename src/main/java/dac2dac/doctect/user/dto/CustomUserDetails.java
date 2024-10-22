@@ -2,13 +2,10 @@ package dac2dac.doctect.user.dto;
 
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.entity.constant.Gender;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -18,7 +15,6 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
-//    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList(); // 권한 로직 필요
     }
@@ -45,9 +41,13 @@ public class CustomUserDetails implements UserDetails {
         return user.getPhoneNumber();
     }
 
-    public Gender getGender(){return user.getGender();}
+    public Gender getGender() {
+        return user.getGender();
+    }
 
-    public String getBirthDate(){return user.getBirthDate();}
+    public String getBirthDate() {
+        return user.getBirthDate();
+    }
 
     @Override
     public boolean isAccountNonExpired() {
