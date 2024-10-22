@@ -46,10 +46,10 @@ export default function MedicalHistory() {
       }
     }, [doctorInfo]); // doctorInfo가 변경될 때만 이 useEffect 실행
 
-      const ModalPress = (item) => {
-        setSelectedItem(item);
-        setModalVisible(true);
-      };
+  const ModalPress = (item) => {
+    setSelectedItem(item);
+    setModalVisible(true);
+  };
 
   const fetchData = async () => {
     try {

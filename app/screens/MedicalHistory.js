@@ -17,8 +17,24 @@ export default function MedicalHistory() {
   const [item, setitem] = useState([]); //done
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const fetchUserInfo = async () => {
+      try {
+        const userInfo = await AsyncStorage.getItem("userInfo");
+        const userData = JSON.parse(userInfo);
+        setDoctorInfo(userData.id);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, []); // doctorInfo를 설정하는 부분은 useEffect에서 한 번만 호출
+
+  useEffect(() => {
+    if (doctorInfo) {
+      fetchData(); // doctorInfo가 설정된 후에만 fetchData 호출
+    }
+  }, [doctorInfo]); // doctorInfo가 변경될 때만 이 useEffect 실행
 
   const handleBlockPress = (id, data) => {
     navigation.navigate("HistoryStack", { id, data });
@@ -26,11 +42,6 @@ export default function MedicalHistory() {
 
   const fetchData = async () => {
     try {
-      const userInfo = await AsyncStorage.getItem("userInfo");
-      const userData = JSON.parse(userInfo);
-      //console.log("userId", userData, ReservationDate(selectedDate));
-      setDoctorInfo(userData.id);
-
       const response = await fetch(
         `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`
       );
@@ -38,7 +49,7 @@ export default function MedicalHistory() {
       setitem(data.data.completedReservationList);
       setCnt(data.data.totalCnt);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching data!:", error);
     }
   };
 
