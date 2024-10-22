@@ -31,12 +31,12 @@ export default function MyPage() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>기본 정보</Text>
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Id</Text>
+              <Text style={styles.label}>이름</Text>
               <Text style={styles.value}>{userInfo.username}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Text style={styles.label}>한줄소개</Text>
+              <Text style={styles.label}>한줄 소개</Text>
               <Text style={styles.value}>{userInfo.oneLiner}</Text>
             </View>
           </View>

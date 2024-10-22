@@ -46,7 +46,7 @@ export default function Login({ navigation }) {
       />
 
       <TouchableOpacity style={styles.button} onPress={emailVerify}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>로그인</Text>
       </TouchableOpacity>
 
       <SafeAreaView>

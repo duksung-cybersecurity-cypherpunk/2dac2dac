@@ -141,7 +141,7 @@ const SignUpForm1 = () => {
         multiline
       />
 
-      <Text style={styles.label}>주 진료 항목을 선택해주세요</Text>
+      <Text style={styles.label}>주 진료 항목을 선택해 주세요.</Text>
       <TouchableOpacity
         style={styles.input}
         onPress={() => openModal("department")}
@@ -153,7 +153,7 @@ const SignUpForm1 = () => {
         </Text>
       </TouchableOpacity>
 
-      <Text style={styles.label}>병원을 선택해주세요</Text>
+      <Text style={styles.label}>병원을 선택해 주세요.</Text>
       <TouchableOpacity
         style={styles.input}
         onPress={() => openModal("hospital")}
@@ -162,7 +162,7 @@ const SignUpForm1 = () => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>저장하기</Text>
+        <Text style={styles.submitButtonText}>입력 완료</Text>
       </TouchableOpacity>
 
       {/* Selection Modal */}
