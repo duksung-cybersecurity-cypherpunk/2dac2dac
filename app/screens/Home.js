@@ -114,7 +114,7 @@ export default function Home() {
         onClose={() => setModalVisible(false)}
         price={price}
         setPrice={setPrice}
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit} 
       />
     </View>
   );
