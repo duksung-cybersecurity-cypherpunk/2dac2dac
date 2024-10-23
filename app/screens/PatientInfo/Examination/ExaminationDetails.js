@@ -15,11 +15,12 @@ export default function ExaminationDetails({ route }) {
   const [examInfo, setExamInfo] = useState([]);
   const [date, setDate] = useState("");
 
-  // const handleBlockPress = (id, data) => {
-  //   navigation.navigate("ExaminationInfoStack", { id, data });
-  // };
   const handleLoad = (userId, data) => {
-    navigation.navigate("MeasurementDetails", { userId, data });
+    navigation.navigate("ExaminationInfoStack", {
+      screen: "MeasurementDetails",
+      id: 2,
+      params: { userId: userId, data: data },
+    });
   };
 
   const fetchData = async () => {

@@ -22,12 +22,12 @@ export default function Vaccination({ route }) {
     fetchData();
   }, []);
 
-  // const handleBlockPress = (id, data) => {
-  //   navigation.navigate("VaccinationInfoStack", { id, data });
-  // };
-
-  const handleLoad = (userId, vaccId) => {
-    navigation.navigate("VaccinationDetails", { userId, vaccId });
+  const handleLoad = (userId, data) => {
+    navigation.navigate("VaccinationInfoStack", {
+      screen: "VaccinationDetails",
+      id: 1,
+      params: { userId: userId, vaccId: vaccId },
+    });
   };
 
   const getDayOfWeek = () => {

@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // page
 import Prescription from '../screens/PatientInfo/Prescription';
-import PrescriptionDetails from '../screens/PatientInfo/Prescription/PrescriptionFaceDetails';
+import PrescriptionFaceDetails from '../screens/PatientInfo/Prescription/PrescriptionFaceDetails';
 
 const PrescriptionInfoStack = createNativeStackNavigator();
 
@@ -15,15 +15,15 @@ export default function PrescriptionNavigator( {route} ) {
             {
                 id === 1 ? (
                   <PrescriptionInfoStack.Screen 
-                      name="PrescriptionDetails"
-                      component={PrescriptionDetails}
+                      name="PrescriptionFaceDetails"
+                      component={PrescriptionFaceDetails}
                       options={{
                           headerTitle: '처방 내역',
                       }}
                       initialParams={{ data }}
                   />
               ) : <PrescriptionInfoStack.Screen 
-                        name="처방" 
+                        name="Prescription" 
                         component={Prescription} 
                         options={{
                             headerShown: false,

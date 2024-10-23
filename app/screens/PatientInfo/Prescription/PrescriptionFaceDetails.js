@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 
 export default function PrescriptionFaceDetails({ route }) {
   const { userId, data } = route.params;
-
   const [item, setItem] = useState([]);
 
   const fetchData = async () => {

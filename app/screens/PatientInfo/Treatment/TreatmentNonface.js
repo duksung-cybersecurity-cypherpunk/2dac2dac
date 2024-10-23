@@ -18,12 +18,12 @@ export default function TreatmentNonface({ route }) {
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
 
-  // const handleBlockPress = (data) => {
-  //   navigation.navigate("TreatmentInfoStack", { id: 1, data }); // 비대면 진료 상세페이지
-  // };
-
   const handleLoad = (userId, data) => {
-    navigation.navigate("NonfaceDetails", { userId, data });
+    navigation.navigate("TreatmentInfoStack", {
+      screen: "NonfaceDetails",
+      id: 1,
+      params: { userId: userId, data: data },
+    });
   };
   const getDayOfWeek = () => {
     const daysOfWeek = [

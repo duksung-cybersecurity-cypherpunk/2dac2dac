@@ -15,15 +15,20 @@ export default function OtherDetails({ route }) {
   const [item, setItem] = useState([]);
   const [date, setDate] = useState("");
 
-  // const handleBlockPress = (id, data) => {
-  //   navigation.navigate("ExaminationInfoStack", { id, data });
-  // };
-  const handleBlockPress = () => {
-    navigation.navigate("Examination", { userId });
+  const handleBlockPress = (userId) => {
+    navigation.navigate("ExaminationInfoStack", {
+      screen: "Examination",
+      id: 10,
+      params: { userId: userId },
+    });
   };
 
   const handleLoad = (userId, data) => {
-    navigation.navigate("BloodDetails", { userId, data });
+    navigation.navigate("ExaminationInfoStack", {
+      screen: "BloodDetails",
+      id: 3,
+      params: { userId: userId, data: data },
+    });
   };
 
   const fetchData = async () => {

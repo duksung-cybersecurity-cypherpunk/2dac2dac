@@ -17,11 +17,12 @@ export default function Examination({ route }) {
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
 
-  // const handleBlockPress = ( data ) => {
-  //   navigation.navigate("ExaminationInfoStack", { id: 1, data }); // 건강 검진 상세
-  // };
   const handleLoad = (userId, data) => {
-    navigation.navigate("ExaminationDetails", { userId, data });
+    navigation.navigate("ExaminationInfoStack", {
+      screen: "ExaminationDetails",
+      id: 1,
+      params: { userId: userId, data: data },
+    });
   };
 
   const fetchData = async () => {
