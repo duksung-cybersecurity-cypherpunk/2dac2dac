@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MedicalHistory() {
@@ -22,19 +22,28 @@ export default function MedicalHistory() {
         const userInfo = await AsyncStorage.getItem("userInfo");
         const userData = JSON.parse(userInfo);
         setDoctorInfo(userData.id);
+        fetchData();
       } catch (error) {
         console.error("Error fetching user info:", error);
       }
     };
 
     fetchUserInfo();
-  }, []); // doctorInfo를 설정하는 부분은 useEffect에서 한 번만 호출
+  }, []);
 
   useEffect(() => {
     if (doctorInfo) {
-      fetchData(); // doctorInfo가 설정된 후에만 fetchData 호출
+      fetchData();
     }
-  }, [doctorInfo]); // doctorInfo가 변경될 때만 이 useEffect 실행
+  }, [doctorInfo]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (doctorInfo) {
+        fetchData();
+      }
+    }, [doctorInfo])
+  );
 
   const handleBlockPress = (data) => {
     navigation.navigate("HistoryStack", {

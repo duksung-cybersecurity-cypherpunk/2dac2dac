@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
   Modal,
   Button,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -25,25 +25,35 @@ export default function Home() {
   const [price, setPrice] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userInfo = await AsyncStorage.getItem("userInfo");
-        const userData = JSON.parse(userInfo);
+useEffect(() => {
+  const fetchUserInfo = async () => {
+    try {
+      const userInfo = await AsyncStorage.getItem("userInfo");
+      const userData = JSON.parse(userInfo);
+      if (userData && userData.id) {
         setDoctorInfo(userData.id);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
 
-    fetchUserInfo();
-  }, []);
+  fetchUserInfo();
+}, []);
 
-  useEffect(() => {
+useEffect(() => {
+  if (doctorInfo) {
+    fetchData();
+  }
+}, [doctorInfo]);
+
+useFocusEffect(
+  useCallback(() => {
     if (doctorInfo) {
       fetchData();
     }
-  }, [doctorInfo]);
+  }, [doctorInfo])
+);
 
   const ModalPress = (item) => {
     setSelectedItem(item);
