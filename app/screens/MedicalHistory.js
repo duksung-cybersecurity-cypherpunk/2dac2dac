@@ -64,7 +64,6 @@ export default function MedicalHistory() {
               />
               <Text
                 style={[
-                  styles.hospitalName,
                   { paddingTop: 20, paddingBottom: 10 },
                 ]}
               >

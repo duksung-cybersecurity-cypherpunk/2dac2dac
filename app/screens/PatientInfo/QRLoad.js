@@ -1,35 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
 
 export default function QRLoad({ route }) {
   const navigation = useNavigation();
   const { doctorId, reservationId } = route.params;
   const [loading, setLoading] = useState(true);
 
-  const [item, setitem] = useState([]);
   const [userId, setUserId] = useState();
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
-
-  const fetchData = async () => {
-    try {
-      const userInfo = await AsyncStorage.getItem("userInfo");
-      const userData = JSON.parse(userInfo);
-      setDoctorInfo(userData.id);
-
-      const response = await fetch(
-        `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`
-      );
-      const data = await response.json();
-      setitem(data.data.completedReservationList);
-      setCnt(data.data.totalCnt);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
 
   const patientData = async () => {
     try {
@@ -50,10 +31,7 @@ export default function QRLoad({ route }) {
   };
 
   useEffect(() => {
-    fetchData();
     patientData();
-  }, []);
-  useEffect(() => {
     setUserId(userId);
   }, [userId]);
 
