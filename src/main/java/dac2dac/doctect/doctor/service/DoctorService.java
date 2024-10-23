@@ -233,6 +233,7 @@ public class DoctorService {
                 .reservationId(r.getId())
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
+            .sorted(Comparator.comparing(ReservationItem::getReservationDate))
             .collect(Collectors.toList());
 
         List<ReservationItem> toBeCompleteReservation = reservationList.stream()
@@ -244,6 +245,7 @@ public class DoctorService {
                 .reservationId(r.getId())
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
+            .sorted(Comparator.comparing(ReservationItem::getReservationDate))
             .collect(Collectors.toList());
 
         List<ReservationItem> completedReservation = reservationList.stream()
@@ -255,6 +257,7 @@ public class DoctorService {
                 .reservationId(r.getId())
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
+            .sorted(Comparator.comparing(ReservationItem::getReservationDate))
             .collect(Collectors.toList());
 
         return TodayReservationDto.builder()
