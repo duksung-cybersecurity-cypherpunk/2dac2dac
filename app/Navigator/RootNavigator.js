@@ -37,10 +37,10 @@ export default function RootNavigator() {
         name="ReservationDetails"
         component={ReservationDetails}
         options={{
-          headerTitle: "진료 내역",
+          headerTitle: "수락된 예약 신청서",
+          headerShown: true, // 헤더가 보이도록 설정
         }}
       />
-
       <RootStack.Screen
         name="HistoryStack"
         component={HistoryStack}
