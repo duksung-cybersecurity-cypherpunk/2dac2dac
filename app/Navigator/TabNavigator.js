@@ -92,7 +92,7 @@ export default function BottomTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="홈" component={Home} />
+      <Tab.Screen name="홈" component={Home} options={{ headerShown: false }}/>
       <Tab.Screen name="예약" component={Reservation} />
       <Tab.Screen name="내역" component={MedicalHistory} />
       <Tab.Screen name="설정" component={MyPage} />
