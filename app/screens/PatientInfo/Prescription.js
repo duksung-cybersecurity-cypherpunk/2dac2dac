@@ -17,11 +17,12 @@ export default function Prescription({ route }) {
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
 
-  // const handleBlockPress = (id, data) => {
-  //   navigation.navigate("PrescriptionInfoStack", { id, data }); // 투약 대면 상세페이지
-  // };
   const handleLoad = (userId, data) => {
-    navigation.navigate("PrescriptionFaceDetails", { userId, data });
+    navigation.navigate("PrescriptionInfoStack", {
+      screen: "PrescriptionFaceDetails",
+      id: 1,
+      params: { userId: userId, data: data },
+    });
   };
 
   const fetchData = async () => {
@@ -30,7 +31,6 @@ export default function Prescription({ route }) {
         `http://203.252.213.209:8080/api/v1/healthList/prescription/${userId}`
       );
       const data = await response.json();
-
       setitem(data.data.prescriptionItemList);
       setCnt(data.data.totalCnt);
     } catch (error) {
@@ -71,7 +71,6 @@ export default function Prescription({ route }) {
                     <View style={{ flex: 1 }}>
                       <Text style={styles.timeText}>{item.treatDate}</Text>
                       <View style={styles.hospitalInfoContainer}>
-                        {/* Doctor's basic information on the right */}
                         <View style={styles.row}>
                           <View style={[{ paddingTop: 5 }]}>
                             <Text style={styles.hospitalName}>

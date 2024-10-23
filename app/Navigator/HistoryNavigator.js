@@ -24,7 +24,7 @@ export default function HistoryNavigator( {route} ) {
                       initialParams={{ data }}
                   />
               ) : <HistoryStack.Screen 
-                        name="처방" 
+                        name="MedicalHistory" 
                         component={MedicalHistory} 
                         options={{
                             headerShown: false,

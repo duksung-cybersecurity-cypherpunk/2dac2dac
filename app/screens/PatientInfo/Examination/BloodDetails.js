@@ -15,15 +15,20 @@ export default function BloodDetails({ route }) {
   const [item, setItem] = useState([]);
   const [date, setDate] = useState("");
 
-  // const handleBlockPress = (id, data) => {
-  //   navigation.navigate("ExaminationInfoStack", { id, data });
-  // };
-  const handleBlockPress = () => {
-    navigation.navigate("MeasurementDetails", { userId, data });
+  const handleBlockPress = (userId, data) => {
+    navigation.navigate("ExaminationInfoStack", {
+      screen: "MeasurementDetails",
+      id: 2,
+      params: { userId: userId, data: data },
+    });
   };
 
   const handleLoad = (userId, data) => {
-    navigation.navigate("OtherDetails", { userId, data });
+    navigation.navigate("ExaminationInfoStack", {
+      screen: "OtherDetails",
+      id: 4,
+      params: { userId: userId, data: data },
+    });
   };
 
   const fetchData = async () => {

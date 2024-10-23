@@ -15,15 +15,20 @@ export default function MeasurementDetails({ route }) {
   const [item, setItem] = useState([]);
   const [date, setDate] = useState("");
 
-  // const handleBlockPress = (id, data) => {
-  //   navigation.navigate("ExaminationInfoStack", { id, data });
-  // };
   const handleBlockPress = (userId, data) => {
-    navigation.navigate("ExaminationDetails", { userId, data });
+    navigation.navigate("ExaminationInfoStack", {
+      screen: "ExaminationDetails",
+      id: 1,
+      params: { userId: userId, data: data },
+    });
   };
 
   const handleLoad = (userId, data) => {
-    navigation.navigate("BloodDetails", { userId, data });
+    navigation.navigate("ExaminationInfoStack", {
+      screen: "BloodDetails",
+      id: 3,
+      params: { userId: userId, data: data },
+    });
   };
 
   const fetchData = async () => {

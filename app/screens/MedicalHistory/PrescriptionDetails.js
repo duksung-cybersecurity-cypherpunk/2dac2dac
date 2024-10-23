@@ -40,19 +40,13 @@ export default function PrescriptionDetails({ route }) {
     <View style={styles.screenContainer}>
       <ScrollView style={styles.scrollView}>
         <View style={[{ padding: 20 }]}>
-          <View style={[styles.doctorInfoContainer, { paddingBottom: 15 }]}>
-            <View style={[{ padding: 10 }]}>
-              <Text style={styles.doctorName}> {name} 환자 </Text>
-              <View style={[{ padding: 3 }]}></View>
-            </View>
-          </View>
           <Text style={styles.titleText}>진료 세부 정보</Text>
-          <View style={[styles.row, { paddingTop: 20 }]}>
+          <View style={[styles.row, { paddingTop: 10 }]}>
             <Text>진료 형태</Text>
             <Text>일반 외래</Text>
           </View>
-          <Text style={styles.titleText}>증상</Text>
-          <View style={[styles.row, { paddingTop: 20 }]}>
+          <Text style={[styles.titleText, { paddingTop: 30 }]}>증상</Text>
+          <View style={[styles.row, { paddingTop: 10 }]}>
             <Text style={styles.text}> 복용 중인 약 유무 </Text>
             {drug === true ? (
               <Icon
@@ -106,8 +100,8 @@ export default function PrescriptionDetails({ route }) {
               />
             )}
           </View>
-          <Text style={styles.titleText}>결제 정보</Text>
-          <View style={[styles.row, { paddingTop: 20 }]}>
+          <Text style={[styles.titleText, { paddingTop: 30 }]}>결제 정보</Text>
+          <View style={[styles.row, { paddingTop: 10 }]}>
             <Text> 진찰료 </Text>
             <Text> {price}원 </Text>
           </View>
@@ -217,7 +211,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   titleText: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
   },
   symptomText: {

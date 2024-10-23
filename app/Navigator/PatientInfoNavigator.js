@@ -28,7 +28,7 @@ export default function PatientInfoNavigator({ route }) {
         />
       ) : id === 2 ? (
         <PatientInfoStack.Screen
-          name="진료 내역"
+          name="Treatment"
           component={Treatment}
           options={{
             headerTitle: "환자 정보",
@@ -36,7 +36,7 @@ export default function PatientInfoNavigator({ route }) {
         />
       ) : id === 3 ? (
         <PatientInfoStack.Screen
-          name="투약 내역"
+          name="Prescription"
           component={Prescription}
           options={{
             headerTitle: "환자 정보",
@@ -44,7 +44,7 @@ export default function PatientInfoNavigator({ route }) {
         />
       ) : id === 4 ? (
         <PatientInfoStack.Screen
-          name="건강 검진 내역"
+          name="Examination"
           component={Examination}
           options={{
             headerTitle: "환자 정보",
@@ -52,14 +52,14 @@ export default function PatientInfoNavigator({ route }) {
         />
       ) : id === 5 ? (
         <PatientInfoStack.Screen
-          name="예방 접종 내역"
+          name="Vaccination"
           component={Vaccination}
           options={{
             headerTitle: "환자 정보",
           }}
         />
       ) : (
-        <PatientInfoStack.Screen name="설정" component={MyPage} />
+        <PatientInfoStack.Screen name="MyPage" component={MyPage} />
       )}
     </PatientInfoStack.Navigator>
   );

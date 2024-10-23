@@ -68,30 +68,29 @@ export default function QRLoad({ route }) {
 
   const handleLoad = (id, userId) => {
     if (id === 1) {
-      navigation.navigate("TreatmentInfoStack", {
+      navigation.navigate("PatientInfoStack", {
         screen: "Treatment",
-        id: 5,
+        id: 2,
         params: { userId: userId },
       });
     }
     if (id === 2) {
-      navigation.navigate("PrescriptionInfoStack", {
-        screen: "처방",
+      navigation.navigate("PatientInfoStack", {
+        screen: "Prescription",
+        id: 3,
         params: { userId: userId },
       });
     }
     if (id === 3) {
-      //ExaminationInfoStack
-      navigation.navigate("ExaminationInfoStack", {
-        screen: "건강검진",
-        id: 5,
+      navigation.navigate("PatientInfoStack", {
+        screen: "Examination",
+        id: 4,
         params: { userId: userId },
       });
     }
-    //PatientInfoStack Vaccination
     if (id === 4) {
       navigation.navigate("PatientInfoStack", {
-        screen: "예방 접종 내역",
+        screen: "Vaccination",
         id: 5,
         params: { userId: userId },
       });

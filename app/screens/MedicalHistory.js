@@ -36,17 +36,22 @@ export default function MedicalHistory() {
     }
   }, [doctorInfo]); // doctorInfo가 변경될 때만 이 useEffect 실행
 
-  const handleBlockPress = (id, data) => {
-    navigation.navigate("HistoryStack", { id, data });
+  const handleBlockPress = (data) => {
+    navigation.navigate("HistoryStack", {
+      screen: "PrescriptionDetails",
+      id: 1,
+      params: { data: data },
+    });
   };
 
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`
+        `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/1`
       );
       const data = await response.json();
       setitem(data.data.completedReservationList);
+      console.log(item);
       setCnt(data.data.totalCnt);
     } catch (error) {
       console.error("Error fetching data!:", error);
@@ -91,7 +96,7 @@ export default function MedicalHistory() {
                             <TouchableOpacity
                               style={styles.vaccinInfo}
                               onPress={() =>
-                                handleBlockPress(1, item.noncontactDiagId)
+                                handleBlockPress(item.noncontactDiagId)
                               }
                               activeOpacity={0.7}
                             >

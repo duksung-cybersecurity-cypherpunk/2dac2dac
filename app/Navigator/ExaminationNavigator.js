@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // page
 import Examination from "../screens/PatientInfo/Examination";
-import Details from "../screens/PatientInfo/Examination/ExaminationDetails";
+import ExaminationDetails from "../screens/PatientInfo/Examination/ExaminationDetails";
 import MeasurementDetails from "../screens/PatientInfo/Examination/MeasurementDetails";
 import BloodDetails from "../screens/PatientInfo/Examination/BloodDetails";
 import OtherDetails from "../screens/PatientInfo/Examination/OtherDetails";
@@ -18,8 +18,8 @@ export default function ExaminationNavigator( {route} ) {
         {
             id === 1 ? (
                 <ExaminationInfoStack.Screen 
-                    name="Details"
-                    component={Details}
+                    name="ExaminationDetails"
+                    component={ExaminationDetails}
                     options={{
                         headerTitle: '건강검진',
                     }} 
@@ -53,7 +53,7 @@ export default function ExaminationNavigator( {route} ) {
                     initialParams={{ data }}
                 />
             )   : <ExaminationInfoStack.Screen 
-                    name="건강검진" 
+                    name="Examination" 
                     component={Examination} 
                     options={{
                         headerShown: false,

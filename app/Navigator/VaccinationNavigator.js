@@ -23,7 +23,7 @@ export default function VaccinationNavigator({ route }) {
                     initialParams={{ data }}
                 />
             ) : <VaccinationInfoStack.Screen 
-                    name="예방 접종" 
+                    name="Vaccination" 
                     component={Vaccination} 
                     options={{
                         headerShown: false,
