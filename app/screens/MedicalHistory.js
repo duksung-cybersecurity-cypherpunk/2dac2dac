@@ -60,7 +60,7 @@ export default function MedicalHistory() {
       );
       const data = await response.json();
       setitem(data.data.completedReservationList);
-      console.log(item);
+
       setCnt(data.data.totalCnt);
     } catch (error) {
       console.error("Error fetching data!:", error);
@@ -76,11 +76,7 @@ export default function MedicalHistory() {
               <Image
                 source={require("../../assets/images/PatientInfo/ListNonExist.png")}
               />
-              <Text
-                style={[
-                  { paddingTop: 20, paddingBottom: 10 },
-                ]}
-              >
+              <Text style={[{ paddingTop: 20, paddingBottom: 10 }]}>
                 완료된 진료 내역이 없어요.
               </Text>
             </View>
