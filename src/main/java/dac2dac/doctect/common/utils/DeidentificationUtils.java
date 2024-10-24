@@ -27,16 +27,13 @@ public class DeidentificationUtils {
 
     // 생년월일을 나이대(10대, 20대 등)로 변환하는 메서드
     public static String convertBirthDateToAgeGroup(String birthDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYYMMdd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate birthDateLocalDate = LocalDate.parse(birthDate, formatter);
+
         int birthYear = birthDateLocalDate.getYear();
         int currentYear = LocalDate.now().getYear();
-
-        if ((birthYear % 100) > (currentYear % 100)) {
-            birthYear -= 100;  // 1900년대 출생자
-        }
-
         int age = currentYear - birthYear + 1;
+
         return calculateAgeGroup(age);
     }
 
