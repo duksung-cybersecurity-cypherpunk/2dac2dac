@@ -1,7 +1,6 @@
 package dac2dac.doctect.common.utils;
 
 import dac2dac.doctect.user.entity.constant.Gender;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -28,7 +27,7 @@ public class DeidentificationUtils {
 
     // 생년월일을 나이대(10대, 20대 등)로 변환하는 메서드
     public static String convertBirthDateToAgeGroup(String birthDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYYMMdd");
         LocalDate birthDateLocalDate = LocalDate.parse(birthDate, formatter);
         int birthYear = birthDateLocalDate.getYear();
         int currentYear = LocalDate.now().getYear();
