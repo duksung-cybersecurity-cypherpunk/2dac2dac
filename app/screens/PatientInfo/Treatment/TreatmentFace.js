@@ -19,12 +19,13 @@ export default function Prescription({ route }) {
   const [date, setDate] = useState();
   const [time, setTime] = useState();
 
-  // const handleBlockPress = (data) => {
-  //   navigation.navigate("TreatmentInfoStack", { id: 2, data }); // 대면 진료 상세페이지
-  // };
   const handleLoad = (userId, data) => {
-    navigation.navigate("FaceDetails", { userId, data });
+    navigation.navigate("TreatmentInfoStack", { 
+      screen: "FaceDetails",
+      id: 2,
+      params: { userId: userId, data: data } });
   };
+
   const getDayOfWeek = () => {
     const daysOfWeek = [
       "일요일",
