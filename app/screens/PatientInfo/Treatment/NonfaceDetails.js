@@ -8,30 +8,39 @@ import {
   Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function NonfaceDetails({ route }) {
   const navigation = useNavigation();
   const { userId, data } = route.params;
-  console.log("userId", userId, data);
 
   const [item, setitem] = useState([]);
   const [diag, setDiag] = useState([]);
 
   const getDayOfWeek = () => {
-    const daysOfWeek = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    const daysOfWeek = [
+      "일요일",
+      "월요일",
+      "화요일",
+      "수요일",
+      "목요일",
+      "금요일",
+      "토요일",
+    ];
     const today = new Date();
     return daysOfWeek[today.getDay()];
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/healthList/diagnosis/noncontact/${userId}/${data}`);
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/healthList/diagnosis/noncontact/${userId}/${data}`
+      );
       const diagdata = await response.json();
       setitem(diagdata.data.noncontactDoctorInfo);
       setDiag(diagdata.data.noncontactDiagDetailInfo);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -41,91 +50,131 @@ export default function NonfaceDetails({ route }) {
 
   return (
     <View style={styles.screenContainer}>
-      <ScrollView style={styles.scrollView}> 
-        <View style={[{padding: 20}]}>
+      <ScrollView style={styles.scrollView}>
+        <View style={[{ padding: 20 }]}>
           <Text style={styles.timeText}>{item.diagDate}</Text>
-          <View style={[styles.doctorInfoContainer, {paddingBottom: 15}]}>
+          <View style={[styles.doctorInfoContainer, { paddingBottom: 15 }]}>
             <Image
               source={require("../../../../assets/images/hospital/hospital_all.png")}
               style={styles.doctorImage}
             />
-            <View style={[{padding: 10}]}>
+            <View style={[{ padding: 10 }]}>
               <Text style={styles.doctorName}> {item.doctorName} 의사 </Text>
-              <View style={[{padding: 3}]}></View>
-              <Text style={styles.doctorInfo}> {item.doctorHospitalName} </Text> 
+              <View style={[{ padding: 3 }]}></View>
+              <Text style={styles.doctorInfo}> {item.doctorHospitalName} </Text>
               <View style={[{ flexDirection: "row" }, { padding: 3 }]}>
-                {
-                  item.agencyIsOpenNow === true ? (
-                    <Text style={[styles.text, { color: "#94C973" }]}> ㆍ영업 중 | </Text>
-                  ) :
-                    <Text style={[styles.text, { color: "#D6D6D6" }]}> ㆍ영업 종료 | </Text>
-                }
-                <Text style={[styles.text, {color: "#D6D6D6"}]}> {getDayOfWeek()} ({item.doctorTodayOpenTime}{" ~ "}{item.doctorTodayCloseTime}) </Text>
+                {item.agencyIsOpenNow === true ? (
+                  <Text style={[styles.text, { color: "#94C973" }]}>
+                    {" "}
+                    ㆍ영업 중 |{" "}
+                  </Text>
+                ) : (
+                  <Text style={[styles.text, { color: "#D6D6D6" }]}>
+                    {" "}
+                    ㆍ영업 종료 |{" "}
+                  </Text>
+                )}
+                <Text style={[styles.text, { color: "#D6D6D6" }]}>
+                  {" "}
+                  {getDayOfWeek()} ({item.doctorTodayOpenTime}
+                  {" ~ "}
+                  {item.doctorTodayCloseTime}){" "}
+                </Text>
               </View>
-            </View>    
+            </View>
           </View>
           <Text style={styles.titleText}>진료 세부 정보</Text>
-          <View style={[styles.row, {paddingTop: 20}]}>
-            <Text>진료 형태</Text>          
+          <View style={[styles.row, { paddingTop: 20 }]}>
+            <Text>진료 형태</Text>
             <Text>일반 외래</Text>
           </View>
           <Text style={styles.titleText}>증상</Text>
-          <View style={[styles.row, {paddingTop: 20}]}>
+          <View style={[styles.row, { paddingTop: 20 }]}>
             <Text style={styles.text}> 복용 중인 약 유무 </Text>
-            {
-              diag.isPrescribedDrug === true ? (
-                <Icon name="check" size={24} color="#76B947" style={[{marginLeft: 100}]} />
-              ) :
-                <Icon name="check" size={24} color="#D6D6D6" style={[{marginLeft: 100}]} />
-            }
+            {diag.isPrescribedDrug === true ? (
+              <Icon
+                name="check"
+                size={24}
+                color="#76B947"
+                style={[{ marginLeft: 100 }]}
+              />
+            ) : (
+              <Icon
+                name="check"
+                size={24}
+                color="#D6D6D6"
+                style={[{ marginLeft: 100 }]}
+              />
+            )}
           </View>
-          <View style={[styles.row, {paddingTop: 5}]}>
+          <View style={[styles.row, { paddingTop: 5 }]}>
             <Text style={styles.text}> 알레르기 유무 </Text>
-            {
-              diag.isAllergicSymptom === true ? (
-                <Icon name="check" size={24} color="#76B947" style={[{marginLeft: 100}]} />
-              ) :
-                <Icon name="check" size={24} color="#D6D6D6" style={[{marginLeft: 100}]} />
-            }
+            {diag.isAllergicSymptom === true ? (
+              <Icon
+                name="check"
+                size={24}
+                color="#76B947"
+                style={[{ marginLeft: 100 }]}
+              />
+            ) : (
+              <Icon
+                name="check"
+                size={24}
+                color="#D6D6D6"
+                style={[{ marginLeft: 100 }]}
+              />
+            )}
           </View>
-          <View style={[styles.row, {paddingTop: 5}]}>
+          <View style={[styles.row, { paddingTop: 5 }]}>
             <Text style={styles.text}> 선천적인 질환 유무 </Text>
-            {
-              diag.isInbornDisease === true ? (
-                <Icon name="check" size={24} color="#76B947" style={[{marginLeft: 100}]} />
-              ) :
-                <Icon name="check" size={24} color="#D6D6D6" style={[{marginLeft: 100}]} />
-            }
+            {diag.isInbornDisease === true ? (
+              <Icon
+                name="check"
+                size={24}
+                color="#76B947"
+                style={[{ marginLeft: 100 }]}
+              />
+            ) : (
+              <Icon
+                name="check"
+                size={24}
+                color="#D6D6D6"
+                style={[{ marginLeft: 100 }]}
+              />
+            )}
           </View>
-          <View style={[{paddingTop: 20}, {paddingBottom: 30}, {paddingLeft: 120}]}> 
-          </View>
+          <View
+            style={[
+              { paddingTop: 20 },
+              { paddingBottom: 30 },
+              { paddingLeft: 120 },
+            ]}
+          ></View>
 
           <Text style={styles.titleText}>결제 정보</Text>
-          <View style={[styles.row, {paddingTop: 20}]}>
-            <Text> 진찰료 </Text>                 
+          <View style={[styles.row, { paddingTop: 20 }]}>
+            <Text> 진찰료 </Text>
             <Text> {diag.price}원 </Text>
           </View>
-          <View style={[styles.row, {paddingTop: 5}]}>
-            <Text> 결제 방법 </Text>          
+          <View style={[styles.row, { paddingTop: 5 }]}>
+            <Text> 결제 방법 </Text>
             <Text> {diag.paymentType} </Text>
           </View>
-          <View style={[styles.row, {paddingTop: 5}]}>
-            <Text> 승인 일시 </Text>          
+          <View style={[styles.row, { paddingTop: 5 }]}>
+            <Text> 승인 일시 </Text>
             <Text> {diag.approvalDate} </Text>
           </View>
-
         </View>
       </ScrollView>
     </View>
-    
   );
 }
 
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "white",
   },
   row: {
@@ -138,8 +187,8 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   countBlock: {
-    flexDirection: "row", 
-    justifyContent: "space-between", 
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingTop: 30,
     paddingLeft: 50,
     paddingRight: 50,
@@ -148,13 +197,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "98%",
     height: "20%",
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#EBF2EA",
   },
   blockTop: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     width: "32%",
     height: 35,
     borderTopLeftRadius: 5,
@@ -162,8 +211,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#9BD394",
   },
   blockBottom: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     width: "32%",
     height: 35,
     borderBottomLeftRadius: 5,
@@ -171,13 +220,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#EBF2EA",
   },
   symptomBlock: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     height: 32,
     borderRadius: 5,
     backgroundColor: "#CFECD9",
   },
-  button: { 
+  button: {
     width: "60%",
     justifyContent: "center",
     alignItems: "center",

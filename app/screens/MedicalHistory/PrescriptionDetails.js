@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
+import dayjs from "dayjs";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function PrescriptionDetails({ route }) {
@@ -111,7 +112,7 @@ export default function PrescriptionDetails({ route }) {
           </View>
           <View style={[styles.row, { paddingTop: 5 }]}>
             <Text> 승인 일시 </Text>
-            <Text> {date} </Text>
+            <Text> {dayjs(date).format("YYYY.MM.DD HH:mm")}</Text>
           </View>
         </View>
       </ScrollView>

@@ -22,7 +22,6 @@ export default function QRLoad({ route }) {
       setName(patient.data.userName);
       setAge(patient.data.age);
       setGender(patient.data.gender);
-      setPhoneNumber(patient.data.phoneNumber);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -159,12 +158,11 @@ const styles = StyleSheet.create({
   },
   infoBlock: {
     width: "90%",
-    height: "12%",
     backgroundColor: "#F5F5F5",
     borderRadius: 8,
     margin: 20,
-    paddingTop: 12,
-    paddingLeft: 20,
+    padding: 10,
+    paddingLeft: 15,
   },
   infoSubText: {
     fontSize: 14,

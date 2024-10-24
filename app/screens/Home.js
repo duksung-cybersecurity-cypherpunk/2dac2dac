@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,8 @@ import {
   Modal,
   Button,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import dayjs from "dayjs";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -30,7 +31,9 @@ export default function Home() {
       try {
         const userInfo = await AsyncStorage.getItem("userInfo");
         const userData = JSON.parse(userInfo);
-        setDoctorInfo(userData.id);
+        if (userData && userData.id) {
+          setDoctorInfo(userData.id);
+        }
       } catch (error) {
         console.error("Error fetching user info:", error);
       }
@@ -45,15 +48,25 @@ export default function Home() {
     }
   }, [doctorInfo]);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (doctorInfo) {
+        fetchData();
+      }
+    }, [doctorInfo])
+  );
+
   const ModalPress = (item) => {
     setSelectedItem(item);
-    console.log(item);
+
     setModalVisible(true);
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorInfo}/today`);
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorInfo}/today`
+      );
       const data = await response.json();
       setCompleted(data.data.completedReservationItemList);
       setSchedule(data.data.scheduledReservationItemList);
@@ -92,20 +105,32 @@ export default function Home() {
       <View style={styles.content}>
         {cnt === 0 ? (
           <View style={styles.emptyState}>
-            <Image source={require("../../assets/images/PatientInfo/ListNonExist.png")} />
+            <Image
+              source={require("../../assets/images/PatientInfo/ListNonExist.png")}
+            />
             <Text style={styles.emptyText}>오늘 진료 예약 내역이 없어요.</Text>
           </View>
         ) : (
           <ScrollView style={styles.scrollView}>
-            {pay != null && pay.map((item) => (
-              <ReservationItem key={item.reservationId} item={item} onPress={ModalPress} />
-            ))}
-            {schedule != null && schedule.map((item) => (
-              <ReservationItem key={item.reservationId} item={item} />
-            ))}
-            {completed != null && completed.map((item) => (
-              <CompletedReservationItem key={item.reservationId} item={item} />
-            ))}
+            {schedule != null &&
+              schedule.map((item) => (
+                <ReservationItem key={item.reservationId} item={item} />
+              ))}
+            {pay != null &&
+              pay.map((item) => (
+                <ReservationItem
+                  key={item.reservationId}
+                  item={item}
+                  onPress={ModalPress}
+                />
+              ))}
+            {completed != null &&
+              completed.map((item) => (
+                <CompletedReservationItem
+                  key={item.reservationId}
+                  item={item}
+                />
+              ))}
           </ScrollView>
         )}
       </View>
@@ -114,7 +139,7 @@ export default function Home() {
         onClose={() => setModalVisible(false)}
         price={price}
         setPrice={setPrice}
-        onSubmit={handleSubmit} 
+        onSubmit={handleSubmit}
       />
     </View>
   );
@@ -122,10 +147,15 @@ export default function Home() {
 
 const ReservationItem = ({ item, onPress }) => (
   <View style={styles.reservationBlock}>
-    <Text style={styles.timeText}>{item.reservationDate}</Text>
+    <Text style={styles.timeText}>
+      {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+    </Text>
     <Text style={styles.hospitalName}>{item.patientName} 환자</Text>
     {onPress && (
-      <TouchableOpacity style={styles.prescriptionBlock} onPress={() => onPress(item)}>
+      <TouchableOpacity
+        style={styles.prescriptionBlock}
+        onPress={() => onPress(item)}
+      >
         <Text style={styles.prescriptionText}>진료비 청구하기</Text>
       </TouchableOpacity>
     )}
@@ -134,17 +164,27 @@ const ReservationItem = ({ item, onPress }) => (
 
 const CompletedReservationItem = ({ item }) => (
   <View style={styles.reservationBlock}>
-    <Text style={styles.timeText}>{item.reservationDate}</Text>
+    <Text style={styles.timeText}>
+      {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+    </Text>
     <Text style={styles.hospitalName}>{item.patientName} 환자</Text>
     <View style={styles.vaccinInfo}>
-      <Image source={require("../../assets/images/PatientInfo/vaccCert.png")} style={styles.vaccCert} />
+      <Image
+        source={require("../../assets/images/PatientInfo/vaccCert.png")}
+        style={styles.vaccCert}
+      />
       <Text style={styles.vaccText}>진료가 완료되었습니다.</Text>
     </View>
   </View>
 );
 
 const ReservationModal = ({ visible, onClose, price, setPrice, onSubmit }) => (
-  <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
+  <Modal
+    animationType="slide"
+    transparent={true}
+    visible={visible}
+    onRequestClose={onClose}
+  >
     <View style={styles.modalContainer}>
       <View style={styles.modalContent}>
         <Text style={styles.modalText}>진료비 금액 입력</Text>
@@ -156,10 +196,16 @@ const ReservationModal = ({ visible, onClose, price, setPrice, onSubmit }) => (
           onChangeText={setPrice}
         />
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={[styles.button, styles.submitButton]} onPress={onSubmit}>
+          <TouchableOpacity
+            style={[styles.button, styles.submitButton]}
+            onPress={onSubmit}
+          >
             <Text style={styles.buttonText}>청구하기</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onClose}>
+          <TouchableOpacity
+            style={[styles.button, styles.cancelButton]}
+            onPress={onClose}
+          >
             <Text style={styles.buttonText}>취소</Text>
           </TouchableOpacity>
         </View>

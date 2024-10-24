@@ -37,7 +37,7 @@ const Email = ({ route, navigation }) => {
 
   const handleVerifyToken = async () => {
     if (enteredToken === serverToken) {
-      Alert.alert("Success", "Email verified successfully.");
+      Alert.alert("", "이메일 인증이 성공적으로 완료됐습니다.");
       await handleLogin(); // Call handleLogin() after successful email verification
     } else {
       Alert.alert(

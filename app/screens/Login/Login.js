@@ -94,10 +94,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 10,
     borderWidth: 2,
-    borderColor: "#007BFF",
+    borderColor: "#5E9740",
   },
   signUpButtonText: {
-    color: "#007BFF",
+    color: "#5E9740",
     textAlign: "center",
     fontWeight: "bold",
   },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import dayjs from "dayjs";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MedicalHistory() {
@@ -22,19 +23,28 @@ export default function MedicalHistory() {
         const userInfo = await AsyncStorage.getItem("userInfo");
         const userData = JSON.parse(userInfo);
         setDoctorInfo(userData.id);
+        fetchData();
       } catch (error) {
         console.error("Error fetching user info:", error);
       }
     };
 
     fetchUserInfo();
-  }, []); // doctorInfo를 설정하는 부분은 useEffect에서 한 번만 호출
+  }, []);
 
   useEffect(() => {
     if (doctorInfo) {
-      fetchData(); // doctorInfo가 설정된 후에만 fetchData 호출
+      fetchData();
     }
-  }, [doctorInfo]); // doctorInfo가 변경될 때만 이 useEffect 실행
+  }, [doctorInfo]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (doctorInfo) {
+        fetchData();
+      }
+    }, [doctorInfo])
+  );
 
   const handleBlockPress = (data) => {
     navigation.navigate("HistoryStack", {
@@ -51,7 +61,7 @@ export default function MedicalHistory() {
       );
       const data = await response.json();
       setitem(data.data.completedReservationList);
-      console.log(item);
+
       setCnt(data.data.totalCnt);
     } catch (error) {
       console.error("Error fetching data!:", error);
@@ -67,11 +77,7 @@ export default function MedicalHistory() {
               <Image
                 source={require("../../assets/images/PatientInfo/ListNonExist.png")}
               />
-              <Text
-                style={[
-                  { paddingTop: 20, paddingBottom: 10 },
-                ]}
-              >
+              <Text style={[{ paddingTop: 20, paddingBottom: 10 }]}>
                 완료된 진료 내역이 없어요.
               </Text>
             </View>
@@ -88,7 +94,9 @@ export default function MedicalHistory() {
                         <View style={styles.hospitalBlock}>
                           <View style={{ flex: 1 }}>
                             <Text style={styles.timeText}>
-                              {item.reservationDate}
+                              {dayjs(item.reservationDate).format(
+                                "YYYY.MM.DD HH:mm"
+                              )}
                             </Text>
                             <Text style={styles.hospitalName}>
                               {item.patientName} 환자

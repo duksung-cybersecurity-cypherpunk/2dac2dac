@@ -1,10 +1,24 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Modal } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  Modal,
+} from "react-native";
 import axios from "axios";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import { formatDate } from "../../Components/weeks";
 
-const ReservationModal = ({ selectedReservation, modalType, modalVisible, setModalVisible, doctorId, fetchReservations }) => {
+const ReservationModal = ({
+  selectedReservation,
+  modalType,
+  modalVisible,
+  setModalVisible,
+  doctorId,
+  fetchReservations,
+}) => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [additionalReason, setAdditionalReason] = useState("");
 
@@ -14,7 +28,6 @@ const ReservationModal = ({ selectedReservation, modalType, modalVisible, setMod
       const response = await axios.post(apiUrl);
 
       if (response.status === 200) {
-        console.log("Reservation accepted successfully!");
         setModalVisible(false);
         fetchReservations();
       } else {
@@ -34,7 +47,7 @@ const ReservationModal = ({ selectedReservation, modalType, modalVisible, setMod
       });
 
       if (response.status === 200) {
-        console.log("Reservation rejected successfully!");
+        ("Reservation rejected successfully!");
         setModalVisible(false);
         fetchReservations();
       } else {
@@ -55,7 +68,9 @@ const ReservationModal = ({ selectedReservation, modalType, modalVisible, setMod
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>
-            {modalType === "accept" ? "예약을 수락하시겠습니까?" : "예약을 거절하시겠습니까?"}
+            {modalType === "accept"
+              ? "예약을 수락하시겠습니까?"
+              : "예약을 거절하시겠습니까?"}
           </Text>
           <Text style={styles.subtitle}>
             {modalType === "accept"
@@ -66,8 +81,18 @@ const ReservationModal = ({ selectedReservation, modalType, modalVisible, setMod
           {selectedReservation && (
             <View style={styles.detailsBox}>
               <Text>신청자 명: {selectedReservation.patientName}</Text>
-              <Text>신청 일시: {dayjs(selectedReservation.signupDate).format('YYYY.MM.DD HH:mm')}</Text>
-              <Text>희망 일시: {dayjs(selectedReservation.reservationDate).format('YYYY.MM.DD HH:mm')}</Text>
+              <Text>
+                신청 일시:{" "}
+                {dayjs(selectedReservation.signupDate).format(
+                  "YYYY.MM.DD HH:mm"
+                )}
+              </Text>
+              <Text>
+                희망 일시:{" "}
+                {dayjs(selectedReservation.reservationDate).format(
+                  "YYYY.MM.DD HH:mm"
+                )}
+              </Text>
             </View>
           )}
 
@@ -91,7 +116,11 @@ const ReservationModal = ({ selectedReservation, modalType, modalVisible, setMod
           <View style={styles.modalButtonsRow}>
             <TouchableOpacity
               style={styles.confirmButton}
-              onPress={modalType === "accept" ? handleAcceptReservation : handleRejectReservation}
+              onPress={
+                modalType === "accept"
+                  ? handleAcceptReservation
+                  : handleRejectReservation
+              }
             >
               <Text style={styles.confirmButtonText}>
                 {modalType === "accept" ? "예약 수락하기" : "예약 거절하기"}

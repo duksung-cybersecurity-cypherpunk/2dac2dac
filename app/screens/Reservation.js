@@ -35,7 +35,7 @@ export default function Reservation() {
 
   useEffect(() => {
     fetchReservations();
-  }, [selectedDate]);
+  }, [selectedDate, selectedTab]);
 
   const fetchReservations = async () => {
     try {
