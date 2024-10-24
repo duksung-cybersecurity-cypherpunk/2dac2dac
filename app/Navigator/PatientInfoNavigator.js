@@ -14,7 +14,7 @@ import Vaccination from "../screens/PatientInfo/Vaccination";
 const PatientInfoStack = createNativeStackNavigator();
 
 export default function PatientInfoNavigator({ route }) {
-  const { id, data } = route.params;
+  const { id } = route.params;
 
   return (
     <PatientInfoStack.Navigator>

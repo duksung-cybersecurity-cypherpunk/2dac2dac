@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from "react-native";
 import axios from "axios";
+import dayjs from "dayjs";
 import { useNavigation } from "@react-navigation/native";
 
 const ReservationDetails = ({ route }) => {
@@ -62,14 +63,9 @@ const ReservationDetails = ({ route }) => {
         <View>
           <View style={styles.headerContainer}>
             <Text style={styles.reservationDate}>
-              {new Date(reservationData.reservationItem.reservationDate)
-                .toLocaleDateString("ko-KR")
-                .replace(/\./g, " ")}
-              {
-                new Date(reservationData.reservationItem.reservationDate)
-                  .toLocaleString()
-                  .split(",")[1]
-              }
+              {dayjs(reservationData.reservationItem.signupDate).format(
+                "YYYY.MM.DD HH:mm"
+              )}
             </Text>
 
             <Text style={styles.patientName}>
@@ -77,14 +73,9 @@ const ReservationDetails = ({ route }) => {
             </Text>
             <Text style={styles.reservationDate}>
               희망 진료 시간:{" "}
-              {new Date(reservationData.reservationItem.signupDate)
-                .toLocaleDateString("ko-KR")
-                .replace(/\./g, " ")}
-              {
-                new Date(reservationData.reservationItem.signupDate)
-                  .toLocaleString()
-                  .split(",")[1]
-              }
+              {dayjs(reservationData.reservationItem.signupDate).format(
+                "YYYY.MM.DD HH:mm"
+              )}
             </Text>
           </View>
           <View style={styles.headerContainer}>

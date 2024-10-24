@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+import dayjs from "dayjs";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -93,7 +94,9 @@ export default function MedicalHistory() {
                         <View style={styles.hospitalBlock}>
                           <View style={{ flex: 1 }}>
                             <Text style={styles.timeText}>
-                              {item.reservationDate}
+                              {dayjs(item.reservationDate).format(
+                                "YYYY.MM.DD HH:mm"
+                              )}
                             </Text>
                             <Text style={styles.hospitalName}>
                               {item.patientName} 환자

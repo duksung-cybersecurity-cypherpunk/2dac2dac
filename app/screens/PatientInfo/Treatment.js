@@ -10,6 +10,7 @@ const Tab = createMaterialTopTabNavigator();
 
 export default function Treatment({ route }) {
   const { userId } = route.params;
+  console.log("userId", userId);
 
   return (
     <View style={styles.blocks}>

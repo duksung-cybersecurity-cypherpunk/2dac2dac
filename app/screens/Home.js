@@ -11,6 +11,7 @@ import {
   Button,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import dayjs from "dayjs";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -25,35 +26,35 @@ export default function Home() {
   const [price, setPrice] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
 
-useEffect(() => {
-  const fetchUserInfo = async () => {
-    try {
-      const userInfo = await AsyncStorage.getItem("userInfo");
-      const userData = JSON.parse(userInfo);
-      if (userData && userData.id) {
-        setDoctorInfo(userData.id);
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const userInfo = await AsyncStorage.getItem("userInfo");
+        const userData = JSON.parse(userInfo);
+        if (userData && userData.id) {
+          setDoctorInfo(userData.id);
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error);
       }
-    } catch (error) {
-      console.error("Error fetching user info:", error);
-    }
-  };
+    };
 
-  fetchUserInfo();
-}, []);
+    fetchUserInfo();
+  }, []);
 
-useEffect(() => {
-  if (doctorInfo) {
-    fetchData();
-  }
-}, [doctorInfo]);
-
-useFocusEffect(
-  useCallback(() => {
+  useEffect(() => {
     if (doctorInfo) {
       fetchData();
     }
-  }, [doctorInfo])
-);
+  }, [doctorInfo]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (doctorInfo) {
+        fetchData();
+      }
+    }, [doctorInfo])
+  );
 
   const ModalPress = (item) => {
     setSelectedItem(item);
@@ -111,6 +112,10 @@ useFocusEffect(
           </View>
         ) : (
           <ScrollView style={styles.scrollView}>
+            {schedule != null &&
+              schedule.map((item) => (
+                <ReservationItem key={item.reservationId} item={item} />
+              ))}
             {pay != null &&
               pay.map((item) => (
                 <ReservationItem
@@ -118,10 +123,6 @@ useFocusEffect(
                   item={item}
                   onPress={ModalPress}
                 />
-              ))}
-            {schedule != null &&
-              schedule.map((item) => (
-                <ReservationItem key={item.reservationId} item={item} />
               ))}
             {completed != null &&
               completed.map((item) => (
@@ -146,7 +147,9 @@ useFocusEffect(
 
 const ReservationItem = ({ item, onPress }) => (
   <View style={styles.reservationBlock}>
-    <Text style={styles.timeText}>{item.reservationDate}</Text>
+    <Text style={styles.timeText}>
+      {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+    </Text>
     <Text style={styles.hospitalName}>{item.patientName} 환자</Text>
     {onPress && (
       <TouchableOpacity
@@ -161,7 +164,9 @@ const ReservationItem = ({ item, onPress }) => (
 
 const CompletedReservationItem = ({ item }) => (
   <View style={styles.reservationBlock}>
-    <Text style={styles.timeText}>{item.reservationDate}</Text>
+    <Text style={styles.timeText}>
+      {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+    </Text>
     <Text style={styles.hospitalName}>{item.patientName} 환자</Text>
     <View style={styles.vaccinInfo}>
       <Image

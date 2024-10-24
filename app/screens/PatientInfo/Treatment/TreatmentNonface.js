@@ -43,6 +43,7 @@ export default function TreatmentNonface({ route }) {
       const response = await fetch(
         `http://203.252.213.209:8080/api/v1/healthList/diagnosis/${userId}`
       );
+      const data = await response.json();
       setitem(data.data.noncontactDiagList.noncontactDiagItemList);
       setCnt(data.data.noncontactDiagList.totalCnt);
     } catch (error) {
