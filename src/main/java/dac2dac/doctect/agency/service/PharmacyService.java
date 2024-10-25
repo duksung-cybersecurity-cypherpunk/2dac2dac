@@ -29,17 +29,17 @@ public class PharmacyService {
     @Async
     public void savePharmacyInfo(int pageNo) {
         PharmacyItems pharmacyItems = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(PHARMACY_ENDPOINT)
-                        .queryParam("serviceKey", PHARMACY_API_KEY)
-                        .queryParam("_type", "json")
-                        .queryParam("pageNo", pageNo)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(PharmacyItems.class)
-                .retry(3)
-                .block();
+            .uri(uriBuilder -> uriBuilder
+                .path(PHARMACY_ENDPOINT)
+                .queryParam("serviceKey", PHARMACY_API_KEY)
+                .queryParam("_type", "json")
+                .queryParam("pageNo", pageNo)
+                .build())
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToMono(PharmacyItems.class)
+            .retry(3)
+            .block();
 
         try {
             pharmacyItems.getPharmacyItems().forEach(item -> {
@@ -49,7 +49,7 @@ public class PharmacyService {
         } catch (DataIntegrityViolationException e) {
         }
 
-        log.info("pageNo: {} :: pharmacyItems: {}", pageNo, pharmacyItems);
+        log.debug("pageNo: {} :: pharmacyItems: {}", pageNo, pharmacyItems);
     }
 
 }

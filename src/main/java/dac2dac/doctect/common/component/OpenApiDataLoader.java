@@ -3,6 +3,7 @@ package dac2dac.doctect.common.component;
 import dac2dac.doctect.agency.service.HospitalService;
 import dac2dac.doctect.agency.service.PharmacyService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -14,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class OpenApiDataLoader implements ApplicationRunner {
 
     private final PharmacyService pharmacyService;
@@ -61,6 +63,8 @@ public class OpenApiDataLoader implements ApplicationRunner {
         for (int i = 1; i <= totalPage; i++) {
             pharmacyService.savePharmacyInfo(i);
         }
+
+        log.info("약국 데이터 모두 불러오기 완료");
     }
 
     public void saveAllHospitalInfo() throws ParseException {
@@ -86,5 +90,7 @@ public class OpenApiDataLoader implements ApplicationRunner {
         for (int i = 1; i <= totalPage; i++) {
             hospitalService.saveHospitalInfo(i);
         }
+
+        log.info("병원 데이터 모두 불러오기 완료");
     }
 }

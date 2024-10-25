@@ -29,17 +29,17 @@ public class HospitalService {
     @Async
     public void saveHospitalInfo(int pageNo) {
         HospitalItems hospitalItems = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(HOSPITAL_ENDPOINT)
-                        .queryParam("serviceKey", HOSPITAL_API_KEY)
-                        .queryParam("_type", "json")
-                        .queryParam("pageNo", pageNo)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(HospitalItems.class)
-                .retry(3)
-                .block();
+            .uri(uriBuilder -> uriBuilder
+                .path(HOSPITAL_ENDPOINT)
+                .queryParam("serviceKey", HOSPITAL_API_KEY)
+                .queryParam("_type", "json")
+                .queryParam("pageNo", pageNo)
+                .build())
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToMono(HospitalItems.class)
+            .retry(3)
+            .block();
 
         try {
             hospitalItems.getHospitalItems().forEach(item -> {
@@ -49,6 +49,6 @@ public class HospitalService {
         } catch (DataIntegrityViolationException e) {
         }
 
-        log.info("pageNo: {} :: hospitalItems: {}", pageNo, hospitalItems);
+        log.debug("pageNo: {} :: hospitalItems: {}", pageNo, hospitalItems);
     }
 }
