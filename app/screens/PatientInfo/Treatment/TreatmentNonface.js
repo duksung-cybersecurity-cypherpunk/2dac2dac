@@ -60,7 +60,7 @@ export default function TreatmentNonface({ route }) {
       <View style={styles.screenContainer}>
         <View style={styles.row}>
           {cnt === 0 ? (
-            <View style={[{ alignItems: "center" }, { paddingTop: 240 }]}>
+            <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}>
               <Image
                 source={require("../../../../assets/images/PatientInfo/ListNonExist.png")}
               />
@@ -89,7 +89,7 @@ export default function TreatmentNonface({ route }) {
                           style={styles.doctorImage}
                         />
                         <View style={styles.row}>
-                          <View style={[{ padding: 10 }, { paddingLeft: 20 }]}>
+                          <View style={[{ padding: 5 }]}>
                             <Text style={styles.doctorName}>
                               {" "}
                               {item.doctorName} 의사{" "}
@@ -102,9 +102,9 @@ export default function TreatmentNonface({ route }) {
                               {item.doctorHostpital}{" "}
                             </Text>
                             <View
-                              style={[{ flexDirection: "row" }, { padding: 5 }]}
+                              style={[{ flexDirection: "row" }, { padding: 3 }]}
                             >
-                              {item.agencyIsOpenNow === true ? (
+                              {item.doctorIsOpenNow === true ? (
                                 <Text
                                   style={[styles.text, { color: "#94C973" }]}
                                 >
@@ -157,12 +157,12 @@ const styles = StyleSheet.create({
   },
   blocks: {
     width: "49%",
-    height: "60%",
+    height: "40%",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#9BD394",
     borderRadius: 6,
-    marginTop: 10,
+    marginTop: 20,
     marginRight: 8,
   },
   one: {
@@ -182,17 +182,17 @@ const styles = StyleSheet.create({
   },
   doctorBlock: {
     flexDirection: "row",
-    height: "90%",
+    height: 150,
     backgroundColor: "white",
     padding: 20,
     borderBottomColor: "#D6D6D6",
     borderBottomWidth: 1,
   },
   doctorImage: {
-    width: 80,
-    height: 80,
+    width: 70,
+    height: 70,
     borderRadius: 5,
-    marginTop: 10,
+    marginTop: 15,
   },
   doctorInfoContainer: {
     flexDirection: "row",
@@ -203,12 +203,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   doctorInfo: {
-    fontSize: 16,
+    fontSize: 15,
+    padding: 5,
   },
   timeText: {
     fontSize: 16,
   },
   text: {
-    fontSize: 15,
+    fontSize: 14,
   },
 });

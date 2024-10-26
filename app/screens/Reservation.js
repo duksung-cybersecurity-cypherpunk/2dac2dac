@@ -44,8 +44,7 @@ export default function Reservation() {
       setDoctorId(userData.id);
 
       const apiUrl = `http://203.252.213.209:8080/api/v1/doctors/reservations/${
-        userData.id
-      }/${ReservationDate(selectedDate)}`;
+        doctorId}/${ReservationDate(selectedDate)}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === 200) {

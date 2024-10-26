@@ -38,7 +38,6 @@ export default function Home() {
         console.error("Error fetching user info:", error);
       }
     };
-
     fetchUserInfo();
   }, []);
 
@@ -58,7 +57,6 @@ export default function Home() {
 
   const ModalPress = (item) => {
     setSelectedItem(item);
-
     setModalVisible(true);
   };
 
@@ -68,6 +66,7 @@ export default function Home() {
         `http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorInfo}/today`
       );
       const data = await response.json();
+      console.log(data);
       setCompleted(data.data.completedReservationItemList);
       setSchedule(data.data.scheduledReservationItemList);
       setPay(data.data.toBeCompleteReservationItemList);
