@@ -59,7 +59,7 @@ export default function MedicalHistory() {
       const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`);
       const data = await response.json();
       console.log(data);
-      setItem(data.data.completedReservationList); // 수정: setitem -> setItem
+      setItem(data.data.completedReservationList);
       setCnt(data.data.totalCnt);
     } catch (error) {
       console.error("Error fetching data!:", error);
@@ -75,16 +75,14 @@ export default function MedicalHistory() {
               <Image
                 source={require("../../assets/images/PatientInfo/ListNonExist.png")}
               />
-              <Text style={[{ paddingTop: 20, paddingLeft: 20, fontWeight: "bold", fontSize: 18 }]}>
-                완료된 진료 내역이 없어요.
-              </Text>
+              <Text style={styles.emptyText}>완료된 진료 내역이 없어요.</Text>
             </View>
           ) : (
             <ScrollView style={styles.scrollView}>
               {item.map((item) => (
                 <View
                   key={item.noncontactDiagId}
-                  style={styles.hospitalBlock} // 수정: 각 항목의 스타일을 병합
+                  style={styles.hospitalBlock}
                 >
                   <View style={{ flex: 1 }}>
                     <Text style={styles.timeText}>
@@ -157,5 +155,13 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 14,
+  },
+  emptyText: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 20,
+    paddingLeft: 20, 
+    fontWeight: "bold", 
+    fontSize: 18
   },
 });
