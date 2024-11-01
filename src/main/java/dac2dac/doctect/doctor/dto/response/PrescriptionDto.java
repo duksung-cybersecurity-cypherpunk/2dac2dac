@@ -15,17 +15,20 @@ public class PrescriptionDto {
     private Boolean isAllergicSymptom;
     private Boolean isInbornDisease;
 
+    private String doctorOpinion;
+
     private Integer paymentPrice;
     private String paymentType;
     private LocalDateTime paymentAcceptedDate;
 
     @Builder
-    public PrescriptionDto(String patientName, Boolean isPrescribedDrug, Boolean isAllergicSymptom, Boolean isInbornDisease, Integer paymentPrice, String paymentType,
+    public PrescriptionDto(String patientName, Boolean isPrescribedDrug, Boolean isAllergicSymptom, Boolean isInbornDisease, String doctorOpinion, Integer paymentPrice, String paymentType,
         LocalDateTime paymentAcceptedDate) {
         this.patientName = patientName;
         this.isPrescribedDrug = isPrescribedDrug;
         this.isAllergicSymptom = isAllergicSymptom;
         this.isInbornDisease = isInbornDisease;
+        this.doctorOpinion = doctorOpinion;
         this.paymentPrice = paymentPrice;
         this.paymentType = paymentType;
         this.paymentAcceptedDate = paymentAcceptedDate;

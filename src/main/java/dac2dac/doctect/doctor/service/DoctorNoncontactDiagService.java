@@ -91,6 +91,7 @@ public class DoctorNoncontactDiagService {
             .isAllergicSymptom(symptom.getIsAllergicSymptom())
             .isInbornDisease(symptom.getIsInbornDisease())
             .isPrescribedDrug(symptom.getIsPrescribedDrug())
+            .doctorOpinion(noncontactDiag.getDoctorOpinion())
             .paymentPrice(paymentInfo.getPrice())
             .paymentType(paymentInfo.getPaymentMethod().getPaymentType().getPaymentTypeName())
             .paymentAcceptedDate(paymentInfo.getCreateDate())
