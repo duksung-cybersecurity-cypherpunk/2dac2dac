@@ -244,10 +244,10 @@ public class DoctorService {
         NoncontactDiagReservation reservation = noncontactDiagReservationRepository.findById(reservationId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
 
+        // 예약 시간이 현재 시간보다 이후일 경우 예외 처리
         LocalDateTime reservationDateTime = LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime());
         LocalDateTime now = LocalDateTime.now();
 
-        // 예약 시간이 현재 시간보다 이후일 경우 예외 처리
         if (reservationDateTime.isAfter(now)) {
             throw new BadRequestException(ErrorCode.RESERVATION_NOT_STARTED);
         }
@@ -262,9 +262,11 @@ public class DoctorService {
             .doctor(reservation.getDoctor())
             .noncontactDiagReservation(reservation)
             .paymentInfo(paymentInfo)
+            .doctorOpinion(request.getDoctorOpinion())
             .diagDate(reservation.getReservationDate())
             .diagTime(reservation.getReservationTime())
             .build();
+
         noncontactDiagRepository.save(noncontactDiag);
     }
 }

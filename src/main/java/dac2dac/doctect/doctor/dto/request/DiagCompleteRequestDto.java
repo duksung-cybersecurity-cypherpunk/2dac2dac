@@ -8,4 +8,5 @@ import lombok.NoArgsConstructor;
 public class DiagCompleteRequestDto {
 
     private Integer price;
+    private String doctorOpinion;
 }

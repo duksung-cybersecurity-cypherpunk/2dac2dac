@@ -42,15 +42,18 @@ public class NoncontactDiag {
     @JoinColumn(name = "payment_info_id")
     private PaymentInfo paymentInfo;
 
+    private String doctorOpinion;
     private LocalDate diagDate;
     private LocalTime diagTime;
 
     @Builder
-    public NoncontactDiag(User user, Doctor doctor, NoncontactDiagReservation noncontactDiagReservation, PaymentInfo paymentInfo, LocalDate diagDate, LocalTime diagTime) {
+    public NoncontactDiag(User user, Doctor doctor, NoncontactDiagReservation noncontactDiagReservation, PaymentInfo paymentInfo, String doctorOpinion, LocalDate diagDate,
+        LocalTime diagTime) {
         this.user = user;
         this.doctor = doctor;
         this.noncontactDiagReservation = noncontactDiagReservation;
         this.paymentInfo = paymentInfo;
+        this.doctorOpinion = doctorOpinion;
         this.diagDate = diagDate;
         this.diagTime = diagTime;
     }
