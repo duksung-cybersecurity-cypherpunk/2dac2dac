@@ -215,13 +215,8 @@ public class DoctorService {
         LocalDate nowDate = LocalDate.now();
 
         // 오늘 예약 목록 가져오기
-        List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByReservationDateAndDoctorId(nowDate, doctorId)
+        List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByDoctorIdAndReservationDate(doctorId, nowDate)
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
-
-//        // 완료된(처방전 작성된) 오늘 예약 아이디 가져오기
-//        List<Long> completedReservationIdList = noncontactDiagRepository.findByDiagDateAndDoctorId(nowDate, doctorId).stream()
-//            .map(nd -> nd.getNoncontactDiagReservation().getId())
-//            .collect(Collectors.toList());
 
         // Scheduled 예약 필터링 (현재 시간 이후 & 예약 상태 Complete)
         List<ReservationItem> scheduledReservation = reservationList.stream()

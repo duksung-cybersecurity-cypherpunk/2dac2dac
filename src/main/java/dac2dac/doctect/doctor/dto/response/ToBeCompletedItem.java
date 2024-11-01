@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class PrescriptionItem {
+public class ToBeCompletedItem {
 
-    private Long noncontactDiagId;
+    private Long reservationId;
     private LocalDateTime reservationDate;
     private String patientName;
 
     @Builder
-    public PrescriptionItem(Long noncontactDiagId, LocalDateTime reservationDate, String patientName) {
-        this.noncontactDiagId = noncontactDiagId;
+    public ToBeCompletedItem(Long reservationId, LocalDateTime reservationDate, String patientName) {
+        this.reservationId = reservationId;
         this.reservationDate = reservationDate;
         this.patientName = patientName;
     }
