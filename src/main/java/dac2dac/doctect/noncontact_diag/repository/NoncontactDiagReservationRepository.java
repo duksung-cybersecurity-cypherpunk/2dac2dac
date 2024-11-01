@@ -15,6 +15,8 @@ public interface NoncontactDiagReservationRepository extends JpaRepository<Nonco
 
     Optional<List<NoncontactDiagReservation>> findByDoctorIdAndReservationDate(Long doctorId, LocalDate date);
 
+    Optional<List<NoncontactDiagReservation>> findByDoctorIdAndStatus(Long doctorId, ReservationStatus status);
+
     /**
      * 현재 시간 기준, 가장 가까운 진료에 해당하는 진료 엔티티를 조회한다. (환자)
      **/
@@ -36,6 +38,4 @@ public interface NoncontactDiagReservationRepository extends JpaRepository<Nonco
         "ORDER BY reservation_date ASC, reservation_time ASC " +
         "LIMIT 1", nativeQuery = true)
     Optional<NoncontactDiagReservation> findNearestReservationByDoctorIdAndStatus(@Param("doctorId") Long doctorId, @Param("status") String status);
-
-    Optional<List<NoncontactDiagReservation>> findByReservationDateAndDoctorId(LocalDate today, @Param("doctorId") Long doctorId);
 }

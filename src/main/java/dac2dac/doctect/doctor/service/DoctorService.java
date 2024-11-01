@@ -18,7 +18,7 @@ import dac2dac.doctect.doctor.dto.response.RequestReservationFormDto;
 import dac2dac.doctect.doctor.dto.response.RequestReservationItemList;
 import dac2dac.doctect.doctor.dto.response.ReservationItem;
 import dac2dac.doctect.doctor.dto.response.ReservationListDto;
-import dac2dac.doctect.doctor.dto.response.TodayReservationDto;
+import dac2dac.doctect.doctor.dto.response.TodayScheduledReservationDto;
 import dac2dac.doctect.doctor.dto.response.UpcomingReservationDto;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
@@ -207,7 +207,7 @@ public class DoctorService {
             .build();
     }
 
-    public TodayReservationDto getTodayReservation(Long doctorId) {
+    public TodayScheduledReservationDto getTodayReservation(Long doctorId) {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
 
@@ -215,15 +215,10 @@ public class DoctorService {
         LocalDate nowDate = LocalDate.now();
 
         // 오늘 예약 목록 가져오기
-        List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByReservationDateAndDoctorId(nowDate, doctorId)
+        List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByDoctorIdAndReservationDate(doctorId, nowDate)
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
 
-        // 완료된(처방전 작성된) 오늘 예약 아이디 가져오기
-        List<Long> completedReservationIdList = noncontactDiagRepository.findByDiagDateAndDoctorId(nowDate, doctorId).stream()
-            .map(nd -> nd.getNoncontactDiagReservation().getId())
-            .collect(Collectors.toList());
-
-        // 예약을 현재 시간 기준으로 나눔
+        // Scheduled 예약 필터링 (현재 시간 이후 & 예약 상태 Complete)
         List<ReservationItem> scheduledReservation = reservationList.stream()
             .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isAfter(nowDateTime)
                 && reservation.getStatus().equals(ReservationStatus.COMPLETE))
@@ -236,34 +231,8 @@ public class DoctorService {
             .sorted(Comparator.comparing(ReservationItem::getReservationDate))
             .collect(Collectors.toList());
 
-        List<ReservationItem> toBeCompleteReservation = reservationList.stream()
-            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isBefore(nowDateTime)
-                && !completedReservationIdList.contains(reservation.getId()))
-            .map(r -> ReservationItem.builder()
-                .userId(r.getUser().getId())
-                .patientName(maskName(r.getUser().getUsername()))
-                .reservationId(r.getId())
-                .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
-                .build())
-            .sorted(Comparator.comparing(ReservationItem::getReservationDate))
-            .collect(Collectors.toList());
-
-        List<ReservationItem> completedReservation = reservationList.stream()
-            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isBefore(nowDateTime)
-                && completedReservationIdList.contains(reservation.getId()))
-            .map(r -> ReservationItem.builder()
-                .userId(r.getUser().getId())
-                .patientName(maskName(r.getUser().getUsername()))
-                .reservationId(r.getId())
-                .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
-                .build())
-            .sorted(Comparator.comparing(ReservationItem::getReservationDate))
-            .collect(Collectors.toList());
-
-        return TodayReservationDto.builder()
-            .totalCnt(scheduledReservation.size() + completedReservation.size() + toBeCompleteReservation.size())
-            .toBeCompleteReservationItemList(toBeCompleteReservation)
-            .completedReservationItemList(completedReservation)
+        return TodayScheduledReservationDto.builder()
+            .totalCnt(scheduledReservation.size())
             .scheduledReservationItemList(scheduledReservation)
             .build();
     }
@@ -275,10 +244,10 @@ public class DoctorService {
         NoncontactDiagReservation reservation = noncontactDiagReservationRepository.findById(reservationId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
 
+        // 예약 시간이 현재 시간보다 이후일 경우 예외 처리
         LocalDateTime reservationDateTime = LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime());
         LocalDateTime now = LocalDateTime.now();
 
-        // 예약 시간이 현재 시간보다 이후일 경우 예외 처리
         if (reservationDateTime.isAfter(now)) {
             throw new BadRequestException(ErrorCode.RESERVATION_NOT_STARTED);
         }
@@ -293,9 +262,11 @@ public class DoctorService {
             .doctor(reservation.getDoctor())
             .noncontactDiagReservation(reservation)
             .paymentInfo(paymentInfo)
+            .doctorOpinion(request.getDoctorOpinion())
             .diagDate(reservation.getReservationDate())
             .diagTime(reservation.getReservationTime())
             .build();
+
         noncontactDiagRepository.save(noncontactDiag);
     }
 }
