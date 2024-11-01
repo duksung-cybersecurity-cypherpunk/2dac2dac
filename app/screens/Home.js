@@ -15,7 +15,7 @@ export default function Home() {
   const navigation = useNavigation();
   const [doctorInfo, setDoctorInfo] = useState(null);
   const [cnt, setCnt] = useState(0);
-  const [totalcnt, setTotalCnt] = useState();
+  const [totalcnt, setTotalCnt] = useState(0);
   const [schedule, setSchedule] = useState([]);
 
   useEffect(() => {

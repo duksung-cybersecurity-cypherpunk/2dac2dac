@@ -14,8 +14,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function MedicalHistory() {
   const navigation = useNavigation();
   const [doctorInfo, setDoctorInfo] = useState(null);
-  const [cnt, setCnt] = useState();
+  const [cnt, setCnt] = useState(0);
   const [item, setItem] = useState([]);
+  const [toBeItem, setToBeItem] = useState([]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -47,10 +48,17 @@ export default function MedicalHistory() {
   );
 
   const handleBlockPress = (data) => {
+      navigation.navigate("HistoryStack", {
+        screen: "PrescriptionDetails",
+        id: 1,
+        params: { data: data },
+      });
+  };
+  const handleLoad = (doctorId, reservationId) => {
     navigation.navigate("HistoryStack", {
-      screen: "PrescriptionDetails",
-      id: 1,
-      params: { data: data },
+      screen: "PrescriptionWriting",
+      id: 2,
+      params: { doctorId: doctorId, reservationId: reservationId },
     });
   };
 
@@ -58,8 +66,9 @@ export default function MedicalHistory() {
     try {
       const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`);
       const data = await response.json();
-      console.log(data);
+      console.log(data.data.completedReservationList);
       setItem(data.data.completedReservationList);
+      setToBeItem(data.data.toBeCompleteReservationList);
       setCnt(data.data.totalCnt);
     } catch (error) {
       console.error("Error fetching data!:", error);
@@ -79,30 +88,52 @@ export default function MedicalHistory() {
             </View>
           ) : (
             <ScrollView style={styles.scrollView}>
-              {item.map((item) => (
-                <View
-                  key={item.noncontactDiagId}
-                  style={styles.hospitalBlock}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.timeText}>
-                      {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
-                    </Text>
-                    <Text style={styles.hospitalName}>
-                      {item.patientName} 환자
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.vaccinInfo}
-                      onPress={() => handleBlockPress(item.noncontactDiagId)}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.prescriptionText}>
-                        처방전 확인하기
+              {toBeItem != null &&
+                toBeItem.map((toBeItem) => (
+                  <View
+                    key={toBeItem.noncontactDiagId}
+                    style={styles.hospitalBlock}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.timeText}>
+                        {dayjs(toBeItem.reservationDate).format("YYYY.MM.DD HH:mm")}
                       </Text>
-                    </TouchableOpacity>
+                      <Text style={styles.hospitalName}>
+                        {toBeItem.patientName} 환자
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.vaccinInfo}
+                        onPress={() => handleLoad(doctorInfo, toBeItem.noncontactDiagId)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.prescriptionText}>처방전 작성하기</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              ))}
+                ))}
+              {item != null &&
+                item.map((item) => (
+                  <View
+                    key={item.noncontactDiagId}
+                    style={styles.hospitalBlock}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.timeText}>
+                        {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+                      </Text>
+                      <Text style={styles.hospitalName}>
+                        {item.patientName} 환자
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.vaccinInfo}
+                        onPress={() => handleBlockPress(item.noncontactDiagId)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.prescriptionText}>처방전 확인하기</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
             </ScrollView>
           )}
         </View>
