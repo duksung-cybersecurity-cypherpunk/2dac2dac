@@ -44,7 +44,9 @@ public class HospitalService {
         try {
             hospitalItems.getHospitalItems().forEach(item -> {
                 Hospital hospital = item.toEntity();
-                hospitalRepository.save(hospital);
+                if (hospital != null) {
+                    hospitalRepository.save(hospital);
+                }
             });
         } catch (DataIntegrityViolationException e) {
         }
