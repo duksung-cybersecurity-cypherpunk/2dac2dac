@@ -220,7 +220,7 @@ public class HealthListService {
                 LocalDateTime diagDateTime = LocalDateTime.of(nc.getDiagDate(), nc.getDiagTime());
                 Doctor doctor = nc.getDoctor();
                 Hospital doctorHospital = doctor.getHospital();
-                
+
                 return NoncontactDiagItem.builder()
                     .diagId(nc.getId())
                     .diagDate(diagDateTime)
@@ -349,6 +349,7 @@ public class HealthListService {
             .isAllergicSymptom(findSymptom.getIsAllergicSymptom())
             .isInbornDisease(findSymptom.getIsInbornDisease())
             .price(findPaymentInfo.getPrice())
+            .doctorOpinion(findNoncontactDiag.getDoctorOpinion())
             .paymentType(findPaymentInfo.getPaymentMethod().getPaymentType().getPaymentTypeName())
             .approvalDate(findPaymentInfo.getCreateDate())
             .build();
