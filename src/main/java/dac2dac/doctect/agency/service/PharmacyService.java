@@ -44,7 +44,9 @@ public class PharmacyService {
         try {
             pharmacyItems.getPharmacyItems().forEach(item -> {
                 Pharmacy pharmacy = item.toEntity();
-                pharmacyRepository.save(pharmacy);
+                if (pharmacy != null) {
+                    pharmacyRepository.save(pharmacy);
+                }
             });
         } catch (DataIntegrityViolationException e) {
         }

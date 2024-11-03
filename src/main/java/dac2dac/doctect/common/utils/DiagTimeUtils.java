@@ -17,9 +17,15 @@ public class DiagTimeUtils {
         Integer todayCloseTime = findTodayCloseTime(diagTime);
 
         if (todayOpenTime != null && todayCloseTime != null) {
+            // 오늘의 클로즈 시간이 2400을 넘는 경우 새벽으로 변환
+            if (todayCloseTime > 2400) {
+                todayCloseTime = todayCloseTime - 2400;
+            }
+
             LocalTime now = LocalTime.now();
             LocalTime startTime = LocalTime.parse(String.format("%04d", todayOpenTime), DateTimeFormatter.ofPattern("HHmm"));
             LocalTime endTime;
+
             if (todayCloseTime == 2400) {
                 endTime = LocalTime.MAX;
             } else {

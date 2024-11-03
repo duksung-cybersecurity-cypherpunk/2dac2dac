@@ -82,30 +82,45 @@ public class PharmacyItem {
     private Integer diagTimeHolidayClose;
 
     public Pharmacy toEntity() {
+        // 모든 diagTime 필드가 null인지 확인
+        boolean allDiagTimesNull = diagTimeMonOpen == null && diagTimeMonClose == null &&
+            diagTimeTuesOpen == null && diagTimeTuesClose == null &&
+            diagTimeWedsOpen == null && diagTimeWedsClose == null &&
+            diagTimeThursOpen == null && diagTimeThursClose == null &&
+            diagTimeFriOpen == null && diagTimeFriClose == null &&
+            diagTimeSatOpen == null && diagTimeSatClose == null &&
+            diagTimeSunOpen == null && diagTimeSunClose == null &&
+            diagTimeHolidayOpen == null && diagTimeHolidayClose == null;
+
+        // 모든 diagTime 필드가 null인 경우 null 반환
+        if (allDiagTimesNull) {
+            return null;
+        }
+
         return Pharmacy.builder()
-                .name(name)
-                .address(address)
-                .tel(tel)
-                .fax(fax)
-                .longitude(longitude)
-                .latitude(latitude)
-                .diagTimeMonOpen(diagTimeMonOpen)
-                .diagTimeMonClose(diagTimeMonClose)
-                .diagTimeTuesOpen(diagTimeTuesOpen)
-                .diagTimeTuesClose(diagTimeTuesClose)
-                .diagTimeWedsOpen(diagTimeWedsOpen)
-                .diagTimeWedsClose(diagTimeWedsClose)
-                .diagTimeThursOpen(diagTimeThursOpen)
-                .diagTimeThursClose(diagTimeThursClose)
-                .diagTimeFriOpen(diagTimeFriOpen)
-                .diagTimeFriClose(diagTimeFriClose)
-                .diagTimeSatOpen(diagTimeSatOpen)
-                .diagTimeSatClose(diagTimeSatClose)
-                .diagTimeSunOpen(diagTimeSunOpen)
-                .diagTimeSunClose(diagTimeSunClose)
-                .diagTimeHolidayOpen(diagTimeHolidayOpen)
-                .diagTimeHolidayClose(diagTimeHolidayClose)
-                .build();
+            .name(name)
+            .address(address)
+            .tel(tel)
+            .fax(fax)
+            .longitude(longitude)
+            .latitude(latitude)
+            .diagTimeMonOpen(diagTimeMonOpen)
+            .diagTimeMonClose(diagTimeMonClose)
+            .diagTimeTuesOpen(diagTimeTuesOpen)
+            .diagTimeTuesClose(diagTimeTuesClose)
+            .diagTimeWedsOpen(diagTimeWedsOpen)
+            .diagTimeWedsClose(diagTimeWedsClose)
+            .diagTimeThursOpen(diagTimeThursOpen)
+            .diagTimeThursClose(diagTimeThursClose)
+            .diagTimeFriOpen(diagTimeFriOpen)
+            .diagTimeFriClose(diagTimeFriClose)
+            .diagTimeSatOpen(diagTimeSatOpen)
+            .diagTimeSatClose(diagTimeSatClose)
+            .diagTimeSunOpen(diagTimeSunOpen)
+            .diagTimeSunClose(diagTimeSunClose)
+            .diagTimeHolidayOpen(diagTimeHolidayOpen)
+            .diagTimeHolidayClose(diagTimeHolidayClose)
+            .build();
     }
 
 }
