@@ -61,12 +61,24 @@ public class MydataJdbcRepository {
         }
     }
 
+    public Optional<Map<String, Object>> findByName(String name) {
+        String sql = "SELECT id, name, pin FROM user WHERE name = ?";
+
+        try {
+            Map<String, Object> userData = jdbcTemplate.queryForObject(sql, new Object[]{name}, new UserRowMapper());
+            return Optional.ofNullable(userData);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
     private static class UserRowMapper implements RowMapper<Map<String, Object>> {
+
         @Override
         public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
             Map<String, Object> userData = new HashMap<>();
             userData.put("id", rs.getLong("id"));
-            userData.put("name", rs.getString("name"));
+            userData.put("name", rs.getString("name")); // 81줄
             userData.put("pin", rs.getString("pin"));
             return userData;
         }

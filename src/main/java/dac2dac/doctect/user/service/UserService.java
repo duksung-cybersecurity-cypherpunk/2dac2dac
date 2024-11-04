@@ -7,60 +7,50 @@ import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
+import dac2dac.doctect.user.dto.request.UserDTO;
 import dac2dac.doctect.user.dto.response.UpcomingReservationDto;
 import dac2dac.doctect.user.dto.response.UserInfoDto;
 import dac2dac.doctect.user.entity.User;
-import dac2dac.doctect.user.entity.constant.SocialType;
 import dac2dac.doctect.user.jwt.JWTUtil;
 import dac2dac.doctect.user.repository.UserRepository;
 import java.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
+    private final NoncontactDiagReservationRepository noncontactDiagReservationRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JWTUtil jwtUtil;
 
-    @Autowired
-    private PaymentMethodRepository paymentMethodRepository;
-
-    @Autowired
-    private NoncontactDiagReservationRepository noncontactDiagReservationRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JWTUtil jwtUtil;
-
-    // 회원가입
     @Transactional
-    public User registerUser(String username, String email, String password, String phoneNumber, String code, SocialType socialType) {
-        // 이메일 중복 체크
-        if (userRepository.findByUsername(username) != null) {
+    public User registerUser(UserDTO userDTO) {
+        // 유저 이름 중복 체크
+        if (userRepository.findByUsername(userDTO.getUsername()) != null) {
             throw new RuntimeException("Username is already registered.");
         }
 
         // 이메일 중복 체크
-        if (userRepository.findByEmail(email) != null) {
+        if (userRepository.findByEmail(userDTO.getEmail()) != null) {
             throw new RuntimeException("Email is already registered.");
         }
+
         // 사용자 등록 로직
-        User user = new User();
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));  // 비밀번호 암호화
-        user.setPhoneNumber(phoneNumber);
-        user.setCode(code);
-        user.setCreateDate(LocalDateTime.now()); // 생성
-        user.setUpdateDate(LocalDateTime.now()); // 업데이트
-        user.setSocialType(socialType);
-        // 사용자 저장
-        return userRepository.save(user);
+        User newUser = User.registerUser(
+            userDTO.getUsername(),
+            userDTO.getEmail(),
+            passwordEncoder.encode(userDTO.getPassword()),
+            userDTO.getPhoneNumber(),
+            userDTO.getBirthDate(),
+            userDTO.getGender()
+        );
+        return userRepository.save(newUser);
     }
 
     public User findByUsername(String username) {
@@ -99,7 +89,7 @@ public class UserService {
         User user = userRepository.findByUsername(username);
         if (authenticate) {
             // DB에서 조회한 사용자 ID를 사용하여 JWT 생성
-            return jwtUtil.createJwt(username, user.getId().toString(), user.getPhoneNumber(), user.getEmail(), "user", 36000L); // 1시간 유효한 토큰 생성
+            return jwtUtil.createJwt(username, user.getId().toString(), user.getPhoneNumber(), user.getEmail(), "user", user.getBirthDate(), user.getGender(), 36000L); // 1시간 유효한 토큰 생성
         } else {
             throw new RuntimeException("Invalid username or password");
         }

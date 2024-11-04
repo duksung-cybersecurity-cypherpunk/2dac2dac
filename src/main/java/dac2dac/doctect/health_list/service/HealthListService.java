@@ -10,6 +10,7 @@ import dac2dac.doctect.agency.repository.HospitalRepository;
 import dac2dac.doctect.agency.repository.PharmacyRepository;
 import dac2dac.doctect.bootpay.entity.PaymentInfo;
 import dac2dac.doctect.common.constant.ErrorCode;
+import dac2dac.doctect.common.error.exception.BadRequestException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.doctor.entity.Doctor;
@@ -20,6 +21,7 @@ import dac2dac.doctect.health_list.dto.request.UserAuthenticationDto;
 import dac2dac.doctect.health_list.dto.request.VaccinationDto;
 import dac2dac.doctect.health_list.dto.response.HostpitalInfo;
 import dac2dac.doctect.health_list.dto.response.PharmacyInfo;
+import dac2dac.doctect.health_list.dto.response.UpdateMydataDto;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagDetailDto;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagItem;
 import dac2dac.doctect.health_list.dto.response.diagnosis.ContactDiagItemList;
@@ -96,11 +98,11 @@ public class HealthListService {
     private final PrescriptionDrugRepository prescriptionDrugRepository;
 
     @Transactional
-    public void syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
+    public UpdateMydataDto syncMydata(UserAuthenticationDto userAuthenticationDto, Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        // 주민등록번호 뒷자리 복호화
+        // 주민등록번호 복호화
         String pinFront = userAuthenticationDto.getPinFront();
         String pinBack = secureKeypadAuthService.authKeypadInput(userAuthenticationDto.getPinBack());
         String pin = pinFront + pinBack;
@@ -108,12 +110,56 @@ public class HealthListService {
         // 유저 정보(이름, 주민등록번호)를 통해 마이데이터 DB의 유저 아이디 가져오기 (본인 인증)
         Long mydataUserId = authenticateUser(userAuthenticationDto.getName(), pin);
 
+        // 마이데이터 유저의 아이디를 이용하여 마이데이터 조회 후 Doc'tech 서버 DB에 저장한다.
+        saveMyData(user, mydataUserId);
+
         // 유저의 생년월일과 성별 저장
-        user.setBirthDate(pinFront);
-        user.setGender(determineGenderByPinBack(pinBack));
+//            user.setBirthDate(pinFront);
+//            user.setGender(determineGenderByPinBack(pinBack));
+//            userRepository.save(user);
+
+        //* 마이데이터 연동 시간
+        LocalDateTime updateTime = LocalDateTime.now();
+        user.syncMydata(updateTime);
         userRepository.save(user);
 
+        return UpdateMydataDto.builder()
+            .updateTime(updateTime)
+            .build();
+    }
+
+    @Transactional
+    public UpdateMydataDto updateMydata(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        // 마이데이터를 처음 연동하는 경우에 대한 예외처리
+        if (!user.isSynced()) {
+            throw new BadRequestException(ErrorCode.MYDATA_NOT_SYNCED);
+        }
+
+        // 유저 정보(이름, 주민등록번호)를 통해 마이데이터 DB의 유저 아이디 가져오기 (본인 인증)
+        Map<String, Object> mydataUser = mydataJdbcRepository
+            .findByName(user.getUsername())
+            .orElseThrow(() -> new UnauthorizedException(ErrorCode.MYDATA_AUTHENTICATION_FAILED));
+        Long mydataUserId = (Long) mydataUser.get("id");
+
         // 마이데이터 유저의 아이디를 이용하여 마이데이터 조회 후 Doc'tech 서버 DB에 저장한다.
+        saveMyData(user, mydataUserId);
+
+        //* 마이데이터 연동 시간
+        LocalDateTime updateTime = LocalDateTime.now();
+        user.syncMydata(updateTime);
+        userRepository.save(user);
+
+        return UpdateMydataDto.builder()
+            .updateTime(updateTime)
+            .build();
+    }
+
+    public void saveMyData(User user, Long mydataUserId) {
+        Long userId = user.getId();
+
         //* 진료 내역
         contactDiagRepository.deleteByUserId(userId);
 
@@ -172,15 +218,18 @@ public class HealthListService {
             .stream()
             .map(nc -> {
                 LocalDateTime diagDateTime = LocalDateTime.of(nc.getDiagDate(), nc.getDiagTime());
+                Doctor doctor = nc.getDoctor();
+                Hospital doctorHospital = doctor.getHospital();
+
                 return NoncontactDiagItem.builder()
                     .diagId(nc.getId())
                     .diagDate(diagDateTime)
-                    .doctorName(nc.getDoctor().getName())
-                    .doctorHostpital(nc.getDoctor().getHospital().getName())
-                    .doctorThumnail(nc.getDoctor().getProfileImagePath())
-                    .doctorIsOpenNow(isAgencyOpenNow(nc.getDoctor().getDiagTime()))
-                    .doctorTodayOpenTime(findTodayOpenTime(nc.getDoctor().getDiagTime()))
-                    .doctorTodayCloseTime(findTodayCloseTime(nc.getDoctor().getDiagTime()))
+                    .doctorName(doctor.getName())
+                    .doctorHostpital(doctorHospital.getName())
+                    .doctorThumnail(doctor.getProfileImagePath())
+                    .doctorIsOpenNow(isAgencyOpenNow(doctorHospital.getDiagTime()))
+                    .doctorTodayOpenTime(findTodayOpenTime(doctorHospital.getDiagTime()))
+                    .doctorTodayCloseTime(findTodayCloseTime(doctorHospital.getDiagTime()))
                     .build();
             })
             .sorted(Comparator.comparing(NoncontactDiagItem::getDiagDate).reversed())
@@ -300,6 +349,7 @@ public class HealthListService {
             .isAllergicSymptom(findSymptom.getIsAllergicSymptom())
             .isInbornDisease(findSymptom.getIsInbornDisease())
             .price(findPaymentInfo.getPrice())
+            .doctorOpinion(findNoncontactDiag.getDoctorOpinion())
             .paymentType(findPaymentInfo.getPaymentMethod().getPaymentType().getPaymentTypeName())
             .approvalDate(findPaymentInfo.getCreateDate())
             .build();

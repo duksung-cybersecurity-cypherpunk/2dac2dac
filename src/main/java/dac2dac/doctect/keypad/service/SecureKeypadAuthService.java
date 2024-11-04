@@ -11,6 +11,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SecureKeypadAuthService {
+
+    private static final Logger LOGGER = Logger.getLogger(SecureKeypadAuthService.class.getName());
 
     private final IntegrityIdFactoryService integrityIdFactoryService;
     private final KeypadRepository keypadRepository;
@@ -30,11 +34,19 @@ public class SecureKeypadAuthService {
     private static final int HASH_LENGTH = 40;
 
     public String authKeypadInput(@Valid SecureKeypadAuthRequest secureKeypadAuthRequest) {
+        LOGGER.log(Level.INFO, "키패드 입력 요청을 받았습니다. 무결성 ID: {0}", secureKeypadAuthRequest.getIntegrityId().toString());
+
         checkIntegrity(secureKeypadAuthRequest.getIntegrityId());
+        LOGGER.log(Level.INFO, "무결성 검사에 성공했습니다. 무결성 ID: {0}", secureKeypadAuthRequest.getIntegrityId().toString());
+
         KeyHashMap keyHashMap = keypadRepository.getKeypad(secureKeypadAuthRequest.getIntegrityId());
+        LOGGER.log(Level.INFO, "무결성 ID에 대한 키맵을 가져왔습니다. 무결성 ID: {0}", secureKeypadAuthRequest.getIntegrityId().toString());
 
         String decryptedInput = decryptUserInputWithPrivateKey(secureKeypadAuthRequest.getUserInput());
+        LOGGER.log(Level.INFO, "사용자 입력을 복호화했습니다: {0}", decryptedInput);
+
         String originalValues = decryptUserInput(decryptedInput, keyHashMap);
+        LOGGER.log(Level.INFO, "키패드 원래 값: {0}", originalValues);
 
         return originalValues;
     }
@@ -53,11 +65,12 @@ public class SecureKeypadAuthService {
                 if (entry.getValue().equals(hash)) {
                     originalValues.append(entry.getKey());
                     found = true;
+                    LOGGER.log(Level.INFO, "해시 값 일치: {0} -> {1}", new Object[]{hash, entry.getKey()});
                     break; // 해시 값이 일치하면 바로 루프를 빠져나감
                 }
             }
             if (!found) {
-                System.err.println("해시 값이 매칭되지 않았습니다: " + hash);
+                LOGGER.log(Level.WARNING, "해시 값이 매칭되지 않았습니다: {0}", hash);
             }
         }
         return originalValues.toString();
@@ -65,26 +78,27 @@ public class SecureKeypadAuthService {
 
     private String decryptUserInputWithPrivateKey(String encryptedInput) {
         try {
-            // Base64로 인코딩된 비공개 키를 디코딩하여 바이트 배열로 변환
+            LOGGER.log(Level.INFO, "비공개 키로 입력을 복호화합니다...");
+
             byte[] keyBytes = Base64.getDecoder().decode(PRIVATE_KEY);
 
-            // 비공개 키 객체 생성
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
 
-            // RSA 복호화 설정
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-            // 암호화된 입력값 디코딩 및 복호화
             byte[] encryptedBytes = Base64.getDecoder().decode(encryptedInput);
             byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
 
-            // 복호화된 바이트 배열을 문자열로 변환하여 반환
-            return new String(decryptedBytes);
+            String decryptedString = new String(decryptedBytes);
+            LOGGER.log(Level.INFO, "복호화 성공. 복호화된 입력: {0}", decryptedString);
+
+            return decryptedString;
         } catch (Exception e) {
-            throw new RuntimeException("Error while decrypting user input with private key", e);
+            LOGGER.log(Level.SEVERE, "복호화 중 오류 발생: {0}", e.getMessage());
+            throw new RuntimeException("비공개 키로 사용자 입력을 복호화하는 중 오류가 발생했습니다.", e);
         }
     }
 }

@@ -52,7 +52,7 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           APP: "jyjyjy25"
-          COMPOSE: "/home/jyjyjy25/docker-compose.yml"
+          COMPOSE: "/home/jyjyjy25/Doctech/docker-compose-doctech.yml"
         with:
           host: ${{ secrets.REMOTE_SSH_HOST }}
           port: ${{ secrets.REMOTE_SSH_PORT }}
@@ -61,6 +61,6 @@ jobs:
           envs: APP, COMPOSE
           script_stop: true
           script: |
-            docker-compose -f $COMPOSE down
+            docker-compose -f $COMPOSE -p doctech down
             docker pull ${{ secrets.DOCKER_ID }}/doctech
-            docker-compose -f $COMPOSE up -d
+            docker-compose -f $COMPOSE -p doctech up -d

@@ -1,5 +1,6 @@
 package dac2dac.doctect.user.jwt;
 import dac2dac.doctect.user.dto.CustomUserDetails;
+import dac2dac.doctect.user.entity.constant.Gender;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -48,6 +49,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String id = customUserDetails.getId().toString();
         String email = customUserDetails.getEmail();
         String phoneNumber = customUserDetails.getPhoneNumber();
+        String birthDate = customUserDetails.getBirthDate();
+        Gender gender = customUserDetails.getGender();
+
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -55,7 +59,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(username, email, phoneNumber,id,  "user", 60*60*10L);
+        String token = jwtUtil.createJwt(username, email, phoneNumber,id, "user",birthDate,gender, 60*60*10L);
 
         response.addHeader("Authorization", "Bearer " + token);
     }

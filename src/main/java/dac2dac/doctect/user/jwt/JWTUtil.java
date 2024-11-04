@@ -1,5 +1,6 @@
 package dac2dac.doctect.user.jwt;
 
+import dac2dac.doctect.user.entity.constant.Gender;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -46,6 +47,18 @@ public class JWTUtil {
 
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("oneLiner", String.class);
     }
+    public Gender getGender(String token)
+    {
+        String genderString = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("gender", String.class);
+        return Gender.valueOf(genderString.toUpperCase());
+
+    }
+
+    public String getBirthdDate(String token)
+    {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("birthDate", String.class);
+
+    }
 
 
 
@@ -57,7 +70,7 @@ public class JWTUtil {
 
     // JWT 토큰 생성하기
     //String token = jwtUtil.createJwt(username, email, phoneNumber,id, 60*60*10L);
-    public String createJwt(String username,String id,String PhoneNumber, String email,String userType,  Long expiredMs) {
+    public String createJwt(String username,String id,String PhoneNumber, String email,String userType, String birthDate, Gender gender, Long expiredMs) {
 
         return Jwts.builder()
                 .claim("id",id)
@@ -65,6 +78,8 @@ public class JWTUtil {
                 .claim ("PhoneNumber", PhoneNumber)
                 .claim("username", username)
                 .claim("userType", userType) // 사용자 타입 추가
+                .claim("birthDate", birthDate)
+                .claim("gender",gender)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)

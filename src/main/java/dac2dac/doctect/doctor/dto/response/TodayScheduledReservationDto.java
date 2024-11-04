@@ -8,16 +8,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class TodayReservationDto {
+public class TodayScheduledReservationDto {
 
     private int totalCnt;
-    private List<ReservationItem> completedReservationItemList = new ArrayList<>();
     private List<ReservationItem> scheduledReservationItemList = new ArrayList<>();
 
     @Builder
-    public TodayReservationDto(int totalCnt, List<ReservationItem> completedReservationItemList, List<ReservationItem> scheduledReservationItemList) {
+    public TodayScheduledReservationDto(int totalCnt, List<ReservationItem> scheduledReservationItemList) {
         this.totalCnt = totalCnt;
-        this.completedReservationItemList = completedReservationItemList;
         this.scheduledReservationItemList = scheduledReservationItemList;
     }
 }

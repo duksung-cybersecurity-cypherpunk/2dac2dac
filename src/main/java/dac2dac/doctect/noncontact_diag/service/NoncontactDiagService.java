@@ -1,5 +1,7 @@
 package dac2dac.doctect.noncontact_diag.service;
 
+import static dac2dac.doctect.common.utils.DiagTimeUtils.findCloseTime;
+import static dac2dac.doctect.common.utils.DiagTimeUtils.findOpenTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayCloseTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayOpenTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.isAgencyOpenNow;
@@ -312,8 +314,8 @@ public class NoncontactDiagService {
         }
 
         // 진료 예약 시간 확인
-        Integer openTime = findTodayOpenTime(diagTime);
-        Integer closeTime = findTodayCloseTime(diagTime);
+        Integer openTime = findOpenTime(diagTime, reservationDate);
+        Integer closeTime = findCloseTime(diagTime, reservationDate);
 
         LocalTime reservationTimeInMinutes = LocalTime.of(reservationTime.getHour(), reservationTime.getMinute());
         LocalTime openTimeInMinutes = LocalTime.of(openTime / 100, openTime % 100);

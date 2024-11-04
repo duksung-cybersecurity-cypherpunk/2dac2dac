@@ -1,9 +1,7 @@
 package dac2dac.doctect.doctor.entity;
 
 import dac2dac.doctect.agency.entity.Hospital;
-import dac2dac.doctect.common.entity.DiagTime;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -45,60 +43,28 @@ public class Doctor {
     @Column(columnDefinition = "TEXT")
     private String experience;
 
-    @Embedded
-    private DiagTime diagTime;
-
-    public Long getHospitalId() {
-        return hospital != null ? hospital.getId() : null;
-    }
-
-    public Long getDepartmentId() {
-        return department != null ? department.getId() : null;
-    }
-
-    public static Doctor createDoctor(
+    public static Doctor registerDoctor(
         Hospital hospital,
         Department department,
         String name,
         String email,
         String password,
-        Boolean isLicenseCertificated,
-        String profileImagePath,
-        String oneLiner,
-        String experience,
-        DiagTime diagTime) {
+        String oneLiner) {
         Doctor doctor = new Doctor();
         doctor.hospital = hospital;
         doctor.department = department;
         doctor.name = name;
         doctor.email = email;
         doctor.password = password;
-        doctor.isLicenseCertificated = isLicenseCertificated;
-        doctor.profileImagePath = profileImagePath;
         doctor.oneLiner = oneLiner;
-        doctor.experience = experience;
-        doctor.diagTime = diagTime;
+        doctor.isLicenseCertificated = true;
         return doctor;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setId(String id) {
+    public void checkJWT(String id, String username, String email, String oneLiner) {
         this.id = Long.parseLong(id);
-    }
-
-    public void setEmail(String email) {
+        this.name = username;
         this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setOneLiner(String oneLiner) {
         this.oneLiner = oneLiner;
     }
-
 }

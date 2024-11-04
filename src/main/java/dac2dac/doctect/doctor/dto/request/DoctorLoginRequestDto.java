@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class DiagCompleteRequestDto {
+public class DoctorLoginRequestDto {
 
-    private Integer price;
-    private String doctorOpinion;
+    private String username;
+    private String password;
 }

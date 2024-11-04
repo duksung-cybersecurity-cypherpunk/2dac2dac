@@ -5,6 +5,7 @@ import static dac2dac.doctect.common.utils.DiagTimeUtils.findTodayOpenTime;
 import static dac2dac.doctect.common.utils.DiagTimeUtils.isAgencyOpenNow;
 
 import dac2dac.doctect.agency.dto.request.SearchCriteria;
+import dac2dac.doctect.agency.dto.request.SearchCriteriaWithoutLocation;
 import dac2dac.doctect.agency.dto.response.AgencySearchResultDto;
 import dac2dac.doctect.agency.dto.response.AgencySearchResultListDto;
 import dac2dac.doctect.agency.dto.response.HospitalDto;
@@ -30,10 +31,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +74,29 @@ public class AgencyService {
         return AgencySearchResultListDto.builder()
             .totalCnt(sortedResult.size())
             .agencySearchResultList(sortedResult)
+            .build();
+    }
+
+    @Transactional
+    public AgencySearchResultListDto searchAgencyWithoutLocation(Long userId, SearchCriteriaWithoutLocation criteria) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        //* 중복 제거를 위한 Set
+        Set<Agency> searchResultSet = new HashSet<>();
+
+        //* 검색 조건에 따른 데이터 조회
+        loadDataBasedOnCriteriaWithoutLocation(criteria, searchResultSet);
+
+        //* 결과 필터링
+        List<AgencySearchResultDto> filteredResult = filterSearchResultWithoutLocation(criteria, new ArrayList<>(searchResultSet))
+            .stream()
+            .map(f -> createAgencySearchResultWithoutLocationDto(f))
+            .collect(Collectors.toList());
+
+        return AgencySearchResultListDto.builder()
+            .totalCnt(filteredResult.size())
+            .agencySearchResultList(filteredResult)
             .build();
     }
 
@@ -118,26 +141,69 @@ public class AgencyService {
     }
 
     private void loadDataBasedOnCriteria(SearchCriteria criteria, double latitude, double longitude, double radius, Set<Agency> searchResultSet) {
+        boolean criteriaApplied = false;
         if (criteria.getKeyword() != null && !criteria.getKeyword().isEmpty()) { // 검색어 있는 경우
             if (criteria.isHospital()) {
                 searchResultSet.addAll(hospitalRepository.findNearbyHospitalsWithKeyword(latitude, longitude, radius, criteria.getKeyword()));
+                criteriaApplied = true;
             }
             if (criteria.isPharmacy()) {
                 searchResultSet.addAll(pharmacyRepository.findNearbyPharmaciesWithKeyword(latitude, longitude, radius, criteria.getKeyword()));
+                criteriaApplied = true;
             }
             if (criteria.isEr()) {
                 searchResultSet.addAll(hospitalRepository.findNearbyERsWithKeyword(latitude, longitude, radius, criteria.getKeyword()));
+                criteriaApplied = true;
+            }
+            // 만약 어떤 조건도 적용되지 않았다면 모든 조건 수행
+            if (!criteriaApplied) {
+                searchResultSet.addAll(hospitalRepository.findHospitalsWithKeyword(criteria.getKeyword()));
+                searchResultSet.addAll(pharmacyRepository.findPharmaciesWithKeyword(criteria.getKeyword()));
+                searchResultSet.addAll(hospitalRepository.findERWithKeyword(criteria.getKeyword()));
             }
         } else { // 검색어 없는 경우
             if (criteria.isHospital()) {
                 searchResultSet.addAll(hospitalRepository.findNearbyHospitals(latitude, longitude, radius));
+                criteriaApplied = true;
             }
             if (criteria.isPharmacy()) {
                 searchResultSet.addAll(pharmacyRepository.findNearbyPharmacies(latitude, longitude, radius));
+                criteriaApplied = true;
             }
             if (criteria.isEr()) {
                 searchResultSet.addAll(hospitalRepository.findNearbyERs(latitude, longitude, radius));
+                criteriaApplied = true;
             }
+            // 만약 어떤 조건도 적용되지 않았다면 모든 조건 수행
+            if (!criteriaApplied) {
+                searchResultSet.addAll(hospitalRepository.findHospitalsWithKeyword(criteria.getKeyword()));
+                searchResultSet.addAll(pharmacyRepository.findPharmaciesWithKeyword(criteria.getKeyword()));
+                searchResultSet.addAll(hospitalRepository.findERWithKeyword(criteria.getKeyword()));
+            }
+        }
+    }
+
+    private void loadDataBasedOnCriteriaWithoutLocation(SearchCriteriaWithoutLocation criteria, Set<Agency> searchResultSet) {
+        boolean criteriaApplied = false;
+
+        if (criteria.isHospital()) {
+            searchResultSet.addAll(hospitalRepository.findHospitalsWithKeyword(criteria.getKeyword()));
+            criteriaApplied = true;
+        }
+        if (criteria.isPharmacy()) {
+            searchResultSet.addAll(pharmacyRepository.findPharmaciesWithKeyword(criteria.getKeyword()));
+            criteriaApplied = true;
+        }
+        if (criteria.isEr()) {
+            searchResultSet.addAll(hospitalRepository.findERWithKeyword(criteria.getKeyword()));
+            criteriaApplied = true;
+        }
+
+        // 만약 어떤 조건도 적용되지 않았다면 모든 조건 수행
+        if (!criteriaApplied) {
+            searchResultSet.addAll(hospitalRepository.findHospitalsWithKeyword(criteria.getKeyword()));
+            searchResultSet.addAll(pharmacyRepository.findPharmaciesWithKeyword(criteria.getKeyword()));
+            searchResultSet.addAll(hospitalRepository.findERWithKeyword(criteria.getKeyword()));
         }
     }
 
@@ -186,25 +252,72 @@ public class AgencyService {
         return stream.collect(Collectors.toList());
     }
 
+    private List<Agency> filterSearchResultWithoutLocation(SearchCriteriaWithoutLocation criteria, List<Agency> searchResult) {
+        Stream<Agency> stream = searchResult.stream();
+
+        // 영업 시간별 필터링
+        if (criteria.isOpenNow()) {
+            stream = stream.filter(s -> isAgencyOpenNow(s.getDiagTime()));
+        }
+        if (criteria.isOpenAllYear()) {
+            stream = stream.filter(s -> isAgencyOpenAllYear(s.getDiagTime()));
+        }
+        if (criteria.isOpenAtMidnight()) {
+            stream = stream.filter(s -> isAgencyOpenMidnight(s.getDiagTime()));
+        }
+
+        // 영업 요일별 필터링
+        List<DayOfWeek> daysFilter = new ArrayList<>();
+        if (criteria.isMon()) {
+            daysFilter.add(DayOfWeek.MONDAY);
+        }
+        if (criteria.isTue()) {
+            daysFilter.add(DayOfWeek.TUESDAY);
+        }
+        if (criteria.isWed()) {
+            daysFilter.add(DayOfWeek.WEDNESDAY);
+        }
+        if (criteria.isThu()) {
+            daysFilter.add(DayOfWeek.THURSDAY);
+        }
+        if (criteria.isFri()) {
+            daysFilter.add(DayOfWeek.FRIDAY);
+        }
+        if (criteria.isSat()) {
+            daysFilter.add(DayOfWeek.SATURDAY);
+        }
+        if (criteria.isSun()) {
+            daysFilter.add(DayOfWeek.SUNDAY);
+        }
+
+        for (DayOfWeek day : daysFilter) {
+            stream = stream.filter(s -> isAgencyOpenOnDay(s.getDiagTime(), day));
+        }
+
+        return stream.collect(Collectors.toList());
+    }
+
     private boolean isAgencyOpenOnDay(DiagTime agency, DayOfWeek day) {
         // 요일별로 오픈 상태를 확인하는 로직
-        switch (day) {
-            case MONDAY:
-                return agency.getDiagTimeMonOpen() != null && agency.getDiagTimeMonClose() != null;
-            case TUESDAY:
-                return agency.getDiagTimeTuesOpen() != null && agency.getDiagTimeTuesClose() != null;
-            case WEDNESDAY:
-                return agency.getDiagTimeWedsOpen() != null && agency.getDiagTimeWedsClose() != null;
-            case THURSDAY:
-                return agency.getDiagTimeThursOpen() != null && agency.getDiagTimeThursClose() != null;
-            case FRIDAY:
-                return agency.getDiagTimeFriOpen() != null && agency.getDiagTimeFriClose() != null;
-            case SATURDAY:
-                return agency.getDiagTimeSatOpen() != null && agency.getDiagTimeSatClose() != null;
-            case SUNDAY:
-                return agency.getDiagTimeSunOpen() != null && agency.getDiagTimeSunClose() != null;
-            default:
-                return false;
+        {
+            switch (day) {
+                case MONDAY:
+                    return agency.getDiagTimeMonOpen() != null && agency.getDiagTimeMonClose() != null;
+                case TUESDAY:
+                    return agency.getDiagTimeTuesOpen() != null && agency.getDiagTimeTuesClose() != null;
+                case WEDNESDAY:
+                    return agency.getDiagTimeWedsOpen() != null && agency.getDiagTimeWedsClose() != null;
+                case THURSDAY:
+                    return agency.getDiagTimeThursOpen() != null && agency.getDiagTimeThursClose() != null;
+                case FRIDAY:
+                    return agency.getDiagTimeFriOpen() != null && agency.getDiagTimeFriClose() != null;
+                case SATURDAY:
+                    return agency.getDiagTimeSatOpen() != null && agency.getDiagTimeSatClose() != null;
+                case SUNDAY:
+                    return agency.getDiagTimeSunOpen() != null && agency.getDiagTimeSunClose() != null;
+                default:
+                    return false;
+            }
         }
     }
 
@@ -245,6 +358,21 @@ public class AgencyService {
             .build();
     }
 
+    private AgencySearchResultDto createAgencySearchResultWithoutLocationDto(Agency a) {
+        return AgencySearchResultDto.builder()
+            .id(a.getId())
+            .name(a.getName())
+            .todayOpenTime(findTodayOpenTime(a.getDiagTime()))
+            .todayCloseTime(findTodayCloseTime(a.getDiagTime()))
+            .isOpen(isAgencyOpenNow(a.getDiagTime()))
+            .address(a.getAddress())
+            .tel(a.getTel())
+            .longtitude(a.getLongitude())
+            .latitude(a.getLatitude())
+            .agencyType(a.getAgencyType())
+            .build();
+    }
+
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         lat1 = Math.toRadians(lat1);
         lon1 = Math.toRadians(lon1);
@@ -256,18 +384,17 @@ public class AgencyService {
     }
 
     public List<HospitalDto> getAllHospitals() {
-        Pageable pageable = PageRequest.of(0,100); // Create a Pageable instance with the provided page and size
+        Pageable pageable = PageRequest.of(0, 100); // Create a Pageable instance with the provided page and size
         Page<Hospital> hospitalPage = hospitalRepository.findAll(pageable); // Fetch the hospitals with pagination
 
         return hospitalPage.getContent().stream() // Get the content (list of hospitals) from the page
-                .map(hospital -> HospitalDto.builder()
-                        .id(hospital.getId())
-                        .name(hospital.getName())
-                        .address(hospital.getAddress())
-                        .build())
-                .collect(Collectors.toList());
+            .map(hospital -> HospitalDto.builder()
+                .id(hospital.getId())
+                .name(hospital.getName())
+                .address(hospital.getAddress())
+                .build())
+            .collect(Collectors.toList());
     }
-
 
 
 }

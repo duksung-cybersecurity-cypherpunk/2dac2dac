@@ -4,6 +4,7 @@ import dac2dac.doctect.agency.service.HospitalService;
 import dac2dac.doctect.doctor.service.MedicineService;
 import dac2dac.doctect.agency.service.PharmacyService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -15,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class OpenApiDataLoader implements ApplicationRunner {
 
     private final PharmacyService pharmacyService;
@@ -74,14 +76,14 @@ public class OpenApiDataLoader implements ApplicationRunner {
 
     public void saveAllPharmacyInfo() throws ParseException {
         String pharmacyInfo = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(PHARMACY_ENDPOINT)
-                        .queryParam("serviceKey", PHARMACY_API_KEY)
-                        .queryParam("_type", "json")
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder
+                .path(PHARMACY_ENDPOINT)
+                .queryParam("serviceKey", PHARMACY_API_KEY)
+                .queryParam("_type", "json")
+                .build())
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
 
         JSONParser parser = new JSONParser();
         JSONObject jsonObject = (JSONObject) parser.parse(pharmacyInfo);
@@ -95,18 +97,20 @@ public class OpenApiDataLoader implements ApplicationRunner {
         for (int i = 1; i <= totalPage; i++) {
             pharmacyService.savePharmacyInfo(i);
         }
+
+        log.info("약국 데이터 모두 불러오기 완료");
     }
 
     public void saveAllHospitalInfo() throws ParseException {
         String hospitalInfo = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(HOSPITAL_ENDPOINT)
-                        .queryParam("serviceKey", HOSPITAL_API_KEY)
-                        .queryParam("_type", "json")
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder
+                .path(HOSPITAL_ENDPOINT)
+                .queryParam("serviceKey", HOSPITAL_API_KEY)
+                .queryParam("_type", "json")
+                .build())
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
 
         JSONParser parser = new JSONParser();
         JSONObject jsonObject = (JSONObject) parser.parse(hospitalInfo);
@@ -120,5 +124,7 @@ public class OpenApiDataLoader implements ApplicationRunner {
         for (int i = 1; i <= totalPage; i++) {
             hospitalService.saveHospitalInfo(i);
         }
+
+        log.info("병원 데이터 모두 불러오기 완료");
     }
 }

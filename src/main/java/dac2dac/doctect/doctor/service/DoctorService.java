@@ -1,5 +1,9 @@
 package dac2dac.doctect.doctor.service;
 
+import static dac2dac.doctect.common.utils.DeidentificationUtils.convertBirthDateToAgeGroup;
+import static dac2dac.doctect.common.utils.DeidentificationUtils.getGenderCode;
+import static dac2dac.doctect.common.utils.DeidentificationUtils.maskName;
+
 import dac2dac.doctect.bootpay.entity.PaymentInfo;
 import dac2dac.doctect.bootpay.entity.PaymentMethod;
 import dac2dac.doctect.bootpay.service.BootpayService;
@@ -14,7 +18,7 @@ import dac2dac.doctect.doctor.dto.response.RequestReservationFormDto;
 import dac2dac.doctect.doctor.dto.response.RequestReservationItemList;
 import dac2dac.doctect.doctor.dto.response.ReservationItem;
 import dac2dac.doctect.doctor.dto.response.ReservationListDto;
-import dac2dac.doctect.doctor.dto.response.TodayReservationDto;
+import dac2dac.doctect.doctor.dto.response.TodayScheduledReservationDto;
 import dac2dac.doctect.doctor.dto.response.UpcomingReservationDto;
 import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
@@ -26,10 +30,8 @@ import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
 import dac2dac.doctect.user.entity.User;
-import dac2dac.doctect.user.entity.constant.Gender;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,7 +66,7 @@ public class DoctorService {
                 .userId(r.getUser().getId())
                 .reservationId(r.getId())
                 .signupDate(r.getCreateDate())
-                .patientName(r.getUser().getUsername())
+                .patientName(maskName(r.getUser().getUsername()))
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
             .sorted(Comparator.comparing(ReservationItem::getSignupDate))
@@ -85,7 +87,7 @@ public class DoctorService {
                 .userId(r.getUser().getId())
                 .reservationId(r.getId())
                 .signupDate(r.getCreateDate())
-                .patientName(r.getUser().getUsername())
+                .patientName(maskName(r.getUser().getUsername()))
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
             .sorted(Comparator.comparing(ReservationItem::getReservationDate))
@@ -113,7 +115,7 @@ public class DoctorService {
         ReservationItem reservationItem = ReservationItem.builder()
             .reservationId(findNoncontactDiagReservation.getId())
             .signupDate(findNoncontactDiagReservation.getCreateDate())
-            .patientName(findNoncontactDiagReservation.getUser().getUsername())
+            .patientName(maskName(findNoncontactDiagReservation.getUser().getUsername()))
             .reservationDate(LocalDateTime.of(findNoncontactDiagReservation.getReservationDate(), findNoncontactDiagReservation.getReservationTime()))
             .build();
 
@@ -191,44 +193,6 @@ public class DoctorService {
             .build();
     }
 
-    public String getGenderCode(Gender gender) {
-        return gender.toString().substring(0, 1);  // 성별 첫 글자만 추출 (예: "M" or "F")
-    }
-
-    public String maskName(String name) {
-        if (name == null || name.length() < 2) {
-            return name;  // 이름이 너무 짧거나 null인 경우 그대로 반환
-        }
-
-        // 첫 글자만 남기고 나머지를 "OO"으로 마스킹
-        String maskedName = name.substring(0, 1) + "OO";
-        return maskedName;
-    }
-
-    // 생년월일을 나이대(10대, 20대 등)로 변환하는 메서드
-    public static String convertBirthDateToAgeGroup(String birthDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
-        LocalDate birthDateLocalDate = LocalDate.parse(birthDate, formatter);
-        int birthYear = birthDateLocalDate.getYear();
-        int currentYear = LocalDate.now().getYear();
-
-        if ((birthYear % 100) > (currentYear % 100)) {
-            birthYear -= 100;  // 1900년대 출생자
-        }
-
-        int age = currentYear - birthYear + 1;
-        return calculateAgeGroup(age);
-    }
-
-    // 나이대(10대, 20대 등) 계산 메서드
-    private static String calculateAgeGroup(int age) {
-        if (age < 10) {
-            return "연령대 미상";
-        }
-        int ageGroup = age / 10 * 10;  // 10 단위로 나이대 계산
-        return ageGroup + "대";
-    }
-
     public UpcomingReservationDto getUpcomingReservation(Long doctorId) {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
@@ -239,44 +203,36 @@ public class DoctorService {
         return UpcomingReservationDto.builder()
             .reservationId(reservation.getId())
             .reservationDate(LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()))
-            .patientName(reservation.getUser().getUsername())
+            .patientName(maskName(reservation.getUser().getUsername()))
             .build();
     }
 
-    public TodayReservationDto getTodayReservation(Long doctorId) {
+    public TodayScheduledReservationDto getTodayReservation(Long doctorId) {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
 
+        LocalDateTime nowDateTime = LocalDateTime.now();
+        LocalDate nowDate = LocalDate.now();
+
         // 오늘 예약 목록 가져오기
-        List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByReservationDateAndDoctorId(LocalDate.now(), doctorId)
+        List<NoncontactDiagReservation> reservationList = noncontactDiagReservationRepository.findByDoctorIdAndReservationDate(doctorId, nowDate)
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
 
-        LocalDateTime now = LocalDateTime.now(); // 현재 시간 가져오기
-
-        // 예약을 현재 시간 기준으로 나눔
+        // Scheduled 예약 필터링 (현재 시간 이후 & 예약 상태 Complete)
         List<ReservationItem> scheduledReservation = reservationList.stream()
-            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isAfter(now))
+            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isAfter(nowDateTime)
+                && reservation.getStatus().equals(ReservationStatus.COMPLETE))
             .map(r -> ReservationItem.builder()
                 .userId(r.getUser().getId())
-                .patientName(r.getUser().getUsername())
+                .patientName(maskName(r.getUser().getUsername()))
                 .reservationId(r.getId())
                 .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
                 .build())
+            .sorted(Comparator.comparing(ReservationItem::getReservationDate))
             .collect(Collectors.toList());
 
-        List<ReservationItem> completedReservation = reservationList.stream()
-            .filter(reservation -> LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime()).isBefore(now))
-            .map(r -> ReservationItem.builder()
-                .userId(r.getUser().getId())
-                .patientName(r.getUser().getUsername())
-                .reservationId(r.getId())
-                .reservationDate(LocalDateTime.of(r.getReservationDate(), r.getReservationTime()))
-                .build())
-            .collect(Collectors.toList());
-
-        return TodayReservationDto.builder()
-            .totalCnt(scheduledReservation.size() + completedReservation.size())
-            .completedReservationItemList(completedReservation)
+        return TodayScheduledReservationDto.builder()
+            .totalCnt(scheduledReservation.size())
             .scheduledReservationItemList(scheduledReservation)
             .build();
     }
@@ -288,10 +244,10 @@ public class DoctorService {
         NoncontactDiagReservation reservation = noncontactDiagReservationRepository.findById(reservationId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_DIAGNOSIS_RESERVATION_NOT_FOUND));
 
+        // 예약 시간이 현재 시간보다 이후일 경우 예외 처리
         LocalDateTime reservationDateTime = LocalDateTime.of(reservation.getReservationDate(), reservation.getReservationTime());
         LocalDateTime now = LocalDateTime.now();
 
-        // 예약 시간이 현재 시간보다 이후일 경우 예외 처리
         if (reservationDateTime.isAfter(now)) {
             throw new BadRequestException(ErrorCode.RESERVATION_NOT_STARTED);
         }
@@ -306,9 +262,11 @@ public class DoctorService {
             .doctor(reservation.getDoctor())
             .noncontactDiagReservation(reservation)
             .paymentInfo(paymentInfo)
+            .doctorOpinion(request.getDoctorOpinion())
             .diagDate(reservation.getReservationDate())
             .diagTime(reservation.getReservationTime())
             .build();
+
         noncontactDiagRepository.save(noncontactDiag);
     }
 }
