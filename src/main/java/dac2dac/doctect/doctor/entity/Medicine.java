@@ -1,9 +1,7 @@
 package dac2dac.doctect.doctor.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import dac2dac.doctect.noncontact_diag.entity.NoncontactPrescription;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +21,10 @@ public class Medicine {
     private String imageUrl;
     private String className;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "noncontact_prescription_id")
+    private NoncontactPrescription noncontactPrescription;
+
     @Builder
     public Medicine(String name, String chart, String imageUrl, String className) {
         this.name = name;
@@ -31,4 +33,7 @@ public class Medicine {
         this.className = className;
     }
 
+    public void setNoncontactPrescription(NoncontactPrescription noncontactPrescription) {
+        this.noncontactPrescription = noncontactPrescription;
+    }
 }
