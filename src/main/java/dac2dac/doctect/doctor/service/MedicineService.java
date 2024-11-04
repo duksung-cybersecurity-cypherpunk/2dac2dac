@@ -1,8 +1,8 @@
-package dac2dac.doctect.agency.service;
+package dac2dac.doctect.doctor.service;
 
-import dac2dac.doctect.agency.entity.Medicine;
-import dac2dac.doctect.agency.repository.MedicineRepository;
-import dac2dac.doctect.agency.vo.MedicineItems;
+import dac2dac.doctect.doctor.entity.Medicine;
+import dac2dac.doctect.doctor.repository.MedicineRepository;
+import dac2dac.doctect.doctor.vo.MedicineItems;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,4 +50,5 @@ public class MedicineService {
 
         log.info("pageNo: {} :: hospitalItems: {}", pageNo, medicineItems);
     }
+
 }

@@ -1,4 +1,4 @@
-package dac2dac.doctect.agency.entity;
+package dac2dac.doctect.doctor.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

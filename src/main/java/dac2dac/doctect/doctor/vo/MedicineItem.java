@@ -1,8 +1,8 @@
-package dac2dac.doctect.agency.vo;
+package dac2dac.doctect.doctor.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dac2dac.doctect.agency.entity.Medicine;
+import dac2dac.doctect.doctor.entity.Medicine;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

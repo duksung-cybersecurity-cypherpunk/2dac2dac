@@ -1,4 +1,4 @@
-package dac2dac.doctect.agency.vo;
+package dac2dac.doctect.doctor.vo;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

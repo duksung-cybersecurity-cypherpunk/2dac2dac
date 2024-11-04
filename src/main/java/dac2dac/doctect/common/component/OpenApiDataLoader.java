@@ -1,7 +1,7 @@
 package dac2dac.doctect.common.component;
 
 import dac2dac.doctect.agency.service.HospitalService;
-import dac2dac.doctect.agency.service.MedicineService;
+import dac2dac.doctect.doctor.service.MedicineService;
 import dac2dac.doctect.agency.service.PharmacyService;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
