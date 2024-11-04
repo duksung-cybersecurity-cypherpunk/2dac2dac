@@ -1,5 +1,6 @@
 package dac2dac.doctect.doctor.service;
 
+import dac2dac.doctect.doctor.dto.request.SearchMedicineRequestDto;
 import dac2dac.doctect.doctor.entity.Medicine;
 import dac2dac.doctect.doctor.repository.MedicineRepository;
 import dac2dac.doctect.doctor.vo.MedicineItems;
@@ -11,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class MedicineService {
     private String MEDICINE_ENDPOINT;
 
     @Async
-    public void saveHospitalInfo(int pageNo) {
+    public void saveMedicineInfo(int pageNo) {
         MedicineItems medicineItems = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(MEDICINE_ENDPOINT)
@@ -51,4 +54,8 @@ public class MedicineService {
         log.info("pageNo: {} :: hospitalItems: {}", pageNo, medicineItems);
     }
 
+    public List<Medicine> searchMedicine(SearchMedicineRequestDto request) {
+        List<Medicine> medicines = medicineRepository.findMedicineWithKeyword(request.getKeyword());
+        return medicines;
+    }
 }

@@ -46,32 +46,54 @@ public class OpenApiDataLoader implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
 //        saveAllPharmacyInfo();
 //        saveAllHospitalInfo();
-        saveAllMedicineInfo();
+//        saveAllMedicineInfo();
     }
 
-    public void saveAllMedicineInfo() throws ParseException {
+    public void saveAllMedicineInfo() {
         String medicineInfo = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(MEDICINE_ENDPOINT)
                         .queryParam("serviceKey", MEDICINE_API_KEY)
-                        .queryParam("type", "json")
+                        .queryParam("_type", "json")
                         .build())
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
 
-        JSONParser parser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) parser.parse(medicineInfo);
-        JSONObject body = (JSONObject) jsonObject.get("body");
-
-        int totalCount = ((Long) body.get("totalCount")).intValue();
-        int numOfRows = ((Long) body.get("numOfRows")).intValue();
-        int totalPage = (int) Math.ceil(totalCount / numOfRows);
-
-        for (int i = 1; i <= totalPage; i++) {
-            medicineService.saveHospitalInfo(i);
+        // 응답 데이터가 비어있거나 null인지 확인
+        if (medicineInfo == null || medicineInfo.trim().isEmpty()) {
+            System.err.println("Received empty or null response from the API.");
+            return;
         }
 
+        // 응답이 JSON으로 시작하는지 확인 (또는 필요한 경우 XML인지 확인)
+        if (!medicineInfo.trim().startsWith("{")) {
+            System.err.println("Received non-JSON response: " + medicineInfo);
+            return;
+        }
+
+        try {
+            JSONParser parser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) parser.parse(medicineInfo);
+            JSONObject body = (JSONObject) jsonObject.get("body");
+
+            if (body == null) {
+                System.err.println("Body is missing in the JSON response.");
+                return;
+            }
+
+            long totalCount = (Long) body.get("totalCount");
+            long numOfRows = (Long) body.get("numOfRows");
+            int totalPage = (int) Math.ceil((double) totalCount / numOfRows);
+
+            // 이후 로직...
+            for (int i = 1; i <= totalPage; i++) {
+                medicineService.saveMedicineInfo(i);
+            }
+        } catch (ParseException e) {
+            System.err.println("Failed to parse JSON response: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void saveAllPharmacyInfo() throws ParseException {

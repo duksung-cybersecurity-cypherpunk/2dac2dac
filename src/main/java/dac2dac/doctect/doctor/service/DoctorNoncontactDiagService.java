@@ -97,4 +97,5 @@ public class DoctorNoncontactDiagService {
             .paymentAcceptedDate(paymentInfo.getCreateDate())
             .build();
     }
+
 }
