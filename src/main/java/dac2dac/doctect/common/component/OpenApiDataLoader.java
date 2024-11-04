@@ -44,9 +44,9 @@ public class OpenApiDataLoader implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-//        saveAllPharmacyInfo();
-//        saveAllHospitalInfo();
-//        saveAllMedicineInfo();
+        saveAllPharmacyInfo();
+        saveAllHospitalInfo();
+        saveAllMedicineInfo();
     }
 
     public void saveAllMedicineInfo() {
