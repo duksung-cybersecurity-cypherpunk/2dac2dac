@@ -59,10 +59,16 @@ public class HealthListController {
         return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getPrescriptionList(userId));
     }
 
-    @Operation(summary = "투약 내역 상세 조회 API", description = "유저의 투약 내역을 상세 조회한다.")
+    @Operation(summary = "투약 내역(대면) 상세 조회 API", description = "유저의 투약 내역을 상세 조회한다.")
     @GetMapping("/prescription/{userId}/{prescriptionId}")
     public ApiResult getPrescription(@PathVariable Long userId, @PathVariable Long prescriptionId) {
         return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getDetailPrescription(userId, prescriptionId));
+    }
+
+    @Operation(summary = "투약 내역(비대면) 상세 조회 API", description = "유저의 투약 내역(비대면)을 상세 조회한다.")
+    @GetMapping("/prescription/noncontact/{userId}/{noncontactPrescriptionId}")
+    public ApiResult getNoncontactPrescription(@PathVariable Long userId, @PathVariable Long noncontactPrescriptionId) {
+        return ApiResult.success(SuccessCode.GET_SUCCESS, healthListService.getDetailNoncontactPrescription(userId, noncontactPrescriptionId));
     }
 
     @Operation(summary = "예방접종 내역 조회 API", description = "유저의 예방접종 내역을 조회한다.")

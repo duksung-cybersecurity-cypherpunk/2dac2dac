@@ -13,10 +13,12 @@ public class PrescriptionItemListDto {
 
     private int totalCnt;
     private List<PrescriptionItem> prescriptionItemList = new ArrayList<>();
+    private List<NoncontactPrescriptionItem> noncontactPrescriptionItemList = new ArrayList<>();
 
     @Builder
-    public PrescriptionItemListDto(int totalCnt, List<PrescriptionItem> prescriptionItemList) {
+    public PrescriptionItemListDto(int totalCnt, List<PrescriptionItem> prescriptionItemList, List<NoncontactPrescriptionItem> noncontactPrescriptionItemList) {
         this.totalCnt = totalCnt;
         this.prescriptionItemList = prescriptionItemList;
+        this.noncontactPrescriptionItemList = noncontactPrescriptionItemList;
     }
 }

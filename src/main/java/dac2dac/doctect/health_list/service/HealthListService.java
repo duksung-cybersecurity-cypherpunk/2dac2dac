@@ -14,6 +14,7 @@ import dac2dac.doctect.common.error.exception.BadRequestException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.doctor.entity.Doctor;
+import dac2dac.doctect.doctor.entity.Medicine;
 import dac2dac.doctect.health_list.dto.request.DiagnosisDto;
 import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
 import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
@@ -40,11 +41,7 @@ import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningI
 import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningItemListDto;
 import dac2dac.doctect.health_list.dto.response.healthScreening.MeasurementTestInfo;
 import dac2dac.doctect.health_list.dto.response.healthScreening.OtherTestInfo;
-import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDetailDto;
-import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDrugItem;
-import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDrugItemList;
-import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionItem;
-import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionItemListDto;
+import dac2dac.doctect.health_list.dto.response.prescription.*;
 import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationDetailDto;
 import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationDetailInfo;
 import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationItem;
@@ -65,8 +62,10 @@ import dac2dac.doctect.health_list.repository.VaccinationRepository;
 import dac2dac.doctect.keypad.service.SecureKeypadAuthService;
 import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
+import dac2dac.doctect.noncontact_diag.entity.NoncontactPrescription;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
+import dac2dac.doctect.noncontact_diag.repository.NoncontactPrescriptionRepository;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.entity.constant.Gender;
 import dac2dac.doctect.user.repository.UserRepository;
@@ -91,6 +90,7 @@ public class HealthListService {
     private final ContactDiagRepository contactDiagRepository;
     private final NoncontactDiagRepository noncontactDiagRepository;
     private final PrescriptionRepository prescriptionRepository;
+    private final NoncontactPrescriptionRepository noncontactPrescriptionRepository;
     private final HealthScreeningRepository healthScreeningRepository;
     private final VaccinationRepository vaccinationRepository;
     private final HospitalRepository hospitalRepository;
@@ -379,15 +379,46 @@ public class HealthListService {
                     .agencyAddress(pharmacy.getAddress())
                     .agencyTel(pharmacy.getTel())
                     .build();
-
             })
             .sorted(Comparator.comparing(PrescriptionItem::getTreatDate).reversed())
             .collect(Collectors.toList());
 
+        List<NoncontactPrescriptionItem> noncontactPrescriptionItemList = noncontactPrescriptionRepository.findByUserId(userId)
+                .stream()
+                .map(p -> {
+                    NoncontactDiag noncontactDiag = p.getNoncontactDiag();
+                    return NoncontactPrescriptionItem.builder()
+                            .noncontactPrescriptionId(p.getId())
+                            .prescriptionDate(LocalDateTime.of(noncontactDiag.getDiagDate(), noncontactDiag.getDiagTime()))
+                            .doctorName(noncontactDiag.getDoctor().getName())
+                            .build();
+                })
+                .sorted(Comparator.comparing(NoncontactPrescriptionItem::getPrescriptionDate).reversed())
+                .collect(Collectors.toList());
+
         return PrescriptionItemListDto.builder()
             .totalCnt(prescriptionItemList.size())
             .prescriptionItemList(prescriptionItemList)
+            .noncontactPrescriptionItemList(noncontactPrescriptionItemList)
             .build();
+    }
+
+    public NoncontactPrescriptionDetailDto getDetailNoncontactPrescription(Long userId, Long noncontactPrescriptionId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        NoncontactPrescription fineNoncontactPrescription = noncontactPrescriptionRepository.findById(noncontactPrescriptionId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_PRESCRIPTION_NOT_FOUND));
+        List<Medicine> medicines = fineNoncontactPrescription.getPrescriptionDrugList();
+
+        //* 유저와 조회한 처방 내역에 해당하는 유저가 다를 경우
+        if (!user.getId().equals(fineNoncontactPrescription.getUser().getId())) {
+            new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        return NoncontactPrescriptionDetailDto.builder()
+                .medicines(medicines)
+                .build();
     }
 
     public PrescriptionDetailDto getDetailPrescription(Long userId, Long prescriptionId) {

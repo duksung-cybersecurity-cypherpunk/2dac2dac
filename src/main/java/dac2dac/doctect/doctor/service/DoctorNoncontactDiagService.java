@@ -13,6 +13,7 @@ import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
+import dac2dac.doctect.noncontact_diag.entity.NoncontactPrescription;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
@@ -22,6 +23,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import dac2dac.doctect.noncontact_diag.repository.NoncontactPrescriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +35,7 @@ public class DoctorNoncontactDiagService {
     private final DoctorRepository doctorRepository;
     private final NoncontactDiagRepository noncontactDiagRepository;
     private final NoncontactDiagReservationRepository noncontactDiagReservationRepository;
+    private final NoncontactPrescriptionRepository noncontactPrescriptionRepository;
 
     public CompletedReservationListDto getCompletedReservation(Long doctorId) {
         Doctor doctor = doctorRepository.findById(doctorId)
@@ -86,15 +90,20 @@ public class DoctorNoncontactDiagService {
         Symptom symptom = noncontactDiag.getNoncontactDiagReservation().getSymptom();
         PaymentInfo paymentInfo = noncontactDiag.getPaymentInfo();
 
+        NoncontactPrescription noncontactPrescription = noncontactPrescriptionRepository.findByNoncontactDiagId(noncontactDiagId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_PRESCRIPTION_NOT_FOUND));
+
         return PrescriptionDto.builder()
             .patientName(maskName((noncontactDiag.getUser().getUsername())))
             .isAllergicSymptom(symptom.getIsAllergicSymptom())
             .isInbornDisease(symptom.getIsInbornDisease())
             .isPrescribedDrug(symptom.getIsPrescribedDrug())
+            .medicineList(noncontactPrescription.getPrescriptionDrugList())
             .doctorOpinion(noncontactDiag.getDoctorOpinion())
             .paymentPrice(paymentInfo.getPrice())
             .paymentType(paymentInfo.getPaymentMethod().getPaymentType().getPaymentTypeName())
             .paymentAcceptedDate(paymentInfo.getCreateDate())
             .build();
     }
+
 }

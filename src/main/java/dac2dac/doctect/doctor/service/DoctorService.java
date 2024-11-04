@@ -21,14 +21,18 @@ import dac2dac.doctect.doctor.dto.response.ReservationListDto;
 import dac2dac.doctect.doctor.dto.response.TodayScheduledReservationDto;
 import dac2dac.doctect.doctor.dto.response.UpcomingReservationDto;
 import dac2dac.doctect.doctor.entity.Doctor;
+import dac2dac.doctect.doctor.entity.Medicine;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
+import dac2dac.doctect.doctor.repository.MedicineRepository;
 import dac2dac.doctect.noncontact_diag.dto.response.NoncontactDiagFormInfo;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
+import dac2dac.doctect.noncontact_diag.entity.NoncontactPrescription;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
+import dac2dac.doctect.noncontact_diag.repository.NoncontactPrescriptionRepository;
 import dac2dac.doctect.user.entity.User;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,6 +50,8 @@ public class DoctorService {
     private final NoncontactDiagReservationRepository noncontactDiagReservationRepository;
     private final NoncontactDiagRepository noncontactDiagRepository;
     private final DoctorRepository doctorRepository;
+    private final NoncontactPrescriptionRepository noncontactPrescriptionRepository;
+    private final MedicineRepository medicineRepository;
 
     public ReservationListDto getReservations(Long doctorId, String reservationDate) {
         Doctor doctor = doctorRepository.findById(doctorId)
@@ -268,5 +274,19 @@ public class DoctorService {
             .build();
 
         noncontactDiagRepository.save(noncontactDiag);
+
+        // 처방 의약품
+        NoncontactPrescription prescription = NoncontactPrescription.builder()
+                .user(reservation.getUser())
+                .noncontactDiag(noncontactDiag)
+                .build();
+
+        request.getMedicineIds().forEach(id -> {
+            Medicine medicine = medicineRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
+            prescription.addPrescriptionDrug(medicine);
+        });
+
+        noncontactPrescriptionRepository.save(prescription);
     }
 }
