@@ -54,4 +54,7 @@ public class PharmacyService {
         log.debug("pageNo: {} :: pharmacyItems: {}", pageNo, pharmacyItems);
     }
 
+    public boolean existsPharmacyData() {
+        return pharmacyRepository.count() > 0; // 데이터가 하나라도 있으면 true를 반환
+    }
 }

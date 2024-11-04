@@ -58,4 +58,8 @@ public class MedicineService {
         List<Medicine> medicines = medicineRepository.findMedicineWithKeyword(request.getKeyword());
         return medicines;
     }
+
+    public boolean existsMedicineData() {
+        return medicineRepository.count() > 0; // 데이터가 하나라도 있으면 true를 반환
+    }
 }

@@ -50,6 +50,11 @@ public class OpenApiDataLoader implements ApplicationRunner {
     }
 
     public void saveAllMedicineInfo() {
+        if (medicineService.existsMedicineData()) {
+            log.info("Already loaded medicine data.");
+            return;
+        }
+
         String medicineInfo = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(MEDICINE_ENDPOINT)
@@ -97,6 +102,11 @@ public class OpenApiDataLoader implements ApplicationRunner {
     }
 
     public void saveAllPharmacyInfo() throws ParseException {
+        if (pharmacyService.existsPharmacyData()) {
+            log.info("Already loaded medicine data.");
+            return;
+        }
+
         String pharmacyInfo = webClient.get()
             .uri(uriBuilder -> uriBuilder
                 .path(PHARMACY_ENDPOINT)
@@ -124,6 +134,11 @@ public class OpenApiDataLoader implements ApplicationRunner {
     }
 
     public void saveAllHospitalInfo() throws ParseException {
+        if (hospitalService.existsHospitalData()) {
+            log.info("Already loaded medicine data.");
+            return;
+        }
+
         String hospitalInfo = webClient.get()
             .uri(uriBuilder -> uriBuilder
                 .path(HOSPITAL_ENDPOINT)

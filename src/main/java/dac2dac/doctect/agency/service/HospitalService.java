@@ -53,4 +53,8 @@ public class HospitalService {
 
         log.debug("pageNo: {} :: hospitalItems: {}", pageNo, hospitalItems);
     }
+
+    public boolean existsHospitalData() {
+        return hospitalRepository.count() > 0; // 데이터가 하나라도 있으면 true를 반환
+    }
 }
