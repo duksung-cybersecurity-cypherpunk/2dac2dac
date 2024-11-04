@@ -40,11 +40,7 @@ import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningI
 import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningItemListDto;
 import dac2dac.doctect.health_list.dto.response.healthScreening.MeasurementTestInfo;
 import dac2dac.doctect.health_list.dto.response.healthScreening.OtherTestInfo;
-import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDetailDto;
-import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDrugItem;
-import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDrugItemList;
-import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionItem;
-import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionItemListDto;
+import dac2dac.doctect.health_list.dto.response.prescription.*;
 import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationDetailDto;
 import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationDetailInfo;
 import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationItem;
@@ -67,6 +63,7 @@ import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
+import dac2dac.doctect.noncontact_diag.repository.NoncontactPrescriptionRepository;
 import dac2dac.doctect.user.entity.User;
 import dac2dac.doctect.user.entity.constant.Gender;
 import dac2dac.doctect.user.repository.UserRepository;
@@ -91,6 +88,7 @@ public class HealthListService {
     private final ContactDiagRepository contactDiagRepository;
     private final NoncontactDiagRepository noncontactDiagRepository;
     private final PrescriptionRepository prescriptionRepository;
+    private final NoncontactPrescriptionRepository noncontactPrescriptionRepository;
     private final HealthScreeningRepository healthScreeningRepository;
     private final VaccinationRepository vaccinationRepository;
     private final HospitalRepository hospitalRepository;
@@ -379,14 +377,27 @@ public class HealthListService {
                     .agencyAddress(pharmacy.getAddress())
                     .agencyTel(pharmacy.getTel())
                     .build();
-
             })
             .sorted(Comparator.comparing(PrescriptionItem::getTreatDate).reversed())
             .collect(Collectors.toList());
 
+        List<NoncontactPrescriptionItem> noncontactPrescriptionItemList = noncontactPrescriptionRepository.findByUserId(userId)
+                .stream()
+                .map(p -> {
+                    NoncontactDiag noncontactDiag = p.getNoncontactDiag();
+                    return NoncontactPrescriptionItem.builder()
+                            .noncontactPrescriptionId(p.getId())
+                            .prescriptionDate(LocalDateTime.of(noncontactDiag.getDiagDate(), noncontactDiag.getDiagTime()))
+                            .doctorName(noncontactDiag.getDoctor().getName())
+                            .build();
+                })
+                .sorted(Comparator.comparing(NoncontactPrescriptionItem::getPrescriptionDate).reversed())
+                .collect(Collectors.toList());
+
         return PrescriptionItemListDto.builder()
             .totalCnt(prescriptionItemList.size())
             .prescriptionItemList(prescriptionItemList)
+            .noncontactPrescriptionItemList(noncontactPrescriptionItemList)
             .build();
     }
 

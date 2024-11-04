@@ -1,9 +1,6 @@
 package dac2dac.doctect.noncontact_diag.entity;
 
-import dac2dac.doctect.bootpay.entity.PaymentInfo;
-import dac2dac.doctect.doctor.entity.Doctor;
 import dac2dac.doctect.doctor.entity.Medicine;
-import dac2dac.doctect.health_list.entity.PrescriptionDrug;
 import dac2dac.doctect.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
