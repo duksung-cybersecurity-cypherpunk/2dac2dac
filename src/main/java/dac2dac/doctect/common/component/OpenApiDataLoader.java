@@ -1,6 +1,7 @@
 package dac2dac.doctect.common.component;
 
 import dac2dac.doctect.agency.service.HospitalService;
+import dac2dac.doctect.agency.service.MedicineService;
 import dac2dac.doctect.agency.service.PharmacyService;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
@@ -18,6 +19,7 @@ public class OpenApiDataLoader implements ApplicationRunner {
 
     private final PharmacyService pharmacyService;
     private final HospitalService hospitalService;
+    private final MedicineService medicineService;
     private final WebClient webClient;
 
     @Value("${open-api.pharmacy.key}")
@@ -32,10 +34,42 @@ public class OpenApiDataLoader implements ApplicationRunner {
     @Value("${open-api.hospital.endpoint}")
     private String HOSPITAL_ENDPOINT;
 
+    @Value("${open-api.medicine.key}")
+    private String MEDICINE_API_KEY;
+
+    @Value("${open-api.medicine.endpoint}")
+    private String MEDICINE_ENDPOINT;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        saveAllPharmacyInfo();
-        saveAllHospitalInfo();
+//        saveAllPharmacyInfo();
+//        saveAllHospitalInfo();
+        saveAllMedicineInfo();
+    }
+
+    public void saveAllMedicineInfo() throws ParseException {
+        String medicineInfo = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(MEDICINE_ENDPOINT)
+                        .queryParam("serviceKey", MEDICINE_API_KEY)
+                        .queryParam("type", "json")
+                        .build())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        JSONParser parser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) parser.parse(medicineInfo);
+        JSONObject body = (JSONObject) jsonObject.get("body");
+
+        int totalCount = ((Long) body.get("totalCount")).intValue();
+        int numOfRows = ((Long) body.get("numOfRows")).intValue();
+        int totalPage = (int) Math.ceil(totalCount / numOfRows);
+
+        for (int i = 1; i <= totalPage; i++) {
+            medicineService.saveHospitalInfo(i);
+        }
+
     }
 
     public void saveAllPharmacyInfo() throws ParseException {
