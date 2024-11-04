@@ -14,6 +14,7 @@ import dac2dac.doctect.common.error.exception.BadRequestException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.doctor.entity.Doctor;
+import dac2dac.doctect.doctor.entity.Medicine;
 import dac2dac.doctect.health_list.dto.request.DiagnosisDto;
 import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
 import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
@@ -61,6 +62,7 @@ import dac2dac.doctect.health_list.repository.VaccinationRepository;
 import dac2dac.doctect.keypad.service.SecureKeypadAuthService;
 import dac2dac.doctect.mydata.repository.MydataJdbcRepository;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
+import dac2dac.doctect.noncontact_diag.entity.NoncontactPrescription;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactPrescriptionRepository;
@@ -399,6 +401,24 @@ public class HealthListService {
             .prescriptionItemList(prescriptionItemList)
             .noncontactPrescriptionItemList(noncontactPrescriptionItemList)
             .build();
+    }
+
+    public NoncontactPrescriptionDetailDto getDetailNoncontactPrescription(Long userId, Long noncontactPrescriptionId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        NoncontactPrescription fineNoncontactPrescription = noncontactPrescriptionRepository.findById(noncontactPrescriptionId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_PRESCRIPTION_NOT_FOUND));
+        List<Medicine> medicines = fineNoncontactPrescription.getPrescriptionDrugList();
+
+        //* 유저와 조회한 처방 내역에 해당하는 유저가 다를 경우
+        if (!user.getId().equals(fineNoncontactPrescription.getUser().getId())) {
+            new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        return NoncontactPrescriptionDetailDto.builder()
+                .medicines(medicines)
+                .build();
     }
 
     public PrescriptionDetailDto getDetailPrescription(Long userId, Long prescriptionId) {
