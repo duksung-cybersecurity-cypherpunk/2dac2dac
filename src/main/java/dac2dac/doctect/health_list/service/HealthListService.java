@@ -13,7 +13,9 @@ import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.BadRequestException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
+import dac2dac.doctect.doctor.dto.response.NoncontactPrescriptionDrugItem;
 import dac2dac.doctect.doctor.entity.Doctor;
+import dac2dac.doctect.doctor.entity.Medicine;
 import dac2dac.doctect.health_list.dto.request.DiagnosisDto;
 import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
 import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
@@ -405,16 +407,30 @@ public class HealthListService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        NoncontactPrescription fineNoncontactPrescription = noncontactPrescriptionRepository.findById(noncontactPrescriptionId)
+        NoncontactPrescription findNoncontactPrescription = noncontactPrescriptionRepository.findById(noncontactPrescriptionId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_PRESCRIPTION_NOT_FOUND));
 
         //* 유저와 조회한 처방 내역에 해당하는 유저가 다를 경우
-        if (!user.getId().equals(fineNoncontactPrescription.getUser().getId())) {
+        if (!user.getId().equals(findNoncontactPrescription.getUser().getId())) {
             new UnauthorizedException(ErrorCode.UNAUTHORIZED);
         }
 
+        List<NoncontactPrescriptionDrugItem> noncontactPrescriptionDrugItemList = findNoncontactPrescription.getPrescriptionDrugList().stream()
+            .map(n -> {
+                Medicine medicine = n.getMedicine();
+                return NoncontactPrescriptionDrugItem.builder()
+                    .medicineName(medicine.getName())
+                    .medicineClassName(medicine.getClassName())
+                    .medicineChart(medicine.getChart())
+                    .medicineImageUrl(medicine.getImageUrl())
+                    .prescriptionCnt(n.getPrescriptionCnt())
+                    .medicationDays(n.getMedicationDays())
+                    .build();
+            })
+            .collect(Collectors.toList());
+
         return NoncontactPrescriptionDetailDto.builder()
-            .medicines(fineNoncontactPrescription.getPrescriptionDrugList())
+            .medicines(noncontactPrescriptionDrugItemList)
             .build();
     }
 

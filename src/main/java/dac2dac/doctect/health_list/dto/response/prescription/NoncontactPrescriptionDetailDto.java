@@ -1,6 +1,6 @@
 package dac2dac.doctect.health_list.dto.response.prescription;
 
-import dac2dac.doctect.noncontact_diag.entity.NoncontactPrescriptionDrug;
+import dac2dac.doctect.doctor.dto.response.NoncontactPrescriptionDrugItem;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NoncontactPrescriptionDetailDto {
 
-    private List<NoncontactPrescriptionDrug> medicines;
+    private List<NoncontactPrescriptionDrugItem> medicines;
 
     @Builder
-    public NoncontactPrescriptionDetailDto(List<NoncontactPrescriptionDrug> medicines) {
+    public NoncontactPrescriptionDetailDto(List<NoncontactPrescriptionDrugItem> medicines) {
         this.medicines = medicines;
     }
 }
