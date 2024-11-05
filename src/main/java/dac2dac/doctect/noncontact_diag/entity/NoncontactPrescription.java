@@ -2,14 +2,21 @@ package dac2dac.doctect.noncontact_diag.entity;
 
 import dac2dac.doctect.doctor.entity.Medicine;
 import dac2dac.doctect.user.entity.User;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -28,12 +35,11 @@ public class NoncontactPrescription {
     @JoinColumn(name = "noncontact_diag_id")
     private NoncontactDiag noncontactDiag;
 
-    @OneToMany(mappedBy = "noncontactPrescription", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Medicine> prescriptionDrugList = new ArrayList<>();
 
     public void addPrescriptionDrug(Medicine prescriptionDrug) {
         prescriptionDrugList.add(prescriptionDrug);
-        prescriptionDrug.setNoncontactPrescription(this);
     }
 
     @Builder

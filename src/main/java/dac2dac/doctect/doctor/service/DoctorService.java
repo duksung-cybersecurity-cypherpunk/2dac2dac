@@ -36,6 +36,7 @@ import dac2dac.doctect.noncontact_diag.repository.NoncontactPrescriptionReposito
 import dac2dac.doctect.user.entity.User;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -277,13 +278,14 @@ public class DoctorService {
 
         // 처방 의약품
         NoncontactPrescription prescription = NoncontactPrescription.builder()
-                .user(reservation.getUser())
-                .noncontactDiag(noncontactDiag)
-                .build();
+            .user(reservation.getUser())
+            .noncontactDiag(noncontactDiag)
+            .prescriptionDrugList(new ArrayList<>())
+            .build();
 
         request.getMedicineIds().forEach(id -> {
             Medicine medicine = medicineRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
             prescription.addPrescriptionDrug(medicine);
         });
 
