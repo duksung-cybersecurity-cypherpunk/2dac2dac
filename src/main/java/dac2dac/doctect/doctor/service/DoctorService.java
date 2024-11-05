@@ -120,6 +120,7 @@ public class DoctorService {
 
         //* 예약 헤더 정보
         ReservationItem reservationItem = ReservationItem.builder()
+            .userId(findNoncontactDiagReservation.getUser().getId())
             .reservationId(findNoncontactDiagReservation.getId())
             .signupDate(findNoncontactDiagReservation.getCreateDate())
             .patientName(maskName(findNoncontactDiagReservation.getUser().getUsername()))
