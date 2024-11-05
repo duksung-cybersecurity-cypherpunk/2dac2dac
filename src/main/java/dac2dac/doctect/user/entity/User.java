@@ -65,6 +65,5 @@ public class User extends BaseEntity {
     public void syncMydata() {
         this.synced = true;
         this.lastSyncedDate = LocalDateTime.now();
-        ;
     }
 }
