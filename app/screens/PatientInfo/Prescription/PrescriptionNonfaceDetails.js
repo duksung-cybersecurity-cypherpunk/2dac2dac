@@ -63,10 +63,12 @@ export default function PrescriptionNonfaceDetails({ route }) {
                   ]}
                 >
                   <View style={[{ flexDirection: "row" }]}>
-                    <Image
-                      style={[{ width: 80 }, { height: 80 }]}
-                      source={require("../../../../assets/images/PatientInfo/pills.png")}
-                    /> {/* 의약품 url 변경 예정*/}
+                    {/* 의약품 URL로부터 이미지 가져오기 */}
+                    <Image 
+                      style={[{width: 80}, {height: 80}]} 
+                      source={{ uri: item.medicineImageUrl }} // URL 링크로 이미지 표시
+                      defaultSource={require("../../../../assets/images/medicalHistory/pills.png")} // 로딩 중 기본 이미지
+                    />
                     <View
                       style={[
                         { alignItems: "flex-start" },
