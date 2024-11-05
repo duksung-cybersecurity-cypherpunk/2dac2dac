@@ -124,12 +124,11 @@ public class HealthListService {
 //            userRepository.save(user);
 
         //* 마이데이터 연동 시간
-        LocalDateTime updateTime = LocalDateTime.now();
-        user.syncMydata(updateTime);
+        user.syncMydata();
         userRepository.save(user);
 
         return UpdateMydataDto.builder()
-            .updateTime(updateTime)
+            .updateTime(user.getLastSyncedDate())
             .build();
     }
 

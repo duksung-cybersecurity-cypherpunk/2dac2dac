@@ -62,8 +62,9 @@ public class User extends BaseEntity {
         this.gender = gender;
     }
 
-    public void syncMydata(LocalDateTime lastSyncedDate) {
+    public void syncMydata() {
         this.synced = true;
-        this.lastSyncedDate = lastSyncedDate;
+        this.lastSyncedDate = LocalDateTime.now();
+        ;
     }
 }
