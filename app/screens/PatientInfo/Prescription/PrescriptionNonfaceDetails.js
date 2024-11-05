@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 
-export default function PrescriptionFaceDetails({ route }) {
+export default function PrescriptionNonfaceDetails({ route }) {
   const { userId, data } = route.params;
   const [item, setItem] = useState([]);
 
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `http://203.252.213.209:8080/api/v1/healthList/prescription/${userId}/${data.prescriptionId}`
+        `http://203.252.213.209:8080/api/v1/healthList/prescription/noncontact/${userId}/${data.noncontactPrescriptionId}`
       );
       const prescription = await response.json();
       if (prescription.data) {
-        setItem(prescription.data.prescriptionDrugInfo.prescriptionDrugList);
+        setItem(prescription.data.medicines);
         console.log(item);
       } else {
         console.error("Prescription data is undefined");
@@ -54,7 +54,7 @@ export default function PrescriptionFaceDetails({ route }) {
       <ScrollView style={[styles.scrollView, { padding: 15 }]}>
         {item.map((item, index) => {
           return (
-            <View key={item.prescriptionId || index}>
+            <View key={index}>
               <View style={[{ flex: 1 }, { paddingTop: 20 }]}>
                 <View
                   style={[
@@ -66,16 +66,23 @@ export default function PrescriptionFaceDetails({ route }) {
                     <Image
                       style={[{ width: 80 }, { height: 80 }]}
                       source={require("../../../../assets/images/PatientInfo/pills.png")}
-                    />
+                    /> {/* 의약품 url 변경 예정*/}
                     <View
                       style={[
                         { alignItems: "flex-start" },
                         { paddingLeft: 10 },
                       ]}
                     >
-                      <Text style={styles.hospitalName}>{item.drugName}</Text>
+                        <Text 
+                            style={styles.hospitalName}
+                            numberOfLines={2}
+                        >{item.medicineName}</Text>
                     </View>
                   </View>
+
+                  <Text>{item.medicineClassName}</Text>
+                  <Text numberOfLines={2}>{item.medicineChart}</Text>
+                  
                   <View style={[styles.row, { paddingTop: 30 }]}>
                     <View style={styles.blockTop}>
                       <Text>투약일 수</Text>

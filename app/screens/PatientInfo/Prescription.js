@@ -1,171 +1,79 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import React from "react";
+import { View, Text, StyleSheet, } from "react-native";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+
+// page
+import NonfaceComponent from "./Prescription/PrescriptionNonface";
+import FaceComponent from "./Prescription/PrescriptionFace";
+
+const Tab = createMaterialTopTabNavigator();
 
 export default function Prescription({ route }) {
-  const navigation = useNavigation();
   const { userId } = route.params;
-
-  const [item, setitem] = useState([]);
-  const [cnt, setCnt] = useState();
-
-  const handleLoad = (userId, data) => {
-    navigation.navigate("PrescriptionInfoStack", {
-      screen: "PrescriptionFaceDetails",
-      id: 1,
-      params: { userId: userId, data: data },
-    });
-  };
-
-  const fetchData = async () => {
-    try {
-      const response = await fetch(
-        `http://203.252.213.209:8080/api/v1/healthList/prescription/${userId}`
-      );
-      const data = await response.json();
-      setitem(data.data.prescriptionItemList);
-      setCnt(data.data.totalCnt);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
+  console.log("userId", userId);
+  
   return (
-    <View style={[{ height: "100%" }, { backgroundColor: "white" }]}>
-      <View style={styles.screenContainer}>
-        <View style={styles.row}>
-          {cnt === 0 ? (
-            <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}>
-              <Image
-                source={require("../../../assets/images/PatientInfo/ListNonExist.png")}
-              />
-              <Text
-                style={[
-                  styles.hospitalName,
-                  { paddingTop: 20 },
-                  { paddingBottom: 10 },
-                ]}
-              >
-                {" "}
-                확인된 처방 내역이 없어요.{" "}
-              </Text>
-              <Text> 확인된 처방 내역이 없습니다. </Text>
-            </View>
-          ) : (
-            <ScrollView style={styles.scrollView}>
-              {item.map((item) => {
-                return (
-                  <View key={item.prescriptionId} style={styles.hospitalBlock}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.timeText}>{item.treatDate}</Text>
-                      <View style={styles.hospitalInfoContainer}>
-                        <View style={styles.row}>
-                          <View style={[{ paddingTop: 5 }]}>
-                            <Text style={styles.hospitalName}>
-                              {" "}
-                              {item.agencyName}{" "}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.hospitalInfo,
-                                { width: 240 },
-                                { paddingTop: 20 },
-                              ]}
-                              numberOfLines={1}
-                              ellipsizeMode="tail"
-                            >
-                              {item.agencyAddress}
-                            </Text>
-                            <Text style={styles.hospitalInfo}>
-                              {" "}
-                              {item.agencyTel}
-                            </Text>
-                          </View>
-                        </View>
-                        <TouchableOpacity
-                          style={{ paddingLeft: 110 }}
-                          onPress={() => handleLoad(userId, item)}
-                          activeOpacity={0.7}
-                        >
-                          <Icon name="chevron-right" size={24} color="#000" />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </View>
-                );
-              })}
-            </ScrollView>
-          )}
-        </View>
-      </View>
+    <View style={styles.blocks}>
+
+      <Tab.Navigator
+        initialRouteName="TreatmentDashboard"
+        screenOptions={{
+          tabBarActiveTintColor: "#050953",
+          tabBarInactiveTintColor: "gray", // 선택되지 않은 탭의 텍스트 색상
+          tabBarLabelStyle: {
+            fontSize: 14,
+            color: "#47743A",
+            fontWeight: "bold",
+            height: 50,
+            width: "100%",
+          },
+          tabBarStyle: {
+            backgroundColor: "white",
+            height: 50,
+            width: "100%",
+            justifyContent: "center",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+          },
+          tabBarIndicatorStyle: {
+            backgroundColor: "#76B947",
+            height: 4,
+            width: "13%",
+            alignSelf: "center",
+            borderRadius: 10,
+          },
+        }}
+      >
+        <Tab.Screen
+          name="NonfaceComponent"
+          component={NonfaceComponent}
+          options={{ tabBarLabel: "비대면" }}
+          initialParams={{ userId: userId }} // userId 전달
+        />
+
+        <Tab.Screen
+          name="FaceComponent"
+          component={FaceComponent}
+          options={{ tabBarLabel: "대면" }}
+          initialParams={{ userId: userId }} // userId 전달
+        />
+      </Tab.Navigator>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screenContainer: {
-    flexDirection: "row",
-    backgroundColor: "white",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   blocks: {
-    width: "49%", // Adjust as needed to fit your design
-    height: "40%", // 너비와 높이 비율 유지
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#9BD394",
-    borderRadius: 6,
-    marginTop: 20,
-    marginRight: 8,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  scrollView: {
-    flex: 1,
+    height: "100%",
     width: "100%",
-  },
-  hospitalBlock: {
-    flexDirection: "row",
-    height: 150,
-    backgroundColor: "white",
-    padding: 20,
-    borderBottomColor: "#D6D6D6",
-    borderBottomWidth: 1,
-  },
-  hospitalImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  hospitalInfoContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  hospitalName: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  hospitalInfo: {
-    fontSize: 13,
-    color: "#A3A3A3",
+    borderColor: "gray",
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
   },
   text: {
-    fontSize: 17,
+    fontSize: 18, // Increase font size
+    fontFamily: "Arial", // Change font family
   },
 });

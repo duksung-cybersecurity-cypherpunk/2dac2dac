@@ -13,20 +13,11 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 export default function NonfaceDetails({ route }) {
   const navigation = useNavigation();
   const { userId, data } = route.params;
-
   const [item, setitem] = useState([]);
   const [diag, setDiag] = useState([]);
 
   const getDayOfWeek = () => {
-    const daysOfWeek = [
-      "일요일",
-      "월요일",
-      "화요일",
-      "수요일",
-      "목요일",
-      "금요일",
-      "토요일",
-    ];
+    const daysOfWeek = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
     const today = new Date();
     return daysOfWeek[today.getDay()];
   };
@@ -150,6 +141,12 @@ export default function NonfaceDetails({ route }) {
               { paddingLeft: 120 },
             ]}
           ></View>
+
+          <Text style={styles.titleText}>의사 소견</Text>
+          <View style={[styles.opinionBlock, {paddingBottom: 30},]}>
+              {diag.doctorOpinion != null && <Text>{diag.doctorOpinion}</Text>}
+              <Text>과식은 몸에 해롭습니다. 적당한 식사량을 유지하는 것이 중요합니다.</Text>
+          </View>
 
           <Text style={styles.titleText}>결제 정보</Text>
           <View style={[styles.row, { paddingTop: 20 }]}>
