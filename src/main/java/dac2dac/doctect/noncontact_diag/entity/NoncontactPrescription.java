@@ -1,6 +1,5 @@
 package dac2dac.doctect.noncontact_diag.entity;
 
-import dac2dac.doctect.doctor.entity.Medicine;
 import dac2dac.doctect.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -36,14 +35,14 @@ public class NoncontactPrescription {
     private NoncontactDiag noncontactDiag;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Medicine> prescriptionDrugList = new ArrayList<>();
+    private List<NoncontactPrescriptionDrug> prescriptionDrugList = new ArrayList<>();
 
-    public void addPrescriptionDrug(Medicine prescriptionDrug) {
+    public void addPrescriptionDrug(NoncontactPrescriptionDrug prescriptionDrug) {
         prescriptionDrugList.add(prescriptionDrug);
     }
 
     @Builder
-    public NoncontactPrescription(User user, NoncontactDiag noncontactDiag, List<Medicine> prescriptionDrugList) {
+    public NoncontactPrescription(User user, NoncontactDiag noncontactDiag, List<NoncontactPrescriptionDrug> prescriptionDrugList) {
         this.user = user;
         this.noncontactDiag = noncontactDiag;
         this.prescriptionDrugList = prescriptionDrugList;

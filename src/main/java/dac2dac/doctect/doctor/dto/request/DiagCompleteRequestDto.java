@@ -1,15 +1,15 @@
 package dac2dac.doctect.doctor.dto.request;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Getter
 @NoArgsConstructor
 public class DiagCompleteRequestDto {
 
     private Integer price;
-    private List<Long> medicineIds;
+    private List<PrescriptionMedicineItem> medicineList = new ArrayList<>();
     private String doctorOpinion;
 }

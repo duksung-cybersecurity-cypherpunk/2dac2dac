@@ -21,13 +21,13 @@ import dac2dac.doctect.doctor.dto.response.ReservationListDto;
 import dac2dac.doctect.doctor.dto.response.TodayScheduledReservationDto;
 import dac2dac.doctect.doctor.dto.response.UpcomingReservationDto;
 import dac2dac.doctect.doctor.entity.Doctor;
-import dac2dac.doctect.doctor.entity.Medicine;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
 import dac2dac.doctect.doctor.repository.MedicineRepository;
 import dac2dac.doctect.noncontact_diag.dto.response.NoncontactDiagFormInfo;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactPrescription;
+import dac2dac.doctect.noncontact_diag.entity.NoncontactPrescriptionDrug;
 import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
@@ -283,11 +283,16 @@ public class DoctorService {
             .prescriptionDrugList(new ArrayList<>())
             .build();
 
-        request.getMedicineIds().forEach(id -> {
-            Medicine medicine = medicineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND));
-            prescription.addPrescriptionDrug(medicine);
-        });
+        request.getMedicineList().stream()
+            .forEach(m -> {
+                NoncontactPrescriptionDrug noncontactPrescriptionDrug = NoncontactPrescriptionDrug.builder()
+                    .medicine(medicineRepository.findById(m.getMedicineId())
+                        .orElseThrow(() -> new NotFoundException(ErrorCode.DOCTOR_NOT_FOUND)))
+                    .prescriptionCnt(m.getPrescriptionCnt())
+                    .medicationDays(m.getMedicationDays())
+                    .build();
+                prescription.addPrescriptionDrug(noncontactPrescriptionDrug);
+            });
 
         noncontactPrescriptionRepository.save(prescription);
     }

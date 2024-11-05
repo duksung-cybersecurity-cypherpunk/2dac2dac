@@ -14,7 +14,6 @@ import dac2dac.doctect.common.error.exception.BadRequestException;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.common.error.exception.UnauthorizedException;
 import dac2dac.doctect.doctor.entity.Doctor;
-import dac2dac.doctect.doctor.entity.Medicine;
 import dac2dac.doctect.health_list.dto.request.DiagnosisDto;
 import dac2dac.doctect.health_list.dto.request.HealthScreeningDto;
 import dac2dac.doctect.health_list.dto.request.PrescriptionDto;
@@ -41,7 +40,13 @@ import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningI
 import dac2dac.doctect.health_list.dto.response.healthScreening.HealthScreeningItemListDto;
 import dac2dac.doctect.health_list.dto.response.healthScreening.MeasurementTestInfo;
 import dac2dac.doctect.health_list.dto.response.healthScreening.OtherTestInfo;
-import dac2dac.doctect.health_list.dto.response.prescription.*;
+import dac2dac.doctect.health_list.dto.response.prescription.NoncontactPrescriptionDetailDto;
+import dac2dac.doctect.health_list.dto.response.prescription.NoncontactPrescriptionItem;
+import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDetailDto;
+import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDrugItem;
+import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionDrugItemList;
+import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionItem;
+import dac2dac.doctect.health_list.dto.response.prescription.PrescriptionItemListDto;
 import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationDetailDto;
 import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationDetailInfo;
 import dac2dac.doctect.health_list.dto.response.vaccination.VaccinationItem;
@@ -384,17 +389,17 @@ public class HealthListService {
             .collect(Collectors.toList());
 
         List<NoncontactPrescriptionItem> noncontactPrescriptionItemList = noncontactPrescriptionRepository.findByUserId(userId)
-                .stream()
-                .map(p -> {
-                    NoncontactDiag noncontactDiag = p.getNoncontactDiag();
-                    return NoncontactPrescriptionItem.builder()
-                            .noncontactPrescriptionId(p.getId())
-                            .prescriptionDate(LocalDateTime.of(noncontactDiag.getDiagDate(), noncontactDiag.getDiagTime()))
-                            .doctorName(noncontactDiag.getDoctor().getName())
-                            .build();
-                })
-                .sorted(Comparator.comparing(NoncontactPrescriptionItem::getPrescriptionDate).reversed())
-                .collect(Collectors.toList());
+            .stream()
+            .map(p -> {
+                NoncontactDiag noncontactDiag = p.getNoncontactDiag();
+                return NoncontactPrescriptionItem.builder()
+                    .noncontactPrescriptionId(p.getId())
+                    .prescriptionDate(LocalDateTime.of(noncontactDiag.getDiagDate(), noncontactDiag.getDiagTime()))
+                    .doctorName(noncontactDiag.getDoctor().getName())
+                    .build();
+            })
+            .sorted(Comparator.comparing(NoncontactPrescriptionItem::getPrescriptionDate).reversed())
+            .collect(Collectors.toList());
 
         return PrescriptionItemListDto.builder()
             .totalCnt(prescriptionItemList.size())
@@ -405,11 +410,10 @@ public class HealthListService {
 
     public NoncontactPrescriptionDetailDto getDetailNoncontactPrescription(Long userId, Long noncontactPrescriptionId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         NoncontactPrescription fineNoncontactPrescription = noncontactPrescriptionRepository.findById(noncontactPrescriptionId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_PRESCRIPTION_NOT_FOUND));
-        List<Medicine> medicines = fineNoncontactPrescription.getPrescriptionDrugList();
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_PRESCRIPTION_NOT_FOUND));
 
         //* 유저와 조회한 처방 내역에 해당하는 유저가 다를 경우
         if (!user.getId().equals(fineNoncontactPrescription.getUser().getId())) {
@@ -417,8 +421,8 @@ public class HealthListService {
         }
 
         return NoncontactPrescriptionDetailDto.builder()
-                .medicines(medicines)
-                .build();
+            .medicines(fineNoncontactPrescription.getPrescriptionDrugList())
+            .build();
     }
 
     public PrescriptionDetailDto getDetailPrescription(Long userId, Long prescriptionId) {
