@@ -137,7 +137,7 @@ export default function QRLoad({ route }) {
 
         <TouchableOpacity
           style={[styles.bottomBlocks]}
-          onPress={() => navigation.navigate("PatientInfoStack", { id: null })}
+          onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
           <Text sytle={styles.textButton}> 열람 종료하기 </Text>

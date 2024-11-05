@@ -10,6 +10,7 @@ import VaccinationInfoStack from "./VaccinationNavigator";
 import PrescriptionInfoStack from "./PrescriptionNavigator";
 import ExaminationInfoStack from "./ExaminationNavigator";
 import HistoryStack from "./HistoryNavigator";
+import ReservationStack from "./ReservationNavigator";
 
 // page
 import ReservationDetails from "../screens/Reservation/ReservationDetails";
@@ -81,6 +82,13 @@ export default function RootNavigator() {
       <RootStack.Screen
         name="ExaminationInfoStack"
         component={ExaminationInfoStack}
+        options={{
+          tabBarVisible: true, // Tab 바 표시
+        }}
+      />
+      <RootStack.Screen
+        name="ReservationStack"
+        component={ReservationStack}
         options={{
           tabBarVisible: true, // Tab 바 표시
         }}

@@ -6,25 +6,17 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  TextInput,
-  Modal,
-  Button,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import dayjs from "dayjs";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Home() {
   const navigation = useNavigation();
   const [doctorInfo, setDoctorInfo] = useState(null);
-  const [cnt, setCnt] = useState();
-  const [completed, setCompleted] = useState([]);
+  const [cnt, setCnt] = useState(0);
+  const [totalcnt, setTotalCnt] = useState(0);
   const [schedule, setSchedule] = useState([]);
-  const [pay, setPay] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [price, setPrice] = useState("");
-  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -38,7 +30,6 @@ export default function Home() {
         console.error("Error fetching user info:", error);
       }
     };
-
     fetchUserInfo();
   }, []);
 
@@ -56,45 +47,30 @@ export default function Home() {
     }, [doctorInfo])
   );
 
-  const ModalPress = (item) => {
-    setSelectedItem(item);
-
-    setModalVisible(true);
-  };
-
   const fetchData = async () => {
     try {
       const response = await fetch(
         `http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorInfo}/today`
       );
       const data = await response.json();
-      setCompleted(data.data.completedReservationItemList);
-      setSchedule(data.data.scheduledReservationItemList);
-      setPay(data.data.toBeCompleteReservationItemList);
-      setCnt(data.data.totalCnt);
+      console.log(data);
+
+      const schedule = data.data.scheduledReservationItemList || []; // 기본값 설정
+      const num = schedule.reduce((acc, curr) => acc + (curr.length || 0), 0); // 총 객체 수 계산
+      setSchedule(schedule);
+      setCnt(num);
+      setTotalCnt(data.data.totalCnt);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  const handleSubmit = async () => {
-    if (!selectedItem) return;
-    try {
-      const response = await axios.post(
-        `http://203.252.213.209:8080/api/v1/doctors/reservations/complete/${doctorInfo}/${selectedItem.reservationId}`,
-        {
-          doctorId: doctorInfo,
-          reservationId: selectedItem.reservationId,
-          price: price,
-        }
-      );
-      await fetchData();
-      setModalVisible(false);
-      setPrice("");
-      setSelectedItem(null);
-    } catch (error) {
-      console.error("Error:", error);
-    }
+  const handleLoad = (doctorId, reservationId) => {
+    navigation.navigate("ReservationStack", {
+      screen: "ReservationDetails",
+      id: 1,
+      params: { doctorId: doctorId, reservationId: reservationId },
+    });
   };
 
   return (
@@ -103,7 +79,7 @@ export default function Home() {
         <Text style={styles.label}>DOC'TECH</Text>
       </View>
       <View style={styles.content}>
-        {cnt === 0 ? (
+        {totalcnt === 0 ? (
           <View style={styles.emptyState}>
             <Image
               source={require("../../assets/images/PatientInfo/ListNonExist.png")}
@@ -112,107 +88,31 @@ export default function Home() {
           </View>
         ) : (
           <ScrollView style={styles.scrollView}>
+            <Text style={styles.cntText}>오늘 남은 진료는 {cnt}건 입니다.</Text>
             {schedule != null &&
               schedule.map((item) => (
-                <ReservationItem key={item.reservationId} item={item} />
-              ))}
-            {pay != null &&
-              pay.map((item) => (
-                <ReservationItem
-                  key={item.reservationId}
-                  item={item}
-                  onPress={ModalPress}
-                />
-              ))}
-            {completed != null &&
-              completed.map((item) => (
-                <CompletedReservationItem
-                  key={item.reservationId}
-                  item={item}
-                />
+                <View key={item.reservationId} style={styles.reservationBlock}>
+                  <Text style={styles.hospitalName}>환자 {item.patientName}</Text>
+                  <Text style={styles.timeText}>
+                    희망 진료 시간: {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+                  </Text>
+                  {onPress && (
+                    <TouchableOpacity
+                      style={styles.prescriptionBlock}
+                      onPress={() => handleLoad(doctorInfo, item.noncontactDiagId)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.prescriptionText}>진료신청서 보기</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               ))}
           </ScrollView>
         )}
       </View>
-      <ReservationModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        price={price}
-        setPrice={setPrice}
-        onSubmit={handleSubmit}
-      />
     </View>
   );
 }
-
-const ReservationItem = ({ item, onPress }) => (
-  <View style={styles.reservationBlock}>
-    <Text style={styles.timeText}>
-      {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
-    </Text>
-    <Text style={styles.hospitalName}>{item.patientName} 환자</Text>
-    {onPress && (
-      <TouchableOpacity
-        style={styles.prescriptionBlock}
-        onPress={() => onPress(item)}
-      >
-        <Text style={styles.prescriptionText}>진료비 청구하기</Text>
-      </TouchableOpacity>
-    )}
-  </View>
-);
-
-const CompletedReservationItem = ({ item }) => (
-  <View style={styles.reservationBlock}>
-    <Text style={styles.timeText}>
-      {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
-    </Text>
-    <Text style={styles.hospitalName}>{item.patientName} 환자</Text>
-    <View style={styles.vaccinInfo}>
-      <Image
-        source={require("../../assets/images/PatientInfo/vaccCert.png")}
-        style={styles.vaccCert}
-      />
-      <Text style={styles.vaccText}>진료가 완료되었습니다.</Text>
-    </View>
-  </View>
-);
-
-const ReservationModal = ({ visible, onClose, price, setPrice, onSubmit }) => (
-  <Modal
-    animationType="slide"
-    transparent={true}
-    visible={visible}
-    onRequestClose={onClose}
-  >
-    <View style={styles.modalContainer}>
-      <View style={styles.modalContent}>
-        <Text style={styles.modalText}>진료비 금액 입력</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="금액을 입력하세요"
-          keyboardType="numeric"
-          value={price}
-          onChangeText={setPrice}
-        />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.submitButton]}
-            onPress={onSubmit}
-          >
-            <Text style={styles.buttonText}>청구하기</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.cancelButton]}
-            onPress={onClose}
-          >
-            <Text style={styles.buttonText}>취소</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  </Modal>
-);
 
 const styles = StyleSheet.create({
   container: {
@@ -236,11 +136,15 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 160,
+    paddingTop: 180,
   },
   emptyText: {
+    alignItems: "center",
+    justifyContent: "center",
     paddingTop: 20,
-    paddingBottom: 10,
+    paddingLeft: 20, 
+    fontWeight: "bold", 
+    fontSize: 18
   },
   scrollView: {
     flex: 1,
@@ -337,5 +241,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "black",
+  },
+  cntText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    alignItems: "center",
   },
 });

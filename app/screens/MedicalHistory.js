@@ -14,8 +14,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function MedicalHistory() {
   const navigation = useNavigation();
   const [doctorInfo, setDoctorInfo] = useState(null);
-  const [cnt, setCnt] = useState();
-  const [item, setitem] = useState([]); //done
+  const [cnt, setCnt] = useState(0);
+  const [item, setItem] = useState([]);
+  const [toBeItem, setToBeItem] = useState([]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -47,21 +48,27 @@ export default function MedicalHistory() {
   );
 
   const handleBlockPress = (data) => {
+      navigation.navigate("HistoryStack", {
+        screen: "PrescriptionDetails",
+        id: 1,
+        params: { data: data },
+      });
+  };
+  const handleLoad = (doctorId, reservationId) => {
     navigation.navigate("HistoryStack", {
-      screen: "PrescriptionDetails",
-      id: 1,
-      params: { data: data },
+      screen: "PrescriptionWriting",
+      id: 2,
+      params: { doctorId: doctorId, reservationId: reservationId },
     });
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch(
-        `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/1`
-      );
+      const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`);
       const data = await response.json();
-      setitem(data.data.completedReservationList);
-
+      console.log(data.data.completedReservationList);
+      setItem(data.data.completedReservationList);
+      setToBeItem(data.data.toBeCompleteReservationList);
       setCnt(data.data.totalCnt);
     } catch (error) {
       console.error("Error fetching data!:", error);
@@ -77,48 +84,56 @@ export default function MedicalHistory() {
               <Image
                 source={require("../../assets/images/PatientInfo/ListNonExist.png")}
               />
-              <Text style={[{ paddingTop: 20, paddingBottom: 10 }]}>
-                완료된 진료 내역이 없어요.
-              </Text>
+              <Text style={styles.emptyText}>완료된 진료 내역이 없어요.</Text>
             </View>
           ) : (
             <ScrollView style={styles.scrollView}>
-              {item.map((item) => (
-                <View
-                  key={item.noncontactDiagId}
-                  style={{ height: "100%", backgroundColor: "white" }}
-                >
-                  <View style={styles.screenContainer}>
-                    <View style={styles.row}>
-                      <ScrollView style={styles.scrollView}>
-                        <View style={styles.hospitalBlock}>
-                          <View style={{ flex: 1 }}>
-                            <Text style={styles.timeText}>
-                              {dayjs(item.reservationDate).format(
-                                "YYYY.MM.DD HH:mm"
-                              )}
-                            </Text>
-                            <Text style={styles.hospitalName}>
-                              {item.patientName} 환자
-                            </Text>
-                            <TouchableOpacity
-                              style={styles.vaccinInfo}
-                              onPress={() =>
-                                handleBlockPress(item.noncontactDiagId)
-                              }
-                              activeOpacity={0.7}
-                            >
-                              <Text style={styles.prescriptionText}>
-                                처방전 확인하기
-                              </Text>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      </ScrollView>
+              {toBeItem != null &&
+                toBeItem.map((toBeItem) => (
+                  <View
+                    key={toBeItem.noncontactDiagId}
+                    style={styles.hospitalBlock}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.timeText}>
+                        {dayjs(toBeItem.reservationDate).format("YYYY.MM.DD HH:mm")}
+                      </Text>
+                      <Text style={styles.hospitalName}>
+                        {toBeItem.patientName} 환자
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.vaccinInfo}
+                        onPress={() => handleLoad(doctorInfo, toBeItem.noncontactDiagId)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.prescriptionText}>처방전 작성하기</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
-                </View>
-              ))}
+                ))}
+              {item != null &&
+                item.map((item) => (
+                  <View
+                    key={item.noncontactDiagId}
+                    style={styles.hospitalBlock}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.timeText}>
+                        {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+                      </Text>
+                      <Text style={styles.hospitalName}>
+                        {item.patientName} 환자
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.vaccinInfo}
+                        onPress={() => handleBlockPress(item.noncontactDiagId)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.prescriptionText}>처방전 확인하기</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
             </ScrollView>
           )}
         </View>
@@ -133,22 +148,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
-  },
-  blocks: {
-    width: "49%", // Adjust as needed to fit your design
-    height: "40%", // 너비와 높이 비율 유지
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#9BD394",
-    borderRadius: 6,
-    marginTop: 20,
-    marginRight: 8,
-  },
-  one: {
-    paddingTop: 40,
-    paddingRight: 50,
-    paddingLeft: 50,
-    backgroundColor: "white",
   },
   row: {
     flexDirection: "row",
@@ -169,13 +168,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 15,
   },
-  vaccCert: {
-    width: 30,
-    height: 30,
-  },
-  vaccText: {
-    fontSize: 16,
-  },
   hospitalBlock: {
     flexDirection: "row",
     height: 140,
@@ -184,34 +176,10 @@ const styles = StyleSheet.create({
     borderBottomColor: "#D6D6D6",
     borderBottomWidth: 1,
   },
-  hospitalImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  hospitalInfoContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
   hospitalName: {
     fontSize: 20,
     fontWeight: "bold",
     paddingTop: 5,
-  },
-  hospitalInfo: {
-    fontSize: 13,
-    color: "#A3A3A3",
-    paddingTop: 5,
-  },
-  prescriptionBlock: {
-    width: "100%",
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#9BD394",
-    borderRadius: 8,
-    marginTop: 15,
   },
   prescriptionText: {
     fontSize: 16,
@@ -219,7 +187,12 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
   },
-  text: {
-    fontSize: 17,
+  emptyText: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 20,
+    paddingLeft: 20, 
+    fontWeight: "bold", 
+    fontSize: 18
   },
 });

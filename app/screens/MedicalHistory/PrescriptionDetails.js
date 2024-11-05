@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  TextInput
+} from "react-native";
 import dayjs from "dayjs";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -10,24 +18,27 @@ export default function PrescriptionDetails({ route }) {
   const [drug, setDrug] = useState();
   const [symptom, setSymptom] = useState();
   const [disease, setDisease] = useState();
+  const [opinion, setOpinion] = useState();
   const [price, setPrice] = useState();
   const [paymentType, setType] = useState("");
   const [date, setDate] = useState("");
-
+  const [item, setItem] = useState([]);
+  
   const fetchData = async () => {
     try {
       const response = await fetch(
         `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/prescription/${data}`
       );
       const itemdata = await response.json();
-
       setName(itemdata.data.patientName);
       setDrug(itemdata.data.isPrescribedDrug);
       setSymptom(itemdata.data.isAllergicSymptom);
       setDisease(itemdata.data.isInbornDisease);
+      setOpinion(itemdata.data.doctorOpinion);
       setPrice(itemdata.data.paymentPrice);
       setType(itemdata.data.paymentType);
       setDate(itemdata.data.paymentAcceptedDate);
+      setItem(itemdata.data.medicineList);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -101,6 +112,66 @@ export default function PrescriptionDetails({ route }) {
               />
             )}
           </View>
+          <Text style={[styles.titleText, { paddingTop: 30 }]}>의사 소견</Text>
+          <View style={styles.opinionBlock}>
+              {opinion != null && <Text>{opinion}</Text>}
+              <Text>과식은 몸에 해롭습니다. 적당한 식사량을 유지하는 것이 중요합니다.</Text>
+          </View>
+          <Text style={[styles.titleText, { paddingTop: 30 }]}>처방전</Text>
+          {item.map((item, index) => {
+            return (
+              <View key={index}>
+                <View style={[{ flex: 1 }, { paddingTop: 20 }]}>
+                  <View
+                    style={[
+                      { borderBlockColor: "#A3A3A3" },
+                      { borderBottomWidth: 0.5 },
+                    ]}
+                  >
+                  <View style={[{ flexDirection: "row" }]}>
+                    {/* 의약품 URL로부터 이미지 가져오기 */}
+                    <Image 
+                      style={[{width: 80}, {height: 80}]} 
+                      source={{ uri: item.medicineImageUrl }} // URL 링크로 이미지 표시
+                      defaultSource={require("../../../assets/images/PatientInfo/pills.png")} // 로딩 중 기본 이미지
+                    />
+                    <View
+                      style={[
+                        { alignItems: "flex-start" },
+                        { paddingLeft: 10 },
+                      ]}
+                    >
+                        <Text 
+                            style={styles.hospitalName}
+                            numberOfLines={2}
+                        >{item.medicineName}</Text>
+                    </View>
+                  </View>
+
+                  <Text>{item.medicineClassName}</Text>
+                  <Text numberOfLines={2}>{item.medicineChart}</Text>
+                  
+                    <View style={[styles.row, { paddingTop: 30 }]}>
+                      <View style={styles.blockTop}>
+                        <Text>투약일 수</Text>
+                      </View>
+                      <View style={styles.blockTop}>
+                        <Text>일일 투약 횟수</Text>
+                      </View>
+                    </View>
+                    <View style={[styles.row, { paddingBottom: 20 }]}>
+                      <View style={styles.blockBottom}>
+                        <Text>{item.medicationDays}일</Text>
+                      </View>
+                      <View style={styles.blockBottom}>
+                        <Text>{item.prescriptionCnt}회</Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            );
+          })}
           <Text style={[styles.titleText, { paddingTop: 30 }]}>결제 정보</Text>
           <View style={[styles.row, { paddingTop: 10 }]}>
             <Text> 진찰료 </Text>
@@ -110,7 +181,7 @@ export default function PrescriptionDetails({ route }) {
             <Text> 결제 방법 </Text>
             <Text> {paymentType} </Text>
           </View>
-          <View style={[styles.row, { paddingTop: 5 }]}>
+          <View style={[styles.row, { paddingTop: 5 }, {paddingBottom: 30}]}>
             <Text> 승인 일시 </Text>
             <Text> {dayjs(date).format("YYYY.MM.DD HH:mm")}</Text>
           </View>
@@ -136,25 +207,14 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
   },
-  countBlock: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingTop: 30,
-    paddingLeft: 50,
-    paddingRight: 50,
-  },
-  reviewBlock: {
-    flexDirection: "row",
-    width: "98%",
-    height: "20%",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#EBF2EA",
+  hospitalName: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
   blockTop: {
     alignItems: "center",
     justifyContent: "center",
-    width: "32%",
+    width: "48%",
     height: 35,
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
@@ -163,60 +223,23 @@ const styles = StyleSheet.create({
   blockBottom: {
     alignItems: "center",
     justifyContent: "center",
-    width: "32%",
+    width: "48%",
     height: 35,
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 5,
     backgroundColor: "#EBF2EA",
   },
-  symptomBlock: {
-    alignItems: "center",
-    justifyContent: "center",
-    height: 32,
-    borderRadius: 5,
-    backgroundColor: "#CFECD9",
-  },
-  button: {
-    width: "60%",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#94C973",
-    borderRadius: 8,
-    marginRight: 8,
-    paddingVertical: 10,
-  },
-  doctorBlock: {
-    flexDirection: "row",
-    height: 160,
-    backgroundColor: "white",
+  opinionBlock: {
+    backgroundColor: "#EBF2EA",
+    borderRadius: 10,
     padding: 20,
-  },
-  doctorImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 5,
     marginTop: 10,
-  },
-  doctorInfoContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  doctorName: {
-    fontSize: 18,
-    fontWeight: "bold",
   },
   doctorInfo: {
     fontSize: 16,
   },
-  timeText: {
-    fontSize: 16,
-  },
   titleText: {
     fontSize: 22,
-    fontWeight: "bold",
-  },
-  symptomText: {
-    fontSize: 14,
     fontWeight: "bold",
   },
   text: {
