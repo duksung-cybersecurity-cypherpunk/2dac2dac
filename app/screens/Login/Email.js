@@ -112,7 +112,6 @@ const Email = ({ route, navigation }) => {
           placeholder="Token"
           value={enteredToken}
           onChangeText={setEnteredToken}
-          keyboardType="numeric"
           maxLength={20}
         />
       </View>

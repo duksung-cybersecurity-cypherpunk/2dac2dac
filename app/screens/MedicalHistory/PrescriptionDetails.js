@@ -6,7 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  TextInput
+  TextInput,
 } from "react-native";
 import dayjs from "dayjs";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -23,7 +23,7 @@ export default function PrescriptionDetails({ route }) {
   const [paymentType, setType] = useState("");
   const [date, setDate] = useState("");
   const [item, setItem] = useState([]);
-  
+
   const fetchData = async () => {
     try {
       const response = await fetch(
@@ -114,8 +114,7 @@ export default function PrescriptionDetails({ route }) {
           </View>
           <Text style={[styles.titleText, { paddingTop: 30 }]}>의사 소견</Text>
           <View style={styles.opinionBlock}>
-              {opinion != null && <Text>{opinion}</Text>}
-              <Text>과식은 몸에 해롭습니다. 적당한 식사량을 유지하는 것이 중요합니다.</Text>
+            {opinion != null && <Text>{opinion}</Text>}
           </View>
           <Text style={[styles.titleText, { paddingTop: 30 }]}>처방전</Text>
           {item.map((item, index) => {
@@ -128,29 +127,28 @@ export default function PrescriptionDetails({ route }) {
                       { borderBottomWidth: 0.5 },
                     ]}
                   >
-                  <View style={[{ flexDirection: "row" }]}>
-                    {/* 의약품 URL로부터 이미지 가져오기 */}
-                    <Image 
-                      style={[{width: 80}, {height: 80}]} 
-                      source={{ uri: item.medicineImageUrl }} // URL 링크로 이미지 표시
-                      defaultSource={require("../../../assets/images/PatientInfo/pills.png")} // 로딩 중 기본 이미지
-                    />
-                    <View
-                      style={[
-                        { alignItems: "flex-start" },
-                        { paddingLeft: 10 },
-                      ]}
-                    >
-                        <Text 
-                            style={styles.hospitalName}
-                            numberOfLines={2}
-                        >{item.medicineName}</Text>
+                    <View style={[{ flexDirection: "row" }]}>
+                      {/* 의약품 URL로부터 이미지 가져오기 */}
+                      <Image
+                        style={[{ width: 80 }, { height: 80 }]}
+                        source={{ uri: item.medicineImageUrl }} // URL 링크로 이미지 표시
+                        defaultSource={require("../../../assets/images/PatientInfo/pills.png")} // 로딩 중 기본 이미지
+                      />
+                      <View
+                        style={[
+                          { alignItems: "flex-start" },
+                          { paddingLeft: 10 },
+                        ]}
+                      >
+                        <Text style={styles.hospitalName} numberOfLines={2}>
+                          {item.medicineName}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
 
-                  <Text>{item.medicineClassName}</Text>
-                  <Text numberOfLines={2}>{item.medicineChart}</Text>
-                  
+                    <Text>{item.medicineClassName}</Text>
+                    <Text numberOfLines={2}>{item.medicineChart}</Text>
+
                     <View style={[styles.row, { paddingTop: 30 }]}>
                       <View style={styles.blockTop}>
                         <Text>투약일 수</Text>
@@ -181,7 +179,7 @@ export default function PrescriptionDetails({ route }) {
             <Text> 결제 방법 </Text>
             <Text> {paymentType} </Text>
           </View>
-          <View style={[styles.row, { paddingTop: 5 }, {paddingBottom: 30}]}>
+          <View style={[styles.row, { paddingTop: 5 }, { paddingBottom: 30 }]}>
             <Text> 승인 일시 </Text>
             <Text> {dayjs(date).format("YYYY.MM.DD HH:mm")}</Text>
           </View>

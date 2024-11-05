@@ -53,7 +53,6 @@ export default function Home() {
         `http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorInfo}/today`
       );
       const data = await response.json();
-      console.log(data);
 
       const schedule = data.data.scheduledReservationItemList || []; // 기본값 설정
       const num = schedule.reduce((acc, curr) => acc + (curr.length || 0), 0); // 총 객체 수 계산
@@ -85,7 +84,10 @@ export default function Home() {
               source={require("../../assets/images/PatientInfo/ListNonExist.png")}
             />
             <Text style={styles.emptyText}>수락된 진료 내역이 없어요.</Text>
-            <Text style={styles.text}>     놓친 진료 신청 내역이 있는지 확인해보세요.</Text>
+            <Text style={styles.text}>
+              {" "}
+              놓친 진료 신청 내역이 있는지 확인해보세요.
+            </Text>
           </View>
         ) : (
           <ScrollView style={styles.scrollView}>
@@ -93,19 +95,23 @@ export default function Home() {
             {schedule != null &&
               schedule.map((item) => (
                 <View key={item.reservationId} style={styles.reservationBlock}>
-                  <Text style={styles.hospitalName}>환자 {item.patientName}</Text>
-                  <Text style={styles.timeText}>
-                    희망 진료 시간: {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+                  <Text style={styles.hospitalName}>
+                    환자 {item.patientName}
                   </Text>
-                  
-                    <TouchableOpacity
-                      style={styles.prescriptionBlock}
-                      onPress={() => handleLoad(doctorInfo, item.noncontactDiagId)}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.prescriptionText}>진료신청서 보기</Text>
-                    </TouchableOpacity>
-                  
+                  <Text style={styles.timeText}>
+                    희망 진료 시간:{" "}
+                    {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+                  </Text>
+
+                  <TouchableOpacity
+                    style={styles.prescriptionBlock}
+                    onPress={() =>
+                      handleLoad(doctorInfo, item.noncontactDiagId)
+                    }
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.prescriptionText}>진료신청서 보기</Text>
+                  </TouchableOpacity>
                 </View>
               ))}
           </ScrollView>
@@ -114,7 +120,7 @@ export default function Home() {
     </View>
   );
 }
- 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -143,9 +149,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 20,
-    paddingLeft: 20, 
-    fontWeight: "bold", 
-    fontSize: 18
+    paddingLeft: 20,
+    fontWeight: "bold",
+    fontSize: 18,
   },
   scrollView: {
     flex: 1,

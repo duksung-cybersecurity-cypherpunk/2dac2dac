@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   Button,
   TouchableOpacity,
-  ScrollView, // ScrollView 추가
+  ScrollView,
 } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
@@ -53,33 +53,26 @@ const ReservationDetails = ({ route }) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {" "}
-      {/* ScrollView로 감싸기 */}
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.reservationDate}>
-          {
-            new Date(reservationData.reservationItem.reservationDate)
-              .toLocaleDateString("ko-KR") // 한국 형식으로 설정
-              .replace(/\./g, " ") // 점(.)을 슬래시(/)로 변경
-          }
+          {new Date(reservationData.reservationItem.reservationDate)
+            .toLocaleDateString("ko-KR")
+            .replace(/\./g, " ")}{" "}
           {
             new Date(reservationData.reservationItem.reservationDate)
               .toLocaleString()
               .split(",")[1]
           }
         </Text>
-
         <Text style={styles.patientName}>
           환자: {reservationData.reservationItem.patientName}
         </Text>
         <Text style={styles.reservationDate}>
           희망 진료 시간:{" "}
-          {
-            new Date(reservationData.reservationItem.signupDate)
-              .toLocaleDateString("ko-KR") // 한국 형식으로 설정
-              .replace(/\./g, " ") // 점(.)을 슬래시(/)로 변경
-          }
+          {new Date(reservationData.reservationItem.signupDate)
+            .toLocaleDateString("ko-KR")
+            .replace(/\./g, " ")}{" "}
           {
             new Date(reservationData.reservationItem.signupDate)
               .toLocaleString()
@@ -103,7 +96,6 @@ const ReservationDetails = ({ route }) => {
       </View>
       <View style={styles.detailsContainer}>
         <Text style={styles.label}>현재 복용 중인 약이 있습니다.</Text>
-
         <View style={styles.detailItem}>
           <Text style={styles.value}>
             {reservationData.noncontactDiagFormInfo.isPrescribedDrug
@@ -111,8 +103,6 @@ const ReservationDetails = ({ route }) => {
               : "없음"}
           </Text>
         </View>
-
-        {/* Display allergy information */}
         <Text style={styles.label}>알레르기 증상이 있습니다.</Text>
         <Text style={styles.checkboxLabel}>
           약이나 음식물로 인한 알레르기 혹은 그와 유사한 증상을 보인 적이
@@ -125,8 +115,6 @@ const ReservationDetails = ({ route }) => {
               : "없음"}
           </Text>
         </View>
-
-        {/* Display congenital disease information */}
         <Text style={styles.label}>선천적 질환이 있습니다.</Text>
         <Text style={styles.checkboxLabel}>
           앓고 있는 선천적 질환이 있습니다.
@@ -138,8 +126,6 @@ const ReservationDetails = ({ route }) => {
               : "없음"}
           </Text>
         </View>
-
-        {/* Display additional information */}
         <Text style={styles.label}>기타 정보가 있습니다.</Text>
         <View style={styles.detailItem}>
           <Text style={styles.value}>
@@ -154,7 +140,7 @@ const ReservationDetails = ({ route }) => {
             style={styles.backButton}
             onPress={() => handleQRLoad()}
           >
-            <Text style={styles.buttonText}>QR 보기</Text>
+            <Text style={styles.buttonText1}>QR 보기</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.acceptButton}>
@@ -162,7 +148,7 @@ const ReservationDetails = ({ route }) => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.buttonText}>뒤로 가기</Text>
+            <Text style={styles.buttonText2}>뒤로 가기</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -175,6 +161,11 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     backgroundColor: "#fff",
     padding: 16,
+  },
+  scrollViewContent: {
+    justifyContent: "flex-start", // 여기에서 justifyContent를 사용하세요
+    alignItems: "center",
+    flexGrow: 1, // ScrollView에 추가 공간을 채우도록 flexGrow 설정
   },
   headerContainer: {
     backgroundColor: "white",
@@ -268,7 +259,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 20,
   },
-  buttonText: {
+  buttonText1: {
+    fontSize: 16,
+    color: "black",
+  },
+  buttonText2: {
     fontSize: 16,
     color: "white",
   },
