@@ -76,9 +76,7 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Image
-              source={require("../../assets/images/PatientInfo/Logo.png")}
-        />
+        <Text style={styles.label}>DOC'TECH</Text>
       </View>
       <View style={styles.content}>
         {totalcnt === 0 ? (
@@ -99,7 +97,7 @@ export default function Home() {
                   <Text style={styles.timeText}>
                     희망 진료 시간: {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
                   </Text>
-                  {onPress && (
+                  
                     <TouchableOpacity
                       style={styles.prescriptionBlock}
                       onPress={() => handleLoad(doctorInfo, item.noncontactDiagId)}
@@ -107,7 +105,7 @@ export default function Home() {
                     >
                       <Text style={styles.prescriptionText}>진료신청서 보기</Text>
                     </TouchableOpacity>
-                  )}
+                  
                 </View>
               ))}
           </ScrollView>
@@ -123,8 +121,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   header: {
-    alignItems: "flex-start",  // 왼쪽 정렬
-    justifyContent: "flex-start",  // 상단 정렬
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   label: {
@@ -164,7 +162,7 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   hospitalName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     paddingTop: 3,
     marginBottom: 3,
