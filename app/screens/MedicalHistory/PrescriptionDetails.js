@@ -22,22 +22,22 @@ export default function PrescriptionDetails({ route }) {
   const [price, setPrice] = useState();
   const [paymentType, setType] = useState("");
   const [date, setDate] = useState("");
-  // const [item, setItem] = useState([]);
+  const [item, setItem] = useState([]);
   
-  const item = [
-    {
-      drugItemId: 1,
-      drugName: "타이레놀",
-      medicationDays: 5,
-      prescriptionCnt: 2,
-    }, 
-    {
-      drugItemId: 2,
-      drugName: "타이레놀",
-      medicationDays: 5,
-      prescriptionCnt: 2,
-    }, 
-  ];
+  // const item = [
+  //   {
+  //     drugItemId: 1,
+  //     drugName: "타이레놀",
+  //     medicationDays: 5,
+  //     prescriptionCnt: 2,
+  //   }, 
+  //   {
+  //     drugItemId: 2,
+  //     drugName: "타이레놀",
+  //     medicationDays: 5,
+  //     prescriptionCnt: 2,
+  //   }, 
+  // ];
   const fetchData = async () => {
     try {
       const response = await fetch(
@@ -52,7 +52,7 @@ export default function PrescriptionDetails({ route }) {
       setPrice(itemdata.data.paymentPrice);
       setType(itemdata.data.paymentType);
       setDate(itemdata.data.paymentAcceptedDate);
-      // setItem(itemdata.data.prescriptionDrugList);
+      setItem(itemdata.data.medicineList);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -134,7 +134,7 @@ export default function PrescriptionDetails({ route }) {
           <Text style={[styles.titleText, { paddingTop: 30 }]}>처방전</Text>
           {item.map((item, index) => {
             return (
-              <View key={item.drugItemId || index}>
+              <View key={index}>
                 <View style={[{ flex: 1 }, { paddingTop: 20 }]}>
                   <View
                     style={[
@@ -142,20 +142,29 @@ export default function PrescriptionDetails({ route }) {
                       { borderBottomWidth: 0.5 },
                     ]}
                   >
-                    <View style={[{ flexDirection: "row" }]}>
-                      <Image
-                        style={[{ width: 80 }, { height: 80 }]}
-                        source={require("../../../assets/images/PatientInfo/pills.png")}
-                      />
-                      <View
-                        style={[
-                          { alignItems: "flex-start" },
-                          { paddingLeft: 20 },
-                        ]}
-                      >
-                        <Text style={styles.hospitalName}>{item.drugName}</Text>
-                      </View>
+                  <View style={[{ flexDirection: "row" }]}>
+                    {/* 의약품 URL로부터 이미지 가져오기 */}
+                    <Image 
+                      style={[{width: 80}, {height: 80}]} 
+                      source={{ uri: item.medicineImageUrl }} // URL 링크로 이미지 표시
+                      defaultSource={require("../../../assets/images/medicalHistory/pills.png")} // 로딩 중 기본 이미지
+                    />
+                    <View
+                      style={[
+                        { alignItems: "flex-start" },
+                        { paddingLeft: 10 },
+                      ]}
+                    >
+                        <Text 
+                            style={styles.hospitalName}
+                            numberOfLines={2}
+                        >{item.medicineName}</Text>
                     </View>
+                  </View>
+
+                  <Text>{item.medicineClassName}</Text>
+                  <Text numberOfLines={2}>{item.medicineChart}</Text>
+                  
                     <View style={[styles.row, { paddingTop: 30 }]}>
                       <View style={styles.blockTop}>
                         <Text>투약일 수</Text>
