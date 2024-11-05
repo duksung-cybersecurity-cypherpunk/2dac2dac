@@ -7,9 +7,11 @@ import dac2dac.doctect.common.constant.ErrorCode;
 import dac2dac.doctect.common.error.exception.NotFoundException;
 import dac2dac.doctect.doctor.dto.response.CompletedDiagItem;
 import dac2dac.doctect.doctor.dto.response.CompletedReservationListDto;
+import dac2dac.doctect.doctor.dto.response.NoncontactPrescriptionDrugItem;
 import dac2dac.doctect.doctor.dto.response.PrescriptionDto;
 import dac2dac.doctect.doctor.dto.response.ToBeCompletedItem;
 import dac2dac.doctect.doctor.entity.Doctor;
+import dac2dac.doctect.doctor.entity.Medicine;
 import dac2dac.doctect.doctor.repository.DoctorRepository;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiag;
 import dac2dac.doctect.noncontact_diag.entity.NoncontactDiagReservation;
@@ -18,13 +20,12 @@ import dac2dac.doctect.noncontact_diag.entity.Symptom;
 import dac2dac.doctect.noncontact_diag.entity.constant.ReservationStatus;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagRepository;
 import dac2dac.doctect.noncontact_diag.repository.NoncontactDiagReservationRepository;
+import dac2dac.doctect.noncontact_diag.repository.NoncontactPrescriptionRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import dac2dac.doctect.noncontact_diag.repository.NoncontactPrescriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -91,14 +92,28 @@ public class DoctorNoncontactDiagService {
         PaymentInfo paymentInfo = noncontactDiag.getPaymentInfo();
 
         NoncontactPrescription noncontactPrescription = noncontactPrescriptionRepository.findByNoncontactDiagId(noncontactDiagId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_PRESCRIPTION_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NONCONTACT_PRESCRIPTION_NOT_FOUND));
+
+        List<NoncontactPrescriptionDrugItem> noncontactPrescriptionDrugItemList = noncontactPrescription.getPrescriptionDrugList().stream()
+            .map(n -> {
+                Medicine medicine = n.getMedicine();
+                return NoncontactPrescriptionDrugItem.builder()
+                    .medicineName(medicine.getName())
+                    .medicineClassName(medicine.getClassName())
+                    .medicineChart(medicine.getChart())
+                    .medicineImageUrl(medicine.getImageUrl())
+                    .prescriptionCnt(n.getPrescriptionCnt())
+                    .medicationDays(n.getMedicationDays())
+                    .build();
+            })
+            .collect(Collectors.toList());
 
         return PrescriptionDto.builder()
             .patientName(maskName((noncontactDiag.getUser().getUsername())))
             .isAllergicSymptom(symptom.getIsAllergicSymptom())
             .isInbornDisease(symptom.getIsInbornDisease())
             .isPrescribedDrug(symptom.getIsPrescribedDrug())
-            .medicineList(noncontactPrescription.getPrescriptionDrugList())
+            .medicineList(noncontactPrescriptionDrugItemList)
             .doctorOpinion(noncontactDiag.getDoctorOpinion())
             .paymentPrice(paymentInfo.getPrice())
             .paymentType(paymentInfo.getPaymentMethod().getPaymentType().getPaymentTypeName())

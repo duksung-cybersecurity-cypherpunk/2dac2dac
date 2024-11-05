@@ -1,6 +1,5 @@
 package dac2dac.doctect.doctor.dto.response;
 
-import dac2dac.doctect.noncontact_diag.entity.NoncontactPrescriptionDrug;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -17,7 +16,7 @@ public class PrescriptionDto {
     private Boolean isAllergicSymptom;
     private Boolean isInbornDisease;
 
-    private List<NoncontactPrescriptionDrug> medicineList;
+    private List<NoncontactPrescriptionDrugItem> medicineList;
     private String doctorOpinion;
 
     private Integer paymentPrice;
@@ -25,7 +24,7 @@ public class PrescriptionDto {
     private LocalDateTime paymentAcceptedDate;
 
     @Builder
-    public PrescriptionDto(String patientName, Boolean isPrescribedDrug, Boolean isAllergicSymptom, Boolean isInbornDisease, List<NoncontactPrescriptionDrug> medicineList, String doctorOpinion,
+    public PrescriptionDto(String patientName, Boolean isPrescribedDrug, Boolean isAllergicSymptom, Boolean isInbornDisease, List<NoncontactPrescriptionDrugItem> medicineList, String doctorOpinion,
         Integer paymentPrice, String paymentType,
         LocalDateTime paymentAcceptedDate) {
         this.patientName = patientName;
