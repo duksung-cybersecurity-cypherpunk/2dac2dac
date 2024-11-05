@@ -29,10 +29,19 @@ public class NoncontactPrescriptionDrug {
     private Integer prescriptionCnt;
     private Integer medicationDays;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "noncontact_prescription_id")
+    private NoncontactPrescription noncontactPrescription;
+
     @Builder
-    public NoncontactPrescriptionDrug(Medicine medicine, Integer prescriptionCnt, Integer medicationDays) {
+    public NoncontactPrescriptionDrug(Medicine medicine, Integer prescriptionCnt, Integer medicationDays, NoncontactPrescription noncontactPrescription) {
         this.medicine = medicine;
         this.prescriptionCnt = prescriptionCnt;
         this.medicationDays = medicationDays;
+        this.noncontactPrescription = noncontactPrescription;
+    }
+
+    public void setNoncontactPrescription(NoncontactPrescription noncontactPrescription) {
+        this.noncontactPrescription = noncontactPrescription;
     }
 }

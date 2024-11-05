@@ -34,11 +34,12 @@ public class NoncontactPrescription {
     @JoinColumn(name = "noncontact_diag_id")
     private NoncontactDiag noncontactDiag;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "noncontactPrescription", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NoncontactPrescriptionDrug> prescriptionDrugList = new ArrayList<>();
 
     public void addPrescriptionDrug(NoncontactPrescriptionDrug prescriptionDrug) {
         prescriptionDrugList.add(prescriptionDrug);
+        prescriptionDrug.setNoncontactPrescription(this);
     }
 
     @Builder

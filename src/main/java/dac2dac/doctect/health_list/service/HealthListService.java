@@ -118,12 +118,7 @@ public class HealthListService {
         // 마이데이터 유저의 아이디를 이용하여 마이데이터 조회 후 Doc'tech 서버 DB에 저장한다.
         saveMyData(user, mydataUserId);
 
-        // 유저의 생년월일과 성별 저장
-//            user.setBirthDate(pinFront);
-//            user.setGender(determineGenderByPinBack(pinBack));
-//            userRepository.save(user);
-
-        //* 마이데이터 연동 시간
+        //* 마이데이터 연동
         user.syncMydata();
         userRepository.save(user);
 
@@ -151,13 +146,12 @@ public class HealthListService {
         // 마이데이터 유저의 아이디를 이용하여 마이데이터 조회 후 Doc'tech 서버 DB에 저장한다.
         saveMyData(user, mydataUserId);
 
-        //* 마이데이터 연동 시간
-        LocalDateTime updateTime = LocalDateTime.now();
-        user.syncMydata(updateTime);
+        //* 마이데이터 연동
+        user.syncMydata();
         userRepository.save(user);
 
         return UpdateMydataDto.builder()
-            .updateTime(updateTime)
+            .updateTime(user.getLastSyncedDate())
             .build();
     }
 
