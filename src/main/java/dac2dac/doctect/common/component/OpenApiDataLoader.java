@@ -1,8 +1,8 @@
 package dac2dac.doctect.common.component;
 
 import dac2dac.doctect.agency.service.HospitalService;
-import dac2dac.doctect.doctor.service.MedicineService;
 import dac2dac.doctect.agency.service.PharmacyService;
+import dac2dac.doctect.doctor.service.MedicineService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -56,14 +56,14 @@ public class OpenApiDataLoader implements ApplicationRunner {
         }
 
         String medicineInfo = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(MEDICINE_ENDPOINT)
-                        .queryParam("serviceKey", MEDICINE_API_KEY)
-                        .queryParam("_type", "json")
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder
+                .path(MEDICINE_ENDPOINT)
+                .queryParam("serviceKey", MEDICINE_API_KEY)
+                .queryParam("_type", "json")
+                .build())
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
 
         // 응답 데이터가 비어있거나 null인지 확인
         if (medicineInfo == null || medicineInfo.trim().isEmpty()) {
@@ -103,7 +103,7 @@ public class OpenApiDataLoader implements ApplicationRunner {
 
     public void saveAllPharmacyInfo() throws ParseException {
         if (pharmacyService.existsPharmacyData()) {
-            log.info("Already loaded medicine data.");
+            log.info("Already loaded pharmacy data.");
             return;
         }
 
@@ -135,7 +135,7 @@ public class OpenApiDataLoader implements ApplicationRunner {
 
     public void saveAllHospitalInfo() throws ParseException {
         if (hospitalService.existsHospitalData()) {
-            log.info("Already loaded medicine data.");
+            log.info("Already loaded hospital data.");
             return;
         }
 
