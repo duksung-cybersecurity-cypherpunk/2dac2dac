@@ -50,7 +50,7 @@ export default function PrescriptionFace({ route }) {
           {cnt === 0 ? (
             <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}>
               <Image
-                source={require("../../../assets/images/PatientInfo/ListNonExist.png")}
+                source={require("../../../../assets/images/PatientInfo/ListNonExist.png")}
               />
               <Text
                 style={[

@@ -133,7 +133,7 @@ export default function PrescriptionDetails({ route }) {
                     <Image 
                       style={[{width: 80}, {height: 80}]} 
                       source={{ uri: item.medicineImageUrl }} // URL 링크로 이미지 표시
-                      defaultSource={require("../../../assets/images/medicalHistory/pills.png")} // 로딩 중 기본 이미지
+                      defaultSource={require("../../../assets/images/PatientInfo/pills.png")} // 로딩 중 기본 이미지
                     />
                     <View
                       style={[
