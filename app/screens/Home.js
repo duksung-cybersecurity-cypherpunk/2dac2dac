@@ -76,7 +76,9 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.label}>DOC'TECH</Text>
+        <Image
+              source={require("../../assets/images/PatientInfo/Logo.png")}
+        />
       </View>
       <View style={styles.content}>
         {totalcnt === 0 ? (
@@ -84,7 +86,8 @@ export default function Home() {
             <Image
               source={require("../../assets/images/PatientInfo/ListNonExist.png")}
             />
-            <Text style={styles.emptyText}>오늘 진료 예약 내역이 없어요.</Text>
+            <Text style={styles.emptyText}>수락된 진료 내역이 없어요.</Text>
+            <Text style={styles.text}>놓친 진료 신청 내역이 있는지 확인해보세요.</Text>
           </View>
         ) : (
           <ScrollView style={styles.scrollView}>
@@ -120,8 +123,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   header: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "flex-start",  // 왼쪽 정렬
+    justifyContent: "flex-start",  // 상단 정렬
     padding: 20,
   },
   label: {
@@ -246,5 +249,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     alignItems: "center",
+  },
+  text: {
+    fontSize: 14,
+    color: "#737373"
   },
 });
