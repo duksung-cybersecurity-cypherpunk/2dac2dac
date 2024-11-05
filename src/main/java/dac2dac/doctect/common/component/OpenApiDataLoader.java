@@ -59,7 +59,7 @@ public class OpenApiDataLoader implements ApplicationRunner {
             .uri(uriBuilder -> uriBuilder
                 .path(MEDICINE_ENDPOINT)
                 .queryParam("serviceKey", MEDICINE_API_KEY)
-                .queryParam("_type", "json")
+                .queryParam("type", "json")
                 .build())
             .retrieve()
             .bodyToMono(String.class)
