@@ -67,7 +67,7 @@ class DoctorController {
     @PostMapping("/complete/{doctorId}/{reservationId}")
     public ApiResult completeReservation(@RequestBody DiagCompleteRequestDto request, @PathVariable Long doctorId, @PathVariable Long reservationId) throws Exception {
         doctorService.completeReservation(request, doctorId, reservationId);
-        return ApiResult.success(SuccessCode.PAYMENT_SUCCESS);
+        return ApiResult.success(SuccessCode.PRESCRIPTION_CREATE_SUCCESS);
     }
 
     @Operation(summary = "오늘 진료 예약 목록 조회 API", description = "메인에 보여지는 오늘 진료 예약 목록을 조회한다.")

@@ -14,6 +14,7 @@ public enum SuccessCode {
     CREATED_SUCCESS(HttpStatus.CREATED, "생성 성공"),
     ACCEPT_SUCCESS(HttpStatus.ACCEPTED, "수락 성공"),
     REJECT_SUCCESS(HttpStatus.ACCEPTED, "거절 성공"),
+    PRESCRIPTION_CREATE_SUCCESS(HttpStatus.CREATED, "처방전 작성 완료"),
     DELETE_SUCCESS(HttpStatus.OK, "삭제 성공");
 
     private final HttpStatus status;
