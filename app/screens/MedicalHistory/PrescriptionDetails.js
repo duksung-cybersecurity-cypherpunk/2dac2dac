@@ -24,20 +24,6 @@ export default function PrescriptionDetails({ route }) {
   const [date, setDate] = useState("");
   const [item, setItem] = useState([]);
   
-  // const item = [
-  //   {
-  //     drugItemId: 1,
-  //     drugName: "타이레놀",
-  //     medicationDays: 5,
-  //     prescriptionCnt: 2,
-  //   }, 
-  //   {
-  //     drugItemId: 2,
-  //     drugName: "타이레놀",
-  //     medicationDays: 5,
-  //     prescriptionCnt: 2,
-  //   }, 
-  // ];
   const fetchData = async () => {
     try {
       const response = await fetch(
