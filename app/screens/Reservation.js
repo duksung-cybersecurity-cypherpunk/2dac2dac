@@ -10,7 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import {
   getCurrentWeekDays,
   formatDate,
@@ -43,7 +43,9 @@ export default function Reservation() {
       const userData = JSON.parse(userInfo);
       setDoctorId(userData.id);
 
-      const apiUrl = `http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorId}/${ReservationDate(selectedDate)}`;
+      const apiUrl = `http://203.252.213.209:8080/api/v1/doctors/reservations/1/${ReservationDate(
+        selectedDate
+      )}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === 200) {
@@ -65,55 +67,58 @@ export default function Reservation() {
     const id = item.reservationId;
 
     return (
-    <ScrollView style={styles.scrollView}>
-      <View key={id.toString()} style={styles.reservationCard}>
-        <Text style={styles.timeText}>{dayjs(item.signupDate).format('YYYY.MM.DD HH:mm')}</Text>
-        <Text style={styles.patientName}>환자 {item.patientName}</Text>
-        <Text style={styles.desiredTime}>
-          희망 진료 시간: {dayjs(item.reservationDate).format('YYYY.MM.DD HH:mm')}
-        </Text>
+      <ScrollView style={styles.scrollView}>
+        <View key={id.toString()} style={styles.reservationCard}>
+          <Text style={styles.timeText}>
+            {dayjs(item.signupDate).format("YYYY.MM.DD HH:mm")}
+          </Text>
+          <Text style={styles.patientName}>환자 {item.patientName}</Text>
+          <Text style={styles.desiredTime}>
+            희망 진료 시간:{" "}
+            {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+          </Text>
 
-        {selectedTab === "요청된 예약" && (
-          <View style={styles.buttonsRow}>
+          {selectedTab === "요청된 예약" && (
+            <View style={styles.buttonsRow}>
+              <TouchableOpacity
+                style={styles.rejectButton}
+                onPress={() => {
+                  setSelectedReservation(item);
+                  setModalType("reject"); // 거절 모달 설정
+                  setModalVisible(true); // 모달 열기
+                }}
+              >
+                <Text style={styles.acceptButtonText}>예약 거절하기</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.acceptButton}
+                onPress={() => {
+                  setSelectedReservation(item);
+                  setModalType("accept"); // 수락 모달 설정
+                  setModalVisible(true); // 모달 열기
+                }}
+              >
+                <Text style={styles.acceptButtonText}>예약 수락하기</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {selectedTab === "수락된 예약" && (
             <TouchableOpacity
-              style={styles.rejectButton}
+              style={styles.DetailButton}
               onPress={() => {
                 setSelectedReservation(item);
-                setModalType("reject"); // 거절 모달 설정
-                setModalVisible(true); // 모달 열기
+                navigation.navigate("ReservationDetails", {
+                  doctorId: doctorId,
+                  reservationId: item.reservationId,
+                });
               }}
             >
-              <Text style={styles.acceptButtonText}>예약 거절하기</Text>
+              <Text style={styles.viewDetailsText}>상세보기</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.acceptButton}
-              onPress={() => {
-                setSelectedReservation(item);
-                setModalType("accept"); // 수락 모달 설정
-                setModalVisible(true); // 모달 열기
-              }}
-            >
-              <Text style={styles.acceptButtonText}>예약 수락하기</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        {selectedTab === "수락된 예약" && (
-          <TouchableOpacity
-            style={styles.DetailButton}
-            onPress={() => {
-              setSelectedReservation(item);
-              navigation.navigate("ReservationDetails", {
-                doctorId: doctorId,
-                reservationId: item.reservationId,
-              });
-            }}
-          >
-            <Text style={styles.viewDetailsText}>상세보기</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    </ScrollView>
+          )}
+        </View>
+      </ScrollView>
     );
   };
 

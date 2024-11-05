@@ -92,19 +92,24 @@ export default function Home() {
             {schedule != null &&
               schedule.map((item) => (
                 <View key={item.reservationId} style={styles.reservationBlock}>
-                  <Text style={styles.hospitalName}>환자 {item.patientName}</Text>
-                  <Text style={styles.timeText}>
-                    희망 진료 시간: {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+                  <Text style={styles.hospitalName}>
+                    환자 {item.patientName}
                   </Text>
-                  {onPress && (
-                    <TouchableOpacity
-                      style={styles.prescriptionBlock}
-                      onPress={() => handleLoad(doctorInfo, item.noncontactDiagId)}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.prescriptionText}>진료신청서 보기</Text>
-                    </TouchableOpacity>
-                  )}
+                  <Text style={styles.timeText}>
+                    희망 진료 시간:{" "}
+                    {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
+                  </Text>
+                  (
+                  <TouchableOpacity
+                    style={styles.prescriptionBlock}
+                    onPress={() =>
+                      handleLoad(doctorInfo, item.noncontactDiagId)
+                    }
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.prescriptionText}>진료신청서 보기</Text>
+                  </TouchableOpacity>
+                  )
                 </View>
               ))}
           </ScrollView>
@@ -142,9 +147,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 20,
-    paddingLeft: 20, 
-    fontWeight: "bold", 
-    fontSize: 18
+    paddingLeft: 20,
+    fontWeight: "bold",
+    fontSize: 18,
   },
   scrollView: {
     flex: 1,
