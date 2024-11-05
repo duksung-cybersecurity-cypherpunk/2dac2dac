@@ -62,11 +62,8 @@ public class AgencyService {
         //* 검색 조건에 따른 데이터 조회
         loadDataBasedOnCriteria(criteria, latitude, longitude, radius, searchResultSet);
 
-        //* 결과 필터링
-        List<Agency> filteredResult = filterSearchResult(criteria, new ArrayList<>(searchResultSet));
-
         //* 가까운순 정렬
-        List<AgencySearchResultDto> sortedResult = filteredResult.stream()
+        List<AgencySearchResultDto> sortedResult = searchResultSet.stream()
             .map(s -> createAgencySearchResultDto(s, latitude, longitude))
             .sorted(Comparator.comparing(AgencySearchResultDto::getDistance))
             .collect(Collectors.toList());
@@ -142,44 +139,25 @@ public class AgencyService {
 
     private void loadDataBasedOnCriteria(SearchCriteria criteria, double latitude, double longitude, double radius, Set<Agency> searchResultSet) {
         boolean criteriaApplied = false;
-        if (criteria.getKeyword() != null && !criteria.getKeyword().isEmpty()) { // 검색어 있는 경우
-            if (criteria.isHospital()) {
-                searchResultSet.addAll(hospitalRepository.findNearbyHospitalsWithKeyword(latitude, longitude, radius, criteria.getKeyword()));
-                criteriaApplied = true;
-            }
-            if (criteria.isPharmacy()) {
-                searchResultSet.addAll(pharmacyRepository.findNearbyPharmaciesWithKeyword(latitude, longitude, radius, criteria.getKeyword()));
-                criteriaApplied = true;
-            }
-            if (criteria.isEr()) {
-                searchResultSet.addAll(hospitalRepository.findNearbyERsWithKeyword(latitude, longitude, radius, criteria.getKeyword()));
-                criteriaApplied = true;
-            }
-            // 만약 어떤 조건도 적용되지 않았다면 모든 조건 수행
-            if (!criteriaApplied) {
-                searchResultSet.addAll(hospitalRepository.findHospitalsWithKeyword(criteria.getKeyword()));
-                searchResultSet.addAll(pharmacyRepository.findPharmaciesWithKeyword(criteria.getKeyword()));
-                searchResultSet.addAll(hospitalRepository.findERWithKeyword(criteria.getKeyword()));
-            }
-        } else { // 검색어 없는 경우
-            if (criteria.isHospital()) {
-                searchResultSet.addAll(hospitalRepository.findNearbyHospitals(latitude, longitude, radius));
-                criteriaApplied = true;
-            }
-            if (criteria.isPharmacy()) {
-                searchResultSet.addAll(pharmacyRepository.findNearbyPharmacies(latitude, longitude, radius));
-                criteriaApplied = true;
-            }
-            if (criteria.isEr()) {
-                searchResultSet.addAll(hospitalRepository.findNearbyERs(latitude, longitude, radius));
-                criteriaApplied = true;
-            }
-            // 만약 어떤 조건도 적용되지 않았다면 모든 조건 수행
-            if (!criteriaApplied) {
-                searchResultSet.addAll(hospitalRepository.findHospitalsWithKeyword(criteria.getKeyword()));
-                searchResultSet.addAll(pharmacyRepository.findPharmaciesWithKeyword(criteria.getKeyword()));
-                searchResultSet.addAll(hospitalRepository.findERWithKeyword(criteria.getKeyword()));
-            }
+
+        if (criteria.isHospital()) {
+            searchResultSet.addAll(hospitalRepository.findNearbyHospitals(latitude, longitude, radius));
+            criteriaApplied = true;
+        }
+        if (criteria.isPharmacy()) {
+            searchResultSet.addAll(pharmacyRepository.findNearbyPharmacies(latitude, longitude, radius));
+            criteriaApplied = true;
+        }
+        if (criteria.isEr()) {
+            searchResultSet.addAll(hospitalRepository.findNearbyERs(latitude, longitude, radius));
+            criteriaApplied = true;
+        }
+
+        // 만약 어떤 조건도 적용되지 않았다면 모든 조건 수행
+        if (!criteriaApplied) {
+            searchResultSet.addAll(hospitalRepository.findNearbyHospitals(latitude, longitude, radius));
+            searchResultSet.addAll(pharmacyRepository.findNearbyPharmacies(latitude, longitude, radius));
+            searchResultSet.addAll(hospitalRepository.findNearbyERs(latitude, longitude, radius));
         }
     }
 
@@ -205,51 +183,6 @@ public class AgencyService {
             searchResultSet.addAll(pharmacyRepository.findPharmaciesWithKeyword(criteria.getKeyword()));
             searchResultSet.addAll(hospitalRepository.findERWithKeyword(criteria.getKeyword()));
         }
-    }
-
-    private List<Agency> filterSearchResult(SearchCriteria criteria, List<Agency> searchResult) {
-        Stream<Agency> stream = searchResult.stream();
-
-        // 영업 시간별 필터링
-        if (criteria.isOpenNow()) {
-            stream = stream.filter(s -> isAgencyOpenNow(s.getDiagTime()));
-        }
-        if (criteria.isOpenAllYear()) {
-            stream = stream.filter(s -> isAgencyOpenAllYear(s.getDiagTime()));
-        }
-        if (criteria.isOpenAtMidnight()) {
-            stream = stream.filter(s -> isAgencyOpenMidnight(s.getDiagTime()));
-        }
-
-        // 영업 요일별 필터링
-        List<DayOfWeek> daysFilter = new ArrayList<>();
-        if (criteria.isMon()) {
-            daysFilter.add(DayOfWeek.MONDAY);
-        }
-        if (criteria.isTue()) {
-            daysFilter.add(DayOfWeek.TUESDAY);
-        }
-        if (criteria.isWed()) {
-            daysFilter.add(DayOfWeek.WEDNESDAY);
-        }
-        if (criteria.isThu()) {
-            daysFilter.add(DayOfWeek.THURSDAY);
-        }
-        if (criteria.isFri()) {
-            daysFilter.add(DayOfWeek.FRIDAY);
-        }
-        if (criteria.isSat()) {
-            daysFilter.add(DayOfWeek.SATURDAY);
-        }
-        if (criteria.isSun()) {
-            daysFilter.add(DayOfWeek.SUNDAY);
-        }
-
-        for (DayOfWeek day : daysFilter) {
-            stream = stream.filter(s -> isAgencyOpenOnDay(s.getDiagTime(), day));
-        }
-
-        return stream.collect(Collectors.toList());
     }
 
     private List<Agency> filterSearchResultWithoutLocation(SearchCriteriaWithoutLocation criteria, List<Agency> searchResult) {
