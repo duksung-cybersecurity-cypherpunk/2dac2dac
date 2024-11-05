@@ -48,11 +48,11 @@ export default function MedicalHistory() {
   );
 
   const handleBlockPress = (data) => {
-      navigation.navigate("HistoryStack", {
-        screen: "PrescriptionDetails",
-        id: 1,
-        params: { data: data },
-      });
+    navigation.navigate("HistoryStack", {
+      screen: "PrescriptionDetails",
+      id: 1,
+      params: { data: data },
+    });
   };
   const handleLoad = (doctorId, reservationId) => {
     navigation.navigate("HistoryStack", {
@@ -64,9 +64,11 @@ export default function MedicalHistory() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`);
+      const response = await fetch(
+        `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`
+      );
       const data = await response.json();
-      console.log(data.data.completedReservationList);
+      console.log(data.data.toBeCompleteReservationList);
       setItem(data.data.completedReservationList);
       setToBeItem(data.data.toBeCompleteReservationList);
       setCnt(data.data.totalCnt);
@@ -96,17 +98,23 @@ export default function MedicalHistory() {
                   >
                     <View style={{ flex: 1 }}>
                       <Text style={styles.timeText}>
-                        {dayjs(toBeItem.reservationDate).format("YYYY.MM.DD HH:mm")}
+                        {dayjs(toBeItem.reservationDate).format(
+                          "YYYY.MM.DD HH:mm"
+                        )}
                       </Text>
                       <Text style={styles.hospitalName}>
                         {toBeItem.patientName} 환자
                       </Text>
                       <TouchableOpacity
                         style={styles.vaccinInfo}
-                        onPress={() => handleLoad(doctorInfo, toBeItem.noncontactDiagId)}
+                        onPress={() =>
+                          handleLoad(doctorInfo, toBeItem.reservationId)
+                        }
                         activeOpacity={0.7}
                       >
-                        <Text style={styles.prescriptionText}>처방전 작성하기</Text>
+                        <Text style={styles.prescriptionText}>
+                          처방전 작성하기
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -129,7 +137,9 @@ export default function MedicalHistory() {
                         onPress={() => handleBlockPress(item.noncontactDiagId)}
                         activeOpacity={0.7}
                       >
-                        <Text style={styles.prescriptionText}>처방전 확인하기</Text>
+                        <Text style={styles.prescriptionText}>
+                          처방전 확인하기
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -191,8 +201,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 20,
-    paddingLeft: 20, 
-    fontWeight: "bold", 
-    fontSize: 18
+    paddingLeft: 20,
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });

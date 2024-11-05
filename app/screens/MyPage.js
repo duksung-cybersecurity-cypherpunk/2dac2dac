@@ -16,7 +16,6 @@ export default function MyPage() {
   useEffect(() => {
     const loadUserData = async () => {
       const storedUserInfo = await AsyncStorage.getItem("userInfo");
-      console.log("id", storedUserInfo);
 
       if (storedUserInfo) {
         setUserInfo(JSON.parse(storedUserInfo));

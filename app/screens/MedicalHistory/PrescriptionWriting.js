@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
-  Image
+  Image,
 } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
-import Icon from 'react-native-vector-icons/Ionicons'; // 아이콘 라이브러리
+import Icon from "react-native-vector-icons/Ionicons"; // 아이콘 라이브러리
 
 export default function PrescriptionWriting({ route }) {
   const navigation = useNavigation();
@@ -26,37 +26,41 @@ export default function PrescriptionWriting({ route }) {
   const [selectedMedications, setSelectedMedications] = useState({});
 
   const handleSubmit = async () => {
-    const medicineList = medications.map(medication => ({
-      medicineId: medication.medicineId,
-      prescriptionCnt: medication.times, // 횟수
-      medicationDays: medication.days, // 일 수
+    const medicineList = medications.map((medication) => ({
+      medicineId: Number(medication.medicineId),
+      prescriptionCnt: Number(medication.times) || 0, // 변환 실패 시 0으로 설정
+      medicationDays: Number(medication.days) || 0, // 변환 실패 시 0으로 설정
     }));
 
     try {
       const response = await axios.post(
-        `${doctorId}/${reservationId}`,
+        `http://203.252.213.209:8080/api/v1/doctors/reservations/complete/${doctorId}/${reservationId}`,
         {
           price: price,
           medicineList: medicineList,
           doctorOpinion: opinion,
         }
       );
+
+      navigation.goBack();
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
   const addMedication = () => {
-    const newMedications = Object.values(selectedMedications).map(item => ({
-      medicineId: item.medicineId,
+    const newMedications = Object.values(selectedMedications).map((item) => ({
+      medicineId: Number(item.medicineId),
       medicineName: item.medicineName,
       medicineClassName: item.medicineClassName,
       medicineChart: item.medicineChart,
       medicineImageUrl: item.medicineImageUrl,
-      days: "", // 초기값 설정
-      times: "", // 초기값 설정
+      days: 0, // 초기값 설정
+      times: 0, // 초기값 설정
     }));
+
     setMedications([...medications, ...newMedications]);
+
     setSelectedMedications({});
     setMedicationsVisible(false);
   };
@@ -64,12 +68,12 @@ export default function PrescriptionWriting({ route }) {
   const handleSearch = async () => {
     try {
       const response = await axios.post(
-        `http://203.252.213.209:8080/api/v1/doctors/reservations/complete/${doctorId}/${reservationId}`, 
+        `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/medicines`,
         {
-            keyword: searchKeyword,
-        });
-      setSearchResults(response.data);
-      console.log(searchResults);
+          keyword: searchKeyword,
+        }
+      );
+      setSearchResults(response.data.data);
     } catch (error) {
       console.error("Search Error:", error);
     }
@@ -82,20 +86,22 @@ export default function PrescriptionWriting({ route }) {
         delete newSelection[item.id];
       } else {
         newSelection[item.id] = {
-          medicineId: item.id,
+          medicineId: Number(item.id),
           medicineName: item.name,
           medicineClassName: item.className,
           medicineChart: item.chart,
           medicineImageUrl: item.imageUrl,
         };
       }
+      console.log(newSelection);
       return newSelection;
     });
   };
 
   const handleInputChange = (index, field, value) => {
     const newMedications = [...medications];
-    newMedications[index][field] = value;
+    // 입력값을 숫자로 변환, 빈 값이면 0으로 설정
+    newMedications[index][field] = value ? parseFloat(value) : 0;
     setMedications(newMedications);
   };
 
@@ -103,7 +109,7 @@ export default function PrescriptionWriting({ route }) {
     <View style={styles.screenContainer}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.paymentContent}>
-          <Text style={styles.titleText}>진료비 금액 입력</Text>
+          <Text style={styles.titleText}>진료비 금액을 입력해 주세요.</Text>
           <TextInput
             style={styles.input}
             placeholder="금액을 입력하세요"
@@ -113,7 +119,7 @@ export default function PrescriptionWriting({ route }) {
           />
         </View>
         <View style={styles.paymentContent}>
-          <Text style={styles.titleText}>의사 소견 작성</Text>
+          <Text style={styles.titleText}>의사 소견을 작성해 주세요.</Text>
           <TextInput
             style={styles.input}
             placeholder="의사 소견을 입력하세요"
@@ -122,13 +128,24 @@ export default function PrescriptionWriting({ route }) {
           />
         </View>
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#F5F5F5", borderRadius: 8, height: 40, margin: 20 }]}
-          onPress={() => setMedicationsVisible(true)}
-        >
-          <Icon name="add" size={24} color="#000" />
-          <Text style={styles.buttonText}>처방 의약품을 추가해 주세요.</Text>
-        </TouchableOpacity>
+        <View style={styles.paymentContent}>
+          <Text style={styles.titleText}>처방 의약품을 기입해 주세요.</Text>
+          <TouchableOpacity
+            style={[
+              styles.buttonSt,
+              {
+                backgroundColor: "#F5F5F5",
+                borderRadius: 8,
+                height: 80,
+                marginLeft: 10,
+              },
+            ]}
+            onPress={() => setMedicationsVisible(true)}
+          >
+            <Icon name="add" size={24} color="#000" />
+            <Text>처방 의약품을 추가해 주세요.</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* 의약품 검색 및 추가를 위한 모달창 */}
         <Modal
@@ -140,7 +157,7 @@ export default function PrescriptionWriting({ route }) {
             <Text style={styles.modalTitle}>의약품을 검색 및 추가하세요.</Text>
             <TextInput
               style={styles.searchInput}
-              placeholder="의약품 검색"
+              placeholder="의약품명을 입력하세요."
               value={searchKeyword}
               onChangeText={setSearchKeyword}
             />
@@ -149,80 +166,130 @@ export default function PrescriptionWriting({ route }) {
             </TouchableOpacity>
 
             <ScrollView>
-              {searchResults.map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={[
-                    styles.searchResultContainer,
-                    selectedMedications[item.id] && { backgroundColor: "#F5F5F5" }
-                  ]}
-                  onPress={() => toggleSelection(item)}
-                >
-                  <Image
-                    style={styles.medicationImage}
-                    source={{ uri: item.imageUrl }}
-                    defaultSource={require("../../../assets/images/PatientInfo/pills.png")}
-                  />
-                  <View style={styles.medicationDetails}>
-                    <Text style={styles.medicineName}>{item.name}</Text>
-                    <Text>{item.className}</Text>
-                    <Text numberOfLines={2}>{item.chart}</Text>
-                  </View>
-                  <Icon
-                    name={selectedMedications[item.id] ? "checkmark-circle" : "checkmark-circle-outline"}
-                    size={24}
-                    color={selectedMedications[item.id] ? "#76B947" : "#D6D6D6"}
-                  />
-                </TouchableOpacity>
-              ))}
+              {searchResults.map((item) => {
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={[
+                      styles.searchResultContainer,
+                      selectedMedications[item.id] && {
+                        backgroundColor: "#F5F5F5",
+                      },
+                    ]}
+                    onPress={() => toggleSelection(item)}
+                  >
+                    <Image
+                      style={styles.medicationImage}
+                      source={{ uri: item.imageUrl }}
+                      defaultSource={require("../../../assets/images/PatientInfo/pills.png")}
+                    />
+                    <View style={styles.medicationDetails}>
+                      <Text style={styles.medicineName}>{item.name}</Text>
+                      <Text>{item.className}</Text>
+                      <Text numberOfLines={2}>{item.chart}</Text>
+                    </View>
+                    <Icon
+                      name={
+                        selectedMedications[item.id]
+                          ? "checkmark-circle"
+                          : "checkmark-circle-outline"
+                      }
+                      size={24}
+                      color={
+                        selectedMedications[item.id] ? "#76B947" : "#D6D6D6"
+                      }
+                    />
+                  </TouchableOpacity>
+                );
+              })}
             </ScrollView>
+            <View style={[{ flexDirection: "row" }]}>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={addMedication}
+              >
+                <Text style={styles.buttonText}>추가하기</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: "#9BD394", borderRadius: 8, height: 40, margin: 20 }]}
-              onPress={addMedication}
-            >
-              <Text style={styles.buttonText}>선택된 의약품 추가하기</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => setMedicationsVisible(false)}>
-              <Text style={styles.closeButton}>닫기</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => setMedicationsVisible(false)}>
+                <Text style={styles.cancelButton}>뒤로가기</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Modal>
 
         {/* 선택된 의약품 목록 표시 */}
         {medications.map((medication, index) => (
-          <View key={index} style={styles.medicationContainer}>
-            <View style={[{ borderBlockColor: "#A3A3A3" }, { borderBottomWidth: 0.5 }]}>
-              <View style={[{ flexDirection: "row" }]}>
+          <View
+            key={medication.medicineId || index}
+            style={styles.medicationContainer}
+          >
+            <View
+              style={[
+                { borderBlockColor: "#A3A3A3" },
+                { borderBottomWidth: 0.5 },
+              ]}
+            >
+              <View style={[{ flexDirection: "row", marginLeft: 20 }]}>
                 <Image
-                  style={[{ width: 80 }, { height: 80 }]}
+                  style={[
+                    { width: 80 },
+                    { height: 80 },
+                    { borderRadius: 6 },
+                    { marginBottom: 20 },
+                  ]}
                   source={{ uri: medication.medicineImageUrl }}
                   defaultSource={require("../../../assets/images/PatientInfo/pills.png")}
                 />
-                <View style={[{ flex: 1, alignItems: "flex-start" , paddingLeft: 10 }]}>
-                  <Text style={styles.hospitalName} numberOfLines={2}>{medication.medicineName}</Text>
-                  <Text>{medication.medicineClassName}</Text>
-                  <Text numberOfLines={2}>{medication.medicineChart}</Text>
+                <View
+                  style={[
+                    { flex: 1, alignItems: "flex-start", paddingLeft: 10 },
+                  ]}
+                >
+                  <Text style={styles.hospitalName} numberOfLines={2}>
+                    {medication.medicineName}
+                  </Text>
+                  <Text style={styles.subName}>
+                    {medication.medicineClassName}
+                  </Text>
+                  <Text style={styles.explainText} numberOfLines={2}>
+                    {medication.medicineChart}
+                  </Text>
                 </View>
               </View>
 
-              <Text style={[{alignItems: "flex-start", fontWeight: "bold"}]}>투약일 수 | 일일 투약 횟수</Text>
-              <View style={styles.inputRow}>
+              <Text
+                style={[
+                  {
+                    alignItems: "flex-start",
+                    fontWeight: "bold",
+                    marginLeft: 20,
+                  },
+                ]}
+              >
+                투약일 수 | 일일 투약 횟수
+              </Text>
+              <View style={[{ flexDirection: "row", marginLeft: 20 }]}>
                 <TextInput
                   style={styles.inputSmall}
                   placeholder="일 수"
                   keyboardType="numeric"
                   value={medication.days}
-                  onChangeText={(value) => handleInputChange(index, 'days', value)}
-                /><Text>일 | </Text>
+                  onChangeText={(value) =>
+                    handleInputChange(index, "days", value)
+                  }
+                />
+                <Text style={[{ marginTop: 16 }]}>일 | </Text>
                 <TextInput
                   style={styles.inputSmall}
                   placeholder="횟수"
                   keyboardType="numeric"
                   value={medication.times}
-                  onChangeText={(value) => handleInputChange(index, 'times', value)}
-                /><Text>회</Text>
+                  onChangeText={(value) =>
+                    handleInputChange(index, "times", value)
+                  }
+                />
+                <Text style={[{ marginTop: 16, marginBottom: 30 }]}>회</Text>
               </View>
             </View>
           </View>
@@ -230,16 +297,10 @@ export default function PrescriptionWriting({ route }) {
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={[styles.button, styles.submitButton]}
+            style={[styles.buttonSt, styles.EndButton]}
             onPress={handleSubmit}
           >
-            <Text style={styles.buttonText}>처방전 발급</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.cancelButton]}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.buttonText}>취소</Text>
+            <Text style={styles.buttonText}>처방전 작성 완료하기</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -258,17 +319,26 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
   },
+  inputSmall: {
+    width: "40%",
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 0.5,
+    borderRadius: 6,
+    paddingLeft: 10,
+    marginTop: 10,
+    marginRight: 5,
+  },
   paymentContent: {
-    padding: 30,
+    padding: 20,
     backgroundColor: "white",
     borderRadius: 10,
   },
   input: {
     width: "100%",
-    height: 50,
+    height: 40,
     borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 15,
+    borderWidth: 0.5,
     paddingLeft: 10,
   },
   modalContainer: {
@@ -277,14 +347,29 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   modalTitle: {
-    fontSize: 24,
+    fontSize: 23,
     fontWeight: "bold",
+    marginTop: 20,
     marginBottom: 20,
+  },
+  hospitalName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 3,
+  },
+  subName: {
+    fontSize: 14,
+    color: "#A3A3A3",
+    marginBottom: 3,
+  },
+  explainText: {
+    fontSize: 16,
+    marginBottom: 10,
   },
   searchInput: {
     height: 40,
     borderColor: "gray",
-    borderWidth: 1,
+    borderWidth: 0.5,
     marginBottom: 10,
     paddingHorizontal: 10,
   },
@@ -294,6 +379,7 @@ const styles = StyleSheet.create({
     color: "white",
     borderRadius: 5,
     textAlign: "center",
+    marginBottom: 20,
   },
   searchResultContainer: {
     flexDirection: "row",
@@ -315,26 +401,54 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "90%",
+    marginLeft: 20,
   },
   button: {
-    flex: 1,
-    marginHorizontal: 3,
+    width: "30%",
+    height: "5%",
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 6,
   },
   submitButton: {
-    backgroundColor: "#9BD394",
+    backgroundColor: "#76B947",
     alignItems: "center",
+    borderRadius: 8,
     padding: 10,
+    margin: 5,
+    marginLeft: 100,
+  },
+  buttonSt: {
+    width: "95%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 6,
+  },
+  EndButton: {
+    backgroundColor: "#76B947",
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 30,
   },
   cancelButton: {
     borderWidth: 1,
-    borderColor: "#9BD394",
+    borderColor: "#76B947",
     alignItems: "center",
+    borderRadius: 8,
     padding: 10,
+    margin: 5,
+    fontSize: 16,
   },
   buttonText: {
-    color: "black",
+    fontSize: 16,
+    color: "white",
+  },
+  titleText: {
+    fontSize: 17,
+    marginBottom: 15,
   },
   closeButton: {
     marginTop: 20,

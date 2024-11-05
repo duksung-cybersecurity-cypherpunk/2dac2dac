@@ -53,7 +53,6 @@ export default function Home() {
         `http://203.252.213.209:8080/api/v1/doctors/reservations/${doctorInfo}/today`
       );
       const data = await response.json();
-      console.log(data);
 
       const schedule = data.data.scheduledReservationItemList || []; // 기본값 설정
       const num = schedule.reduce((acc, curr) => acc + (curr.length || 0), 0); // 총 객체 수 계산
@@ -84,7 +83,11 @@ export default function Home() {
             <Image
               source={require("../../assets/images/PatientInfo/ListNonExist.png")}
             />
-            <Text style={styles.emptyText}>오늘 진료 예약 내역이 없어요.</Text>
+            <Text style={styles.emptyText}>수락된 진료 내역이 없어요.</Text>
+            <Text style={styles.text}>
+              {" "}
+              놓친 진료 신청 내역이 있는지 확인해보세요.
+            </Text>
           </View>
         ) : (
           <ScrollView style={styles.scrollView}>
@@ -99,7 +102,7 @@ export default function Home() {
                     희망 진료 시간:{" "}
                     {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
                   </Text>
-                  (
+
                   <TouchableOpacity
                     style={styles.prescriptionBlock}
                     onPress={() =>
@@ -109,7 +112,6 @@ export default function Home() {
                   >
                     <Text style={styles.prescriptionText}>진료신청서 보기</Text>
                   </TouchableOpacity>
-                  )
                 </View>
               ))}
           </ScrollView>
@@ -166,7 +168,7 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   hospitalName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     paddingTop: 3,
     marginBottom: 3,
@@ -251,5 +253,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     alignItems: "center",
+  },
+  text: {
+    fontSize: 14,
+    color: "#737373",
+    marginTop: 3,
   },
 });
