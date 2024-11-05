@@ -85,7 +85,7 @@ export default function Home() {
               source={require("../../assets/images/PatientInfo/ListNonExist.png")}
             />
             <Text style={styles.emptyText}>수락된 진료 내역이 없어요.</Text>
-            <Text style={styles.text}>놓친 진료 신청 내역이 있는지 확인해보세요.</Text>
+            <Text style={styles.text}>     놓친 진료 신청 내역이 있는지 확인해보세요.</Text>
           </View>
         ) : (
           <ScrollView style={styles.scrollView}>
@@ -114,7 +114,7 @@ export default function Home() {
     </View>
   );
 }
-
+ 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -250,6 +250,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 14,
-    color: "#737373"
+    color: "#737373",
+    marginTop: 3,
   },
 });
