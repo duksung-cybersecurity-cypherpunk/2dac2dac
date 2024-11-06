@@ -18,6 +18,8 @@ export default function Prescription({ route }) {
   const [cnt, setCnt] = useState();
   const [date, setDate] = useState();
   const [time, setTime] = useState();
+  
+  const [error, setError] = useState(0);
 
   const handleLoad = (userId, data) => {
     navigation.navigate("TreatmentInfoStack", { 
@@ -49,6 +51,7 @@ export default function Prescription({ route }) {
       setitem(data.data.contactDiagList.contactDiagItemList);
       setCnt(data.data.contactDiagList.totalCnt);
     } catch (error) {
+      setError(1);
       console.error("Error fetching data:", error);
     }
   };
@@ -76,7 +79,7 @@ export default function Prescription({ route }) {
     <View style={[{ height: "100%" }, { backgroundColor: "white" }]}>
       <View style={styles.screenContainer}>
         <View style={styles.row}>
-          {cnt === 0 ? (
+          {cnt === 0  || error === 1 ? (
             <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}>
               <Image
                 source={require("../../../../assets/images/PatientInfo/ListNonExist.png")}

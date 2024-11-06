@@ -17,7 +17,9 @@ export default function Vaccination({ route }) {
 
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
-
+  
+  const [error, setError] = useState(0);
+  
   useEffect(() => {
     fetchData();
   }, []);
@@ -53,6 +55,7 @@ export default function Vaccination({ route }) {
       setitem(data.data.vaccinationItemList);
       setCnt(data.data.totalCnt);
     } catch (error) {
+      setError(1);
       console.error("Error fetching data:", error);
     }
   };
@@ -61,7 +64,7 @@ export default function Vaccination({ route }) {
     <View style={[{ height: "100%" }, { backgroundColor: "white" }]}>
       <View style={styles.screenContainer}>
         <View style={styles.row}>
-          {cnt === 0 ? (
+          {cnt === 0 || error === 1 ? (
             <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}>
               <Image
                 source={require("../../../assets/images/PatientInfo/ListNonExist.png")}

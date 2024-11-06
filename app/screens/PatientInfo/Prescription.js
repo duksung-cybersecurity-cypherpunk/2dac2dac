@@ -16,7 +16,7 @@ export default function Prescription({ route }) {
     <View style={styles.blocks}>
 
       <Tab.Navigator
-        initialRouteName="TreatmentDashboard"
+        initialRouteName="PrescriptionDashboard"
         screenOptions={{
           tabBarActiveTintColor: "#050953",
           tabBarInactiveTintColor: "gray", // 선택되지 않은 탭의 텍스트 색상

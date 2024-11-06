@@ -17,6 +17,8 @@ export default function TreatmentNonface({ route }) {
   const [item, setitem] = useState([]);
   const [cnt, setCnt] = useState();
 
+  const [error, setError] = useState(0);
+  
   const handleLoad = (userId, data) => {
     navigation.navigate("TreatmentInfoStack", {
       screen: "NonfaceDetails",
@@ -47,6 +49,7 @@ export default function TreatmentNonface({ route }) {
       setitem(data.data.noncontactDiagList.noncontactDiagItemList);
       setCnt(data.data.noncontactDiagList.totalCnt);
     } catch (error) {
+      setError(1);
       console.error("Error fetching data:", error);
     }
   };
@@ -59,7 +62,7 @@ export default function TreatmentNonface({ route }) {
     <View style={[{ height: "100%" }, { backgroundColor: "white" }]}>
       <View style={styles.screenContainer}>
         <View style={styles.row}>
-          {cnt === 0 ? (
+          {cnt === 0  || error === 1 ? (
             <View style={[{ alignItems: "center" }, { paddingTop: 250 }]}>
               <Image
                 source={require("../../../../assets/images/PatientInfo/ListNonExist.png")}
