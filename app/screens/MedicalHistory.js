@@ -1,22 +1,16 @@
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import dayjs from "dayjs";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, } from "react-native";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// page
+import TobeLIst from "../screens/MedicalHistory/ToBeList";
+import CompletedList from "../screens/MedicalHistory/CompletedList";
+
+const Tab = createMaterialTopTabNavigator();
+
 export default function MedicalHistory() {
-  const navigation = useNavigation();
   const [doctorInfo, setDoctorInfo] = useState(null);
-  const [cnt, setCnt] = useState(0);
-  const [item, setItem] = useState([]);
-  const [toBeItem, setToBeItem] = useState([]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -24,7 +18,6 @@ export default function MedicalHistory() {
         const userInfo = await AsyncStorage.getItem("userInfo");
         const userData = JSON.parse(userInfo);
         setDoctorInfo(userData.id);
-        fetchData();
       } catch (error) {
         console.error("Error fetching user info:", error);
       }
@@ -32,177 +25,68 @@ export default function MedicalHistory() {
 
     fetchUserInfo();
   }, []);
-
-  useEffect(() => {
-    if (doctorInfo) {
-      fetchData();
-    }
-  }, [doctorInfo]);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (doctorInfo) {
-        fetchData();
-      }
-    }, [doctorInfo])
-  );
-
-  const handleBlockPress = (data) => {
-    navigation.navigate("HistoryStack", {
-      screen: "PrescriptionDetails",
-      id: 1,
-      params: { data: data },
-    });
-  };
-  const handleLoad = (doctorId, reservationId) => {
-    navigation.navigate("HistoryStack", {
-      screen: "PrescriptionWriting",
-      id: 2,
-      params: { doctorId: doctorId, reservationId: reservationId },
-    });
-  };
-
-  const fetchData = async () => {
-    try {
-      const response = await fetch(
-        `http://203.252.213.209:8080/api/v1/doctors/noncontactDiag/completed/${doctorInfo}`
-      );
-      const data = await response.json();
-      console.log(data.data.toBeCompleteReservationList);
-      setItem(data.data.completedReservationList);
-      setToBeItem(data.data.toBeCompleteReservationList);
-      setCnt(data.data.totalCnt);
-    } catch (error) {
-      console.error("Error fetching data!:", error);
-    }
-  };
-
+  
   return (
-    <View style={{ height: "100%", backgroundColor: "white" }}>
-      <View style={styles.screenContainer}>
-        <View style={styles.row}>
-          {cnt === 0 ? (
-            <View style={{ alignItems: "center", paddingTop: 250 }}>
-              <Image
-                source={require("../../assets/images/PatientInfo/ListNonExist.png")}
-              />
-              <Text style={styles.emptyText}>완료된 진료 내역이 없어요.</Text>
-            </View>
-          ) : (
-            <ScrollView style={styles.scrollView}>
-              {toBeItem != null &&
-                toBeItem.map((toBeItem) => (
-                  <View
-                    key={toBeItem.noncontactDiagId}
-                    style={styles.hospitalBlock}
-                  >
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.timeText}>
-                        {dayjs(toBeItem.reservationDate).format(
-                          "YYYY.MM.DD HH:mm"
-                        )}
-                      </Text>
-                      <Text style={styles.hospitalName}>
-                        {toBeItem.patientName} 환자
-                      </Text>
-                      <TouchableOpacity
-                        style={styles.vaccinInfo}
-                        onPress={() =>
-                          handleLoad(doctorInfo, toBeItem.reservationId)
-                        }
-                        activeOpacity={0.7}
-                      >
-                        <Text style={styles.prescriptionText}>
-                          처방전 작성하기
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                ))}
-              {item != null &&
-                item.map((item) => (
-                  <View
-                    key={item.noncontactDiagId}
-                    style={styles.hospitalBlock}
-                  >
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.timeText}>
-                        {dayjs(item.reservationDate).format("YYYY.MM.DD HH:mm")}
-                      </Text>
-                      <Text style={styles.hospitalName}>
-                        {item.patientName} 환자
-                      </Text>
-                      <TouchableOpacity
-                        style={styles.vaccinInfo}
-                        onPress={() => handleBlockPress(item.noncontactDiagId)}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={styles.prescriptionText}>
-                          처방전 확인하기
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                ))}
-            </ScrollView>
-          )}
-        </View>
-      </View>
+    <View style={styles.blocks}>
+
+      <Tab.Navigator
+        initialRouteName="MedicalHistoryDashboard"
+        screenOptions={{
+          tabBarActiveTintColor: "#050953",
+          tabBarInactiveTintColor: "gray", // 선택되지 않은 탭의 텍스트 색상
+          tabBarLabelStyle: {
+            fontSize: 14,
+            color: "#47743A",
+            fontWeight: "bold",
+            height: 50,
+            width: "100%",
+          },
+          tabBarStyle: {
+            backgroundColor: "white",
+            height: 50,
+            width: "100%",
+            justifyContent: "center",
+            position: "absolute",
+          },
+          tabBarIndicatorStyle: {
+            backgroundColor: "#76B947",
+            height: 4,
+            width: "15%",
+            marginLeft: 75,
+            alignSelf: "center",
+            justifyContent: "center",
+            borderRadius: 10,
+          },
+        }}
+      >
+        <Tab.Screen
+          name="TobeLIst"
+          component={TobeLIst}
+          options={{ tabBarLabel: "처방전 작성" }}
+          initialParams={{ doctorInfo: doctorInfo }} // doctorInfo 전달
+        />
+
+        <Tab.Screen
+          name="CompletedList"
+          component={CompletedList}
+          options={{ tabBarLabel: "진료 완료" }}
+          initialParams={{ doctorInfo: doctorInfo }} // doctorInfo 전달
+        />
+      </Tab.Navigator>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screenContainer: {
-    flexDirection: "row",
-    backgroundColor: "white",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  scrollView: {
-    flex: 1,
+  blocks: {
+    height: "100%",
     width: "100%",
+    borderColor: "gray",
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
   },
-  vaccinInfo: {
-    height: 40,
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#EBF2EA",
-    borderRadius: 6,
-    marginTop: 15,
-    marginBottom: 15,
-  },
-  hospitalBlock: {
-    flexDirection: "row",
-    height: 140,
-    backgroundColor: "white",
-    padding: 20,
-    borderBottomColor: "#D6D6D6",
-    borderBottomWidth: 1,
-  },
-  hospitalName: {
-    fontSize: 20,
-    fontWeight: "bold",
-    paddingTop: 5,
-  },
-  prescriptionText: {
-    fontSize: 16,
-  },
-  timeText: {
-    fontSize: 14,
-  },
-  emptyText: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 20,
-    paddingLeft: 20,
-    fontWeight: "bold",
-    fontSize: 18,
+  text: {
+    fontSize: 18, // Increase font size
+    fontFamily: "Arial", // Change font family
   },
 });

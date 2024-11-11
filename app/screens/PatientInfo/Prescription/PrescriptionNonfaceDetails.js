@@ -4,6 +4,8 @@ import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 export default function PrescriptionNonfaceDetails({ route }) {
   const { userId, data } = route.params;
   const [item, setItem] = useState([]);
+  
+  const [error, setError] = useState(0);
 
   const fetchData = async () => {
     try {
@@ -15,9 +17,11 @@ export default function PrescriptionNonfaceDetails({ route }) {
         setItem(prescription.data.medicines);
         console.log(item);
       } else {
+        setError(1);
         console.error("Prescription data is undefined");
       }
     } catch (error) {
+      setError(1);
       console.error("Error fetching data:", error);
     }
   };
@@ -28,29 +32,12 @@ export default function PrescriptionNonfaceDetails({ route }) {
 
   return (
     <View style={styles.screenContainer}>
-      <View
-        style={[
-          { padding: 20 },
-          { borderBlockColor: "#EBF2EA" },
-          { borderBottomWidth: 9 },
-        ]}
-      >
-        <Text style={styles.timeText}>{data.treatDate}</Text>
-        <Text style={[styles.hospitalName, { paddingTop: 5 }]}>
-          {data.agencyName}
-        </Text>
-        <Text
-          style={[styles.hospitalInfo, { paddingTop: 15 }]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {data.agencyAddress}
-        </Text>
-        <Text style={styles.hospitalInfo}>{data.agencyTel}</Text>
-      </View>
       <Text style={[styles.titleText, { paddingTop: 10 }, { paddingLeft: 20 }]}>
         처방전
       </Text>
+{      error === 1 ? (
+  <Text>  </Text>
+) : (
       <ScrollView style={[styles.scrollView, { padding: 15 }]}>
         {item.map((item, index) => {
           return (
@@ -69,22 +56,17 @@ export default function PrescriptionNonfaceDetails({ route }) {
                       source={{ uri: item.medicineImageUrl }} // URL 링크로 이미지 표시
                       defaultSource={require("../../../../assets/images/PatientInfo/pills.png")} // 로딩 중 기본 이미지
                     />
-                    <View
-                      style={[
-                        { alignItems: "flex-start" },
-                        { paddingLeft: 10 },
-                      ]}
+                                      <View style={{ flex: 1, paddingLeft: 10 }}> {/* 이미지와 텍스트 사이에 패딩 추가 */}
+                    <Text 
+                      style={styles.hospitalName}
+                      numberOfLines={2}
                     >
-                        <Text 
-                            style={styles.hospitalName}
-                            numberOfLines={2}
-                        >{item.medicineName}</Text>
-                    </View>
+                      {item.medicineName}
+                    </Text>
+                    <Text>{item.medicineClassName}</Text>
+                    <Text numberOfLines={2}>{item.medicineChart}</Text>
                   </View>
-
-                  <Text>{item.medicineClassName}</Text>
-                  <Text numberOfLines={2}>{item.medicineChart}</Text>
-                  
+                  </View>
                   <View style={[styles.row, { paddingTop: 30 }]}>
                     <View style={styles.blockTop}>
                       <Text>투약일 수</Text>
@@ -107,6 +89,7 @@ export default function PrescriptionNonfaceDetails({ route }) {
           );
         })}
       </ScrollView>
+)}
     </View>
   );
 }
