@@ -23,9 +23,9 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./mysql/db:/var/lib/mysql:rw
-      - ./mysql/initdb:/docker-entrypoint-initdb.d:ro
-      - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      - ../mysql/db:/var/lib/mysql:rw
+      - ../mysql/initdb:/docker-entrypoint-initdb.d:ro
+      - ../mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     environment:
       MYSQL_DATABASE: doctech
       MYSQL_ROOT_PASSWORD: root
