@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  application:
+    container_name: doctech-BE
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5050:8080"
+    depends_on:
+      - database
+      - redis
+    environment:
+      TZ: Asia/Seoul
+    networks:
+      - doctech-internal
+
+  database:
+    container_name: doctech-mysql
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql/db:/var/lib/mysql:rw
+      - ./mysql/initdb:/docker-entrypoint-initdb.d:ro
+      - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+    environment:
+      MYSQL_DATABASE: doctech
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      TZ: Asia/Seoul
+    command:
+      - "--bind-address=0.0.0.0"
+      - "--lower_case_table_names=1"
+    networks:
+      - doctech-internal
+
+  redis:
+    container_name: doctech-redis
+    image: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - doctech-internal
+
+networks:
+  doctech-internal:
+    driver: bridge
