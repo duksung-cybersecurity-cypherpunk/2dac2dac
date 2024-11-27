@@ -55,5 +55,7 @@ jobs:
           script_stop: true
           script: |
             cd DocTech/DocTech-backend
+            git pull origin develop
+            
             docker-compose -p doctech down
             docker-compose -p doctech up -d
