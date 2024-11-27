@@ -16,27 +16,8 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
         with:
-          ssh-key: ${{ secrets.REMOTE_SSH_PRIVATE_KEY }}
           token: ${{ secrets.ACTION_TOKEN }}
           submodules: recursive
-
-      # (2) SSH 키 설정 (원격 서버 및 Private Repo 인증)
-      - name: Setup SSH Keys for Private Repo and Server
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.REMOTE_SSH_PRIVATE_KEY }}" > ~/.ssh/aegislenz
-          chmod 600 ~/.ssh/aegislenz
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add ~/.ssh/aegislenz
-          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-
-      # (3) submodule Update
-      - name: Update config submodule
-        run: |
-          git submodule sync
-          git submodule update --init --recursive
 
       # (4) JDK 17 세팅
       - name: Set up JDK 17
@@ -74,5 +55,5 @@ jobs:
           script_stop: true
           script: |
             cd DocTech/DocTech-backend
-            docker-compose pull
-            docker-compose up -d
+            docker-compose -p doctech down
+            docker-compose -p doctech up -d
