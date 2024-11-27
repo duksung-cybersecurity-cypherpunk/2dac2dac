@@ -16,7 +16,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
         with:
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-key: ${{ secrets.REMOTE_SSH_PRIVATE_KEY }}
           token: ${{ secrets.ACTION_TOKEN }}
           submodules: recursive
 
@@ -26,7 +26,7 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/aegislenz
+          echo "${{ secrets.REMOTE_SSH_PRIVATE_KEY }}" > ~/.ssh/aegislenz
           chmod 600 ~/.ssh/aegislenz
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add ~/.ssh/aegislenz
