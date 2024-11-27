@@ -3,9 +3,7 @@ version: "3.8"
 services:
   application:
     container_name: doctech-BE
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: jyjyjy25/doctech:latest
     restart: always
     ports:
       - "5050:8080"

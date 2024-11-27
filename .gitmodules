@@ -1,4 +1,4 @@
 [submodule "submodule-config"]
 	path = submodule-config
-	url = https://github.com/2dac2dac/submodule-config.git
+	url = git@github.com:2dac2dac/submodule-config.git
 	branch = main
