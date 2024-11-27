@@ -40,7 +40,7 @@ jobs:
       # (7) Docker build & push
       - name: Docker build & Push
         run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_ID }}" --password-stdin
+          docker login -u ${{ secrets.DOCKER_ID }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t ${{ secrets.DOCKER_ID }}/doctech .
           docker push ${{ secrets.DOCKER_ID }}/doctech
 
