@@ -27,7 +27,7 @@
 
 <br>
 
-## 👥 Team Members
+## 👥 Developers
 <div align="center">
   
 | [곽수찬](https://github.com/soooochan) | [김지윤](https://github.com/jyjyjy25) |
