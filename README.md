@@ -49,7 +49,7 @@
 <br>
 
 ## 🏗️ Architecture
-![doc'tech-Architecture](https://github.com/user-attachments/assets/5c83dba1-466a-4146-ab97-10091a2656cb)
+![doc'tech-Architecture](https://github.com/user-attachments/assets/ca3e1e3a-bd3b-4f97-8b42-12c808d63535)
 
 <br>
 
