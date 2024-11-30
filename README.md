@@ -1,50 +1,121 @@
-# Welcome to your Expo app 👋
+# 👋 ABOUT Doc'Tech
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<div align="center">  
+  
+  ![로고](https://github.com/user-attachments/assets/d4a9290a-5879-4797-8f0b-a6db2c98819c)
+  
+<img width="417" alt="image" src="https://github.com/user-attachments/assets/85b3d706-b2bd-446b-badc-9c99ca76f584">
 
-## Get started
+기존 비대면 진료에서는 과도한 개인 진료 서류 제출, 신속한 처방의 어려움, 불필요한 개인정보 노출 등의 문제가 있었습니다. <br>
+이를 해결하기 위해 의료 마이데이터를 활용하여 환자가 자신의 건강 상태를 효율적으로 관리하고, <br>이를 바탕으로 비대면 진료 서비스에서 정확한 진단을 받을 수 있도록 지원합니다.
+</div>
+<br>
 
-1. Install dependencies
+## 🎬 시연 영상
 
-   ```bash
-   npm install
-   ```
+<br>
 
-2. Start the app
+## 🔍 Main Features
+### 1️⃣ 의료 마이데이터 연동
+마이데이터 API 서버를 통해 내 의료 마이데이터(건강검진/예방접종/진료이력/투약이력)를 한 곳에서 모아볼 수 있습니다.
 
-   ```bash
-    npx expo start
-   ```
+### 2️⃣ 비대면 진료
+언제 어디서나 쉽고 간편하게 예약하고 비대면 진료를 받을 수 있습니다.<br>
+이때, 비식별화된 마이데이터가 사용자 동의 하에 의사와 공유되어 보다 정확한 진료가 이루어집니다.
 
-In the output, you'll find options to open the app in a
+### 3️⃣ 빠른 지도 검색
+인근 병원 · 약국 · 응급실을 지도를 통해 빠르게 찾아볼 수 있습니다.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+<br>
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 👥 Developers
+<div align="center">
+  
+| [곽수찬](https://github.com/soooochan) | [유혜선](https://github.com/Hyeseon00) |
+|--------|------- |
+| <img width="300px" src= "https://github.com/user-attachments/assets/beac5c0a-c58c-4374-9a2c-35e29f3f5552"> | <img width="290px" src="https://github.com/user-attachments/assets/321710ea-c916-4ea6-9948-86d309e4e8f9"> | 
+| ✔️ 온보딩 화면 <br> ✔️ 회원가입/로그인 화면 <br> ✔️ 진료 내역 화면 <br> | ✔️ 환자 정보 비식별화 기능 <br> ✔️ 홈 화면 <br> ✔️ 처방전 작성 기능 <br> ✔️ 환자 의료기록 열람 및 조회 기능 <br> |
+</div>
 
-## Get a fresh project
+<br>
 
-When you're ready, run:
+## 🎨 User Flow
+<div align="center"> 
+  
+  ![doctech-userflow](https://github.com/user-attachments/assets/f3bb8d4c-1481-42be-aeb7-333db236df46)
+</div>
 
-```bash
-npm run reset-project
+<br>
+
+## 🚀 로컬 실행 커맨드
+1. node_modules 설치<br>
+
+```
+npm install --force
+```
+호환되지 않는 라이브러리가 있기 때문에 --force 명령어로 설치하여야 합니다.
+
+2. 개발 환경에서 시작
+```
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+<br>
 
-## Learn more
+## ⚒️ Stacks
 
-To learn more about developing your project with Expo, look at the following resources:
+| Skill | Name |
+|--------|------- |
+| Language | `JavaScript` |
+| Framework | `React.js` |
+| Library | `React Native`, `Axios`, `Expo`, `React Navigation` |
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+<br>
 
-## Join the community
+## 📜 Code Covention
+| 항목                | 규칙                                                                                  |
+|---------------------|---------------------------------------------------------------------------------------|
+| `Function`              | **PascalCase**                                                                         |
+| `Variable`                | **camelCase**                                                                    |                                                                       
 
-Join our community of developers creating universal apps.
+<br>
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 🗂️ Package
+```
+├── 📁 app                      
+│   ├── 📁 Components           # 재사용 가능한 컴포넌트 디렉토리
+│   ├── 📁 Navigator            # 화면 간 네비게이션 설정 디렉토리
+│   └── 📁 screens              # 각 화면별 컴포넌트 디렉토리
+│       ├── 📁 Login            # 로그인 화면 관련 파일
+│       ├── 📁 MedicalHistory   # 의료 기록 화면 관련 파일
+│       ├── 📁 PatientInfo      # 환자 정보 화면 관련 파일
+│       ├── 📁 Reservation      # 예약 화면 관련 파일
+│       ├── 📄 Home.js          # 홈 화면 컴포넌트
+│       ├── 📄 MedicalHistory.js# 의료 기록 메인 화면
+│       ├── 📄 MyPage.js        # 내 정보 화면 컴포넌트
+│       ├── 📄 OnboardingScreen.js # 온보딩 화면
+│       ├── 📄 Reservation.js   # 예약 메인 화면
+│       └── 📄 index.js         # 화면 엔트리 포인트
+├── 📁 assets                   # 애플리케이션 정적 자산 디렉토리
+│   ├── 📁 fonts                # 폰트 파일 디렉토리
+│   └── 📁 images               # 이미지 파일 디렉토리
+├── 📁 components               # 재사용 가능한 컴포넌트 디렉토리
+│   ├── 📁 __tests__            # 테스트 파일 디렉토리
+│   └── 📁 navigation           # 네비게이션 관련 컴포넌트 디렉토리
+│       ├── 📄 Collapsible.tsx  # 확장/축소 가능한 UI 컴포넌트
+│       ├── 📄 ExternalLink.tsx # 외부 링크 관련 컴포넌트
+│       ├── 📄 HelloWave.tsx    # 웨이브 애니메이션 컴포넌트
+│       ├── 📄 ParallaxScrollView.tsx # 패럴럭스 스크롤뷰 컴포넌트
+│       ├── 📄 ThemedText.tsx   # 테마 적용 텍스트 컴포넌트
+│       └── 📄 ThemedView.tsx   # 테마 적용 뷰 컴포넌트
+├── 📁 constants                # 상수 값 관련 디렉토리
+│   └── 📄 Colors.ts            # 색상 정의 파일
+├── 📁 hooks                    # 커스텀 훅 디렉토리
+│   ├── 📄 useColorScheme.ts    # 색상 테마 관련 훅
+│   ├── 📄 useColorScheme.web.ts # 웹 색상 테마 관련 훅
+│   └── 📄 useThemeColor.ts     # 테마 색상 관리 훅
+├── 📁 scripts                  # 프로젝트 스크립트 디렉토리
+├── 📄 .gitignore               # Git 무시 설정 파일
+├── 📄 app.json                 # 앱 설정 JSON 파일
+└── 📄 babel.config.js          # Babel 설정 파일
+```
