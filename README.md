@@ -12,9 +12,10 @@
 <br>
 
 ## 🎬 시연 영상
-환자, 의사 
 <div align="center">  
-https://github.com/user-attachments/assets/a34880ca-52de-4478-ab84-1f46fb7f9c8e
+<div>의사</div>
+https://github.com/user-attachments/assets/2d87d099-1723-4084-9d1d-81fc0f523dba
+
 </div>
 
 
