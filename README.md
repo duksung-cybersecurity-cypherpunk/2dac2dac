@@ -11,6 +11,10 @@
 
   [🎬 Doc'tech 시연영상 🎬]()
   
+
+https://github.com/user-attachments/assets/18c121a6-76f3-48ff-84cd-d8a59b06c7ba
+
+
 </div>
 <br>
 
