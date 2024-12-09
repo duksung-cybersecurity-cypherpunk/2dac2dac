@@ -12,7 +12,11 @@
   [🎬 Doc'tech 시연영상 🎬]()
   
 
-https://github.com/user-attachments/assets/18c121a6-76f3-48ff-84cd-d8a59b06c7ba
+
+https://github.com/user-attachments/assets/d6238e70-c5b9-430a-bdb8-7448ec906267
+
+
+
 
 
 </div>
