@@ -12,9 +12,10 @@
 <br>
 
 ## 🎬 시연 영상
-<div align="center">  
-https://github.com/user-attachments/assets/b72a54b9-5436-4cdf-9e01-d955543bdd23
-</div>
+
+
+https://github.com/user-attachments/assets/9b919031-c3f0-4deb-8a07-3f4b43184ecd
+
 
 
 <br>
