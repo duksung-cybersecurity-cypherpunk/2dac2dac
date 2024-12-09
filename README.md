@@ -13,8 +13,7 @@
 
 ## 🎬 시연 영상
 <div align="center">  
-https://github.com/user-attachments/assets/2d87d099-1723-4084-9d1d-81fc0f523dba
-
+https://github.com/user-attachments/assets/b72a54b9-5436-4cdf-9e01-d955543bdd23
 </div>
 
 
