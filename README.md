@@ -12,8 +12,8 @@
 <br>
 
 ## 🎬 시연 영상
+환자, 의사 
 <div align="center">  
-### 의사
 https://github.com/user-attachments/assets/a34880ca-52de-4478-ab84-1f46fb7f9c8e
 </div>
 
