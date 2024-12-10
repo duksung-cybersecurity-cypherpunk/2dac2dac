@@ -14,25 +14,10 @@
 
 ## 🎬 시연 영상
 
-<div style="display: flex; justify-content: space-between; gap: 20px; width: 100%;">
-  <!-- 환자 시연 영상 -->
-  <div style="flex: 1; max-width: 45%; text-align: center;">
-    <a href="https://github.com/user-attachments/assets/cb26223d-2dfe-4278-9bd5-c391fe0a3843" target="_blank" style="text-decoration: none; color: inherit;">
-      <img src="https://github.com/user-attachments/assets/33f2136b-3ca0-4046-b246-c96438ca430e" style="width: 100%; height: auto;"/>
-      <p>환자 시연 영상 보기</p>
-    </a>
-  </div>
+| 환자 시연 영상 | 의사 시연 영상 |
+|----------------|----------------|
+| [![환자 시연 영상](https://github.com/user-attachments/assets/33f2136b-3ca0-4046-b246-c96438ca430e)](https://github.com/user-attachments/assets/cb26223d-2dfe-4278-9bd5-c391fe0a3843) <br> 환자 시연 영상 보기 | [![의사 시연 영상](https://github.com/user-attachments/assets/5fe3ff3c-2c5e-4823-96be-a9bda5dfd4ae)](https://github.com/user-attachments/assets/7925b290-da76-494f-97a3-a65a3decab5f) <br> 의사 시연 영상 보기 |
 
-  <!-- 의사 시연 영상 -->
-  <div style="flex: 1; max-width: 45%; text-align: center;">
-    <a href="https://github.com/user-attachments/assets/7925b290-da76-494f-97a3-a65a3decab5f" target="_blank" style="text-decoration: none; color: inherit;">
-      <img src="https://github.com/user-attachments/assets/5fe3ff3c-2c5e-4823-96be-a9bda5dfd4ae" style="width: 100%; height: auto;"/>
-      <p>의사 시연 영상 보기</p>
-    </a>
-  </div>
-</div>
-
-</div>
 
 
 
