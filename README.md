@@ -15,11 +15,12 @@
 ## 🎬 시연 영상
 
 <div style="display: flex; justify-content: space-between; gap: 20px;">
-
-
-https://github.com/user-attachments/assets/0e7999d4-15a7-47c3-9be2-698ae0776966
-
-
+  <a href="https://github.com/user-attachments/assets/0e7999d4-15a7-47c3-9be2-698ae0776966" target="_blank">
+    [영상 1 보기](https://github.com/user-attachments/assets/0e7999d4-15a7-47c3-9be2-698ae0776966)
+  </a>
+  <a href="https://github.com/user-attachments/assets/0e7999d4-15a7-47c3-9be2-698ae0776966" target="_blank">
+    [영상 2 보기](https://github.com/user-attachments/assets/0e7999d4-15a7-47c3-9be2-698ae0776966)
+  </a>
 </div>
 
 
