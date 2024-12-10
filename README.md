@@ -11,12 +11,18 @@
 </div>
 <br>
 
+
 ## 🎬 시연 영상
 
 <div style="display: flex; justify-content: space-between; gap: 20px;">
-  <iframe src="https://github.com/user-attachments/assets/c1a64d80-dbf9-4f16-b10a-497b71a0c593" width="45%" height="300" frameborder="0"></iframe>
-  <iframe src="https://github.com/user-attachments/assets/9b919031-c3f0-4deb-8a07-3f4b43184ecd" width="45%" height="300" frameborder="0"></iframe>
+  <a href="https://github.com/user-attachments/assets/c1a64d80-dbf9-4f16-b10a-497b71a0c593" target="_blank">
+    [영상 1 보기](https://github.com/user-attachments/assets/c1a64d80-dbf9-4f16-b10a-497b71a0c593)
+  </a>
+  <a href="https://github.com/user-attachments/assets/9b919031-c3f0-4deb-8a07-3f4b43184ecd" target="_blank">
+    [영상 2 보기](https://github.com/user-attachments/assets/9b919031-c3f0-4deb-8a07-3f4b43184ecd)
+  </a>
 </div>
+
 <br>
 
 ## 🔍 Main Features
