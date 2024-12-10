@@ -14,14 +14,9 @@
 
 ## 🎬 시연 영상
 
-
 [환자 시연 영상 보기](https://github.com/user-attachments/assets/cb26223d-2dfe-4278-9bd5-c391fe0a3843)
 
-
-
 [의사 시연 영상 보기](https://github.com/user-attachments/assets/7925b290-da76-494f-97a3-a65a3decab5f)
-
-
 
 
 <br>
