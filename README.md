@@ -14,6 +14,10 @@
 ## 🎬 시연 영상
 
 
+https://github.com/user-attachments/assets/c1a64d80-dbf9-4f16-b10a-497b71a0c593
+
+
+
 https://github.com/user-attachments/assets/9b919031-c3f0-4deb-8a07-3f4b43184ecd
 
 <br>
